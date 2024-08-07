@@ -19,7 +19,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt install -y clang-format ninja-build
+          sudo apt install -y clang-format \
+            ninja-build \
+            extra-cmake-modules \
+            gettext
 
       - name: Lint
         run: |
