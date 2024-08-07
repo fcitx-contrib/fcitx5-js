@@ -34,6 +34,7 @@ jobs:
 
       - name: Build
         run: |
+          ./install-deps.sh
           . emsdk/emsdk_env.sh
           export EMCC_FORCE_STDLIBS=libc++
           pushd fcitx5 && git apply ../patches/fcitx5.patch && popd
