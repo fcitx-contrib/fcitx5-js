@@ -1,0 +1,7 @@
+[Addon]
+Name=WASM Frontend
+Type=StaticLibrary
+Library=libwasmfrontend
+Category=Frontend
+Version=@PROJECT_VERSION@
+Configurable=True

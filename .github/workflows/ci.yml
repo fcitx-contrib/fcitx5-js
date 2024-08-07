@@ -1,0 +1,62 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    env:
+      EMSCRIPTEN_VERSION: '3.1.64'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt install -y clang-format ninja-build
+
+      - name: Lint
+        run: |
+          find src wasmfrontend -name '*.h' -o -name '*.cpp' | xargs clang-format -Werror --dry-run
+
+      - name: Install emsdk
+        run: |
+          git clone https://github.com/emscripten-core/emsdk
+          cd emsdk
+          ./emsdk install ${{ env.EMSCRIPTEN_VERSION }}
+          ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
+
+      - name: Build
+        run: |
+          . emsdk/emsdk_env.sh
+          export EMCC_FORCE_STDLIBS=libc++
+          pushd fcitx5 && git apply ../patches/fcitx5.patch && popd
+          emcmake cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr
+          cmake --build build || true
+          DESTDIR=$(pwd)/build/sysroot cmake --install build/fcitx5
+          DESTDIR=$(pwd)/build/sysroot cmake --install build/wasmfrontend
+          cmake --build build
+          tar chjvf fcitx5-js.tar.bz2 preview
+
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+
+      - name: Release
+        # if: ${{ github.ref == 'refs/heads/master' }}
+        uses: 'marvinpinto/action-automatic-releases@latest'
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: latest
+          prerelease: true
+          title: "Nightly Build"
+          files: |
+            fcitx5-js.tar.bz2

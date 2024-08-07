@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <textarea></textarea>
+    <script src="./Fcitx5.js"></script>
+    <script>
+      const textarea = document.querySelector('textarea')
+      let focus = false
+      textarea.addEventListener('focus', () => {
+        focus = true
+        Module.ccall('focus_in', 'void', [], [])
+      })
+      textarea.addEventListener('blur', () => {
+        focus = false
+        Module.ccall('focus_out', 'void', [], [])
+      })
+      textarea.addEventListener('keydown', e => {
+        if (!focus) {
+          return
+        }
+        console.log(Module.ccall('process_key', 'bool', ['string'], [e.key]))
+      })
+    </script>
+  </body>
+</html>
