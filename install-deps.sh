@@ -1,5 +1,6 @@
 deps=(
   fmt
+  json
 )
 
 EXTRACT_DIR=build/sysroot/usr
