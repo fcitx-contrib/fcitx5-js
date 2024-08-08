@@ -35,5 +35,7 @@ set(CMAKE_INSTALL_LIBDATADIR "${CMAKE_INSTALL_PREFIX}/lib")
 add_subdirectory(fcitx5)
 
 add_subdirectory(wasmfrontend)
+add_subdirectory(fcitx5-webview)
+add_subdirectory(webpanel)
 
 add_subdirectory(src)
