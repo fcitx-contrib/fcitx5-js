@@ -30,6 +30,7 @@ option(ENABLE_EMOJI "" OFF)
 option(ENABLE_LIBUUID "" OFF)
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
 option(BUILD_SPELL_DICT "" OFF)
+option(BUILD_PREVIEW "" OFF)
 
 set(CMAKE_INSTALL_LIBDATADIR "${CMAKE_INSTALL_PREFIX}/lib")
 add_subdirectory(fcitx5)
