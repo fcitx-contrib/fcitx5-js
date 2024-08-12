@@ -49,6 +49,7 @@ jobs:
           DESTDIR=$(pwd)/build/sysroot cmake --install build/wasmfrontend
           cmake --build build
           tar chjvf fcitx5-js.tar.bz2 preview
+          cd build/sysroot/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib
 
       - name: Setup tmate session
         if: ${{ failure() }}
@@ -64,3 +65,4 @@ jobs:
           title: "Nightly Build"
           files: |
             fcitx5-js.tar.bz2
+            fcitx5-js-dev.tar.bz2
