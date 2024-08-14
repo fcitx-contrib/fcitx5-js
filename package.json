@@ -1,0 +1,25 @@
+{
+  "name": "fcitx5-js",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "description": "Fcitx5 as a JavaScript library",
+  "type": "module",
+  "files": [
+    "page",
+    "dist"
+  ],
+  "scripts": {
+    "lint": "eslint page",
+    "lint:fix": "eslint page --fix",
+    "check": "tsc --noEmit",
+    "build": "node scripts/build.mjs",
+    "prepack": "rm -rf dist && cp -rL preview dist"
+  },
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.25.1",
+    "esbuild": "^0.23.0",
+    "eslint": "^9.9.0",
+    "typescript": "^5.5.4"
+  }
+}

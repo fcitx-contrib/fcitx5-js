@@ -1,3 +1,9 @@
 .cache
 *.tar.bz2
+*.tgz
 build
+dist
+node_modules
+pnpm-lock.yaml
+preview/index.js
+preview/index.js.map
