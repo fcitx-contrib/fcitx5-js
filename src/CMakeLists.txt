@@ -11,5 +11,6 @@ target_link_libraries(Fcitx5
     "-Lfcitx5/src/lib/fcitx-utils"
     "-Lfcitx5/src/lib/fcitx-config"
     Fcitx5::Core
+    webpanel
     wasmfrontend
 )

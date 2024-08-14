@@ -17,16 +17,22 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
       - name: Install dependencies
         run: |
           sudo apt install -y clang-format \
             ninja-build \
             extra-cmake-modules \
             gettext
+          npm i -g pnpm
+          pnpm --prefix=fcitx5-webview i
 
       - name: Lint
         run: |
-          find src wasmfrontend -name '*.h' -o -name '*.cpp' | xargs clang-format -Werror --dry-run
+          find src wasmfrontend webpanel -name '*.h' -o -name '*.cpp' | xargs clang-format -Werror --dry-run
 
       - name: Install emsdk
         run: |
@@ -40,13 +46,15 @@ jobs:
           ./install-deps.sh
           . emsdk/emsdk_env.sh
           export EMCC_FORCE_STDLIBS=libc++
+          export FCITX_DISTRIBUTION=fcitx5-js
           pushd fcitx5 && git apply ../patches/fcitx5.patch && popd
-          emcmake cmake -B build -G Ninja \
+          PKG_CONFIG_PATH=build/sysroot/usr/share/pkgconfig emcmake cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=/usr
           cmake --build build || true
           DESTDIR=$(pwd)/build/sysroot cmake --install build/fcitx5
           DESTDIR=$(pwd)/build/sysroot cmake --install build/wasmfrontend
+          DESTDIR=$(pwd)/build/sysroot cmake --install build/webpanel
           cmake --build build
           tar chjvf fcitx5-js.tar.bz2 preview
           cd build/sysroot/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib
