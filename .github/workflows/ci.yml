@@ -17,12 +17,18 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
       - name: Install dependencies
         run: |
           sudo apt install -y clang-format \
             ninja-build \
             extra-cmake-modules \
             gettext
+          npm i -g pnpm
+          pnpm --prefix=fcitx5-webview i
 
       - name: Lint
         run: |
