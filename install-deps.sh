@@ -12,4 +12,4 @@ for dep in "${deps[@]}"; do
   tar xjvf cache/$file -C $EXTRACT_DIR
 done
 
-sed -i "s|/usr/include|$(pwd)/$(EXTRACT_DIR)/include|" $EXTRACT_DIR/share/pkgconfig/nlohmann_json.pc
+sed -i "s|/usr/include|$(pwd)/$EXTRACT_DIR/include|" $EXTRACT_DIR/share/pkgconfig/nlohmann_json.pc

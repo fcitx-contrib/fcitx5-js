@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.27)
 
-project(fcitx5-wasm VERSION 0.1.0)
+project(fcitx5-js VERSION 0.1.0)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -28,7 +28,6 @@ option(USE_SYSTEMD "" OFF)
 option(ENABLE_XDGAUTOSTART "" OFF)
 option(ENABLE_EMOJI "" OFF)
 option(ENABLE_LIBUUID "" OFF)
-option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
 option(BUILD_SPELL_DICT "" OFF)
 option(BUILD_PREVIEW "" OFF)
 

@@ -1,4 +1,5 @@
 #include "../wasmfrontend/wasmfrontend.h"
+#include "../webpanel/webpanel.h"
 #include <emscripten.h>
 #include <fcitx/instance.h>
 #include <iostream>
@@ -6,8 +7,11 @@
 using namespace fcitx;
 
 WasmFrontendFactory wasmFrontendFactory;
-StaticAddonRegistry staticAddons = {std::make_pair<std::string, AddonFactory *>(
-    "wasmfrontend", &wasmFrontendFactory)};
+WebPanelFactory webPanelFactory;
+StaticAddonRegistry staticAddons = {
+    std::make_pair<std::string, AddonFactory *>("wasmfrontend",
+                                                &wasmFrontendFactory),
+    std::make_pair<std::string, AddonFactory *>("webpanel", &webPanelFactory)};
 
 std::unique_ptr<Instance> instance;
 WasmFrontend *frontend;
