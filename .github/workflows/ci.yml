@@ -28,11 +28,14 @@ jobs:
             extra-cmake-modules \
             gettext
           npm i -g pnpm
+          pnpm i
           pnpm --prefix=fcitx5-webview i
 
       - name: Lint
         run: |
           find src wasmfrontend webpanel -name '*.h' -o -name '*.cpp' | xargs clang-format -Werror --dry-run
+          pnpm run lint
+          pnpm run check
 
       - name: Install emsdk
         run: |
@@ -56,6 +59,7 @@ jobs:
           DESTDIR=$(pwd)/build/sysroot cmake --install build/wasmfrontend
           DESTDIR=$(pwd)/build/sysroot cmake --install build/webpanel
           cmake --build build
+          pnpm run build
           tar chjvf fcitx5-js.tar.bz2 preview
           cd build/sysroot/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib
 
