@@ -291,9 +291,6 @@ FCITX_CONFIGURATION(
         this, "HorizontalDividerWidth", _("Horizontal divider width (px)"), 1,
         IntConstrain(0, BORDER_WIDTH_MAX)};);
 
-FCITX_CONFIGURATION(UnsafeAPI, Option<bool> curl{this, "EnableUnsafeCurlAPI",
-                                                 "curl", false};);
-
 FCITX_CONFIGURATION(
     Advanced,
     OptionWithAnnotation<std::string, CssAnnotation> userCss{
@@ -304,9 +301,7 @@ FCITX_CONFIGURATION(
                               _("I know there may be risks for using plugins"),
                               false};
     OptionWithAnnotation<std::vector<std::string>, PluginAnnotation> plugins{
-        this, "Plugins", _("Plugins"), {}};
-    Option<UnsafeAPI> unsafeAPI{this, "UnsafeAPI",
-                                _("Dangerous API for JavaScript plugins")};);
+        this, "Plugins", _("Plugins"), {}};);
 
 FCITX_CONFIGURATION(
     WebPanelConfig, Option<BasicConfig> basic{this, "Basic", _("Basic")};
@@ -325,7 +320,7 @@ enum class PanelShowFlag : int;
 using PanelShowFlags = Flags<PanelShowFlag>;
 
 class WebPanel final : public UserInterface {
-public:
+  public:
     WebPanel(Instance *);
     virtual ~WebPanel() = default;
 
@@ -347,7 +342,7 @@ public:
     void updateInputPanel(const Text &preedit, const Text &auxUp,
                           const Text &auxDown);
 
-private:
+  private:
     Instance *instance_;
     std::shared_ptr<candidate_window::CandidateWindow> window_;
 
@@ -373,7 +368,7 @@ private:
 };
 
 class WebPanelFactory : public AddonFactory {
-public:
+  public:
     AddonInstance *create(AddonManager *manager) override {
         return new WebPanel(manager->instance());
     }

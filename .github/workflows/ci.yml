@@ -32,7 +32,7 @@ jobs:
 
       - name: Lint
         run: |
-          find src wasmfrontend -name '*.h' -o -name '*.cpp' | xargs clang-format -Werror --dry-run
+          find src wasmfrontend webpanel -name '*.h' -o -name '*.cpp' | xargs clang-format -Werror --dry-run
 
       - name: Install emsdk
         run: |

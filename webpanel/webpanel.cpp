@@ -9,121 +9,121 @@ WebPanel::WebPanel(Instance *instance)
     : instance_(instance),
       window_(std::make_shared<candidate_window::WebviewCandidateWindow>()) {
     window_->set_select_callback([this](int index) {
-            auto ic = instance_->mostRecentInputContext();
-            const auto &list = ic->inputPanel().candidateList();
-            if (!list)
-                return;
-            if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
-                const auto &bulk = list->toBulk();
-                if (!bulk) {
-                    return;
-                }
-                try {
-                    bulk->candidateFromAll(index).select(ic);
-                } catch (const std::invalid_argument &e) {
-                    FCITX_ERROR() << "select candidate index out of range";
-                }
+        auto ic = instance_->mostRecentInputContext();
+        const auto &list = ic->inputPanel().candidateList();
+        if (!list)
+            return;
+        if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
+            const auto &bulk = list->toBulk();
+            if (!bulk) {
                 return;
             }
             try {
-                // Engine is responsible for updating UI
-                list->candidate(index).select(ic);
+                bulk->candidateFromAll(index).select(ic);
             } catch (const std::invalid_argument &e) {
                 FCITX_ERROR() << "select candidate index out of range";
             }
+            return;
+        }
+        try {
+            // Engine is responsible for updating UI
+            list->candidate(index).select(ic);
+        } catch (const std::invalid_argument &e) {
+            FCITX_ERROR() << "select candidate index out of range";
+        }
     });
     // Doesn't have any effect now.
     window_->set_highlight_callback([this](int index) {
-            auto ic = instance_->mostRecentInputContext();
-            const auto &list = ic->inputPanel().candidateList();
-            if (!list)
+        auto ic = instance_->mostRecentInputContext();
+        const auto &list = ic->inputPanel().candidateList();
+        if (!list)
+            return;
+        if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
+            const auto bulkCursor = list->toBulkCursor();
+            if (!bulkCursor) {
                 return;
-            if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
-                const auto bulkCursor = list->toBulkCursor();
-                if (!bulkCursor) {
-                    return;
-                }
-                return bulkCursor->setGlobalCursorIndex(index);
             }
+            return bulkCursor->setGlobalCursorIndex(index);
+        }
     });
     window_->set_page_callback([this](bool next) {
-            auto ic = instance_->mostRecentInputContext();
-            const auto &list = ic->inputPanel().candidateList();
-            if (!list)
-                return;
-            auto *pageableList = list->toPageable();
-            if (!pageableList)
-                return;
-            if (next) {
-                pageableList->next();
-            } else {
-                pageableList->prev();
-            }
-            // UI is responsible for updating UI
-            ic->updateUserInterface(UserInterfaceComponent::InputPanel);
+        auto ic = instance_->mostRecentInputContext();
+        const auto &list = ic->inputPanel().candidateList();
+        if (!list)
+            return;
+        auto *pageableList = list->toPageable();
+        if (!pageableList)
+            return;
+        if (next) {
+            pageableList->next();
+        } else {
+            pageableList->prev();
+        }
+        // UI is responsible for updating UI
+        ic->updateUserInterface(UserInterfaceComponent::InputPanel);
     });
     window_->set_scroll_callback(
         [this](int start, int count) { scroll(start, count); });
     window_->set_ask_actions_callback([&](int index) {
-            auto ic = instance_->mostRecentInputContext();
-            const auto &list = ic->inputPanel().candidateList();
-            if (!list)
+        auto ic = instance_->mostRecentInputContext();
+        const auto &list = ic->inputPanel().candidateList();
+        if (!list)
+            return;
+        if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
+            const auto &bulk = list->toBulk();
+            if (!bulk) {
                 return;
-            if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
-                const auto &bulk = list->toBulk();
-                if (!bulk) {
-                    return;
-                }
-                auto *actionableList = list->toActionable();
-                if (!actionableList) {
-                    return;
-                }
-                try {
-                    auto &candidate = bulk->candidateFromAll(index);
-                    if (actionableList->hasAction(candidate)) {
-                        std::vector<candidate_window::CandidateAction> actions;
-                        for (const auto &action :
-                             actionableList->candidateActions(candidate)) {
-                            actions.push_back({action.id(), action.text()});
-                        }
-                        window_->answer_actions(actions);
-                    }
-                } catch (const std::invalid_argument &e) {
-                    FCITX_ERROR() << "action candidate index out of range";
-                }
             }
-    });
-    window_->set_action_callback([this](int index, int id) {
-            auto ic = instance_->mostRecentInputContext();
-            const auto &list = ic->inputPanel().candidateList();
-            if (!list)
-                return;
             auto *actionableList = list->toActionable();
-            if (!actionableList)
-                return;
-            if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
-                const auto &bulk = list->toBulk();
-                if (!bulk) {
-                    return;
-                }
-                try {
-                    const auto &candidate = bulk->candidateFromAll(index);
-                    if (actionableList->hasAction(candidate)) {
-                        actionableList->triggerAction(candidate, id);
-                    }
-                } catch (const std::invalid_argument &e) {
-                    FCITX_ERROR() << "action candidate index out of range";
-                }
+            if (!actionableList) {
                 return;
             }
             try {
-                const auto &candidate = list->candidate(index);
+                auto &candidate = bulk->candidateFromAll(index);
+                if (actionableList->hasAction(candidate)) {
+                    std::vector<candidate_window::CandidateAction> actions;
+                    for (const auto &action :
+                         actionableList->candidateActions(candidate)) {
+                        actions.push_back({action.id(), action.text()});
+                    }
+                    window_->answer_actions(actions);
+                }
+            } catch (const std::invalid_argument &e) {
+                FCITX_ERROR() << "action candidate index out of range";
+            }
+        }
+    });
+    window_->set_action_callback([this](int index, int id) {
+        auto ic = instance_->mostRecentInputContext();
+        const auto &list = ic->inputPanel().candidateList();
+        if (!list)
+            return;
+        auto *actionableList = list->toActionable();
+        if (!actionableList)
+            return;
+        if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
+            const auto &bulk = list->toBulk();
+            if (!bulk) {
+                return;
+            }
+            try {
+                const auto &candidate = bulk->candidateFromAll(index);
                 if (actionableList->hasAction(candidate)) {
                     actionableList->triggerAction(candidate, id);
                 }
             } catch (const std::invalid_argument &e) {
                 FCITX_ERROR() << "action candidate index out of range";
             }
+            return;
+        }
+        try {
+            const auto &candidate = list->candidate(index);
+            if (actionableList->hasAction(candidate)) {
+                actionableList->triggerAction(candidate, id);
+            }
+        } catch (const std::invalid_argument &e) {
+            FCITX_ERROR() << "action candidate index out of range";
+        }
     });
     window_->set_init_callback([this]() { reloadConfig(); });
     eventHandler_ = instance_->watchEvent(
@@ -133,12 +133,12 @@ WebPanel::WebPanel(Instance *instance)
             if (keyEvent.isRelease()) {
                 return;
             }
-            // if (keyEvent.key().checkKeyList(*config_.advanced->copyHtml)) {
-            //     static_cast<candidate_window::WebviewCandidateWindow *>(
-            //         window_.get())
-            //         ->copy_html();
-            //     return keyEvent.filterAndAccept();
-            // }
+            if (keyEvent.key().checkKeyList(*config_.advanced->copyHtml)) {
+                static_cast<candidate_window::WebviewCandidateWindow *>(
+                    window_.get())
+                    ->copy_html();
+                return keyEvent.filterAndAccept();
+            }
             if (scrollState_ == candidate_window::scroll_state_t::ready &&
                 keyEvent.key().checkKeyList(*config_.scrollMode->expand)) {
                 expand();
@@ -369,8 +369,7 @@ void WebPanel::updateInputPanel(const Text &preedit, const Text &auxUp,
     updatePanelShowFlags(!auxDown.empty(), PanelShowFlag::HasAuxDown);
 }
 
-void WebPanel::updateClient(InputContext *ic) {
-}
+void WebPanel::updateClient(InputContext *ic) {}
 
 /// Before calling this, the panel states must already be initialized
 /// synchronously, by using set_candidates, etc.
@@ -386,45 +385,44 @@ void WebPanel::showAsync(bool show) {
 }
 
 void WebPanel::scroll(int start, int count) {
-        if (scrollState_ == candidate_window::scroll_state_t::none) {
-            return;
+    if (scrollState_ == candidate_window::scroll_state_t::none) {
+        return;
+    }
+    auto ic = instance_->mostRecentInputContext();
+    if (start < 0) { // collapse
+        return collapse();
+    }
+    const auto &list = ic->inputPanel().candidateList();
+    if (!list) {
+        return;
+    }
+    const auto &bulk = list->toBulk();
+    if (!bulk) {
+        return;
+    }
+    int size = bulk->totalSize();
+    int end = size < 0 ? start + count : std::min(start + count, size);
+    bool endReached = size == end;
+    std::vector<candidate_window::Candidate> candidates;
+    for (int i = start; i < end; ++i) {
+        try {
+            auto &candidate = bulk->candidateFromAll(i);
+            candidates.push_back(
+                {instance_->outputFilter(ic, candidate.text()).toString(),
+                 "",
+                 instance_->outputFilter(ic, candidate.comment()).toString(),
+                 {}});
+        } catch (const std::invalid_argument &e) {
+            // size == -1 but actual limit is reached
+            endReached = true;
+            break;
         }
-        auto ic = instance_->mostRecentInputContext();
-        if (start < 0) { // collapse
-            return collapse();
-        }
-        const auto &list = ic->inputPanel().candidateList();
-        if (!list) {
-            return;
-        }
-        const auto &bulk = list->toBulk();
-        if (!bulk) {
-            return;
-        }
-        int size = bulk->totalSize();
-        int end = size < 0 ? start + count : std::min(start + count, size);
-        bool endReached = size == end;
-        std::vector<candidate_window::Candidate> candidates;
-        for (int i = start; i < end; ++i) {
-            try {
-                auto &candidate = bulk->candidateFromAll(i);
-                candidates.push_back(
-                    {instance_->outputFilter(ic, candidate.text()).toString(),
-                     "",
-                     instance_->outputFilter(ic, candidate.comment())
-                         .toString(),
-                     {}});
-            } catch (const std::invalid_argument &e) {
-                // size == -1 but actual limit is reached
-                endReached = true;
-                break;
-            }
-        }
-        scrollState_ = candidate_window::scroll_state_t::scrolling;
-        window_->set_candidates(candidates, -1, scrollState_, start == 0,
-                                endReached);
-        updateClient(ic);
-        showAsync(true);
+    }
+    scrollState_ = candidate_window::scroll_state_t::scrolling;
+    window_->set_candidates(candidates, -1, scrollState_, start == 0,
+                            endReached);
+    updateClient(ic);
+    showAsync(true);
 }
 
 void WebPanel::expand() {
