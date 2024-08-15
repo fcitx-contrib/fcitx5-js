@@ -14,8 +14,8 @@ void WasmFrontend::createInputContext() {
     ic_->setFocusGroup(&focusGroup_);
 }
 
-bool WasmFrontend::keyEvent(const Key &key) {
-    KeyEvent event(ic_, key, false);
+bool WasmFrontend::keyEvent(const Key &key, bool isRelease) {
+    KeyEvent event(ic_, key, isRelease);
     ic_->keyEvent(event);
     return event.accepted();
 }

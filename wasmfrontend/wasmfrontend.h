@@ -20,7 +20,7 @@ class WasmFrontend : public AddonInstance {
     void setConfig(const RawConfig &config) override {}
 
     void createInputContext();
-    bool keyEvent(const Key &key);
+    bool keyEvent(const Key &key, bool isRelease);
     void focusIn();
     void focusOut();
 

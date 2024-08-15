@@ -2,8 +2,9 @@
 <html>
   <body>
     <textarea></textarea>
-    <script src="./index.js" type="module"></script>
-    <script>
+    <script type="module">
+      import { fcitxReady } from "./index.js"
+      await fcitxReady
       const textarea = document.querySelector('textarea')
       let focus = false
       textarea.addEventListener('focus', () => {
@@ -14,12 +15,8 @@
         focus = false
         Module.ccall('focus_out', 'void', [], [])
       })
-      textarea.addEventListener('keydown', e => {
-        if (!focus) {
-          return
-        }
-        console.log(Module.ccall('process_key', 'bool', ['string'], [e.key]))
-      })
+      textarea.addEventListener('keydown', fcitx.keyEvent)
+      textarea.addEventListener('keyup', fcitx.keyEvent)
     </script>
   </body>
 </html>

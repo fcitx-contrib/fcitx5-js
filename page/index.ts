@@ -1,3 +1,11 @@
+import { keyEvent } from './keycode'
+
+let res: (value: any) => void
+
+const fcitxReady = new Promise((resolve) => {
+  res = resolve
+})
+
 window.fcitx = {
   createPanel(html: string) {
     const tree = document.createElement('div')
@@ -16,6 +24,7 @@ window.fcitx = {
       }
     }
   },
+  keyEvent,
 }
 const apis = [
   'log',
@@ -35,9 +44,14 @@ for (const api of apis) {
 
 window.Module = { ...window.Module, ...{
   onRuntimeInitialized() {
+    res(null)
   },
 } }
 
 const script = document.createElement('script')
 script.src = './Fcitx5.js'
 document.body.append(script)
+
+export {
+  fcitxReady,
+}
