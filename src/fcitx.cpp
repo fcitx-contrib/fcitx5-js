@@ -1,5 +1,6 @@
 #include "../wasmfrontend/wasmfrontend.h"
 #include "../webpanel/webpanel.h"
+#include "keycode.h"
 #include <emscripten.h>
 #include <fcitx/instance.h>
 #include <iostream>
@@ -22,10 +23,10 @@ EMSCRIPTEN_KEEPALIVE void focus_in() { frontend->focusIn(); }
 
 EMSCRIPTEN_KEEPALIVE void focus_out() { frontend->focusOut(); }
 
-EMSCRIPTEN_KEEPALIVE bool process_key(const char *sym) {
-    uint32_t unicode = sym[0];
-    auto key = Key{Key::keySymFromUnicode(unicode)};
-    return frontend->keyEvent(key);
+EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
+                                      uint32_t modifiers, bool isRelease) {
+    return frontend->keyEvent(js_key_to_fcitx_key(key, code, modifiers),
+                              isRelease);
 }
 
 int main() {

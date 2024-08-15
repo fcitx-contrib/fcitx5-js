@@ -1,4 +1,7 @@
-add_executable(Fcitx5 fcitx.cpp)
+add_executable(Fcitx5
+    fcitx.cpp
+    keycode.cpp
+)
 
 target_link_libraries(Fcitx5
     "-sMAIN_MODULE=1"

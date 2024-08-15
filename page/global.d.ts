@@ -3,7 +3,7 @@ declare global {
   interface Window {
     fcitx: { [key: string]: (...args: any[]) => void }
     Module: {
-      ccall: (name: string, retType: WASM_TYPE, argsType: WASM_TYPE[], args: any[]) => void
+      ccall: (name: string, retType: WASM_TYPE, argsType: WASM_TYPE[], args: any[]) => any
       onRuntimeInitialized: () => void
     }
   }
