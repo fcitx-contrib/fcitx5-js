@@ -1,5 +1,6 @@
 #include "wasmfrontend.h"
 #include "fcitx/focusgroup.h"
+#include <emscripten.h>
 
 namespace fcitx {
 
@@ -35,6 +36,6 @@ WasmInputContext::WasmInputContext(WasmFrontend *frontend,
 WasmInputContext::~WasmInputContext() { destroy(); }
 
 void WasmInputContext::commitStringImpl(const std::string &text) {
-    std::cerr << text << std::endl;
+    EM_ASM(fcitx.commit(UTF8ToString($0)), text.c_str());
 }
 } // namespace fcitx

@@ -1,5 +1,6 @@
 import { blur, focus } from './focus'
 import { keyEvent } from './keycode'
+import { commit } from './client'
 
 let res: (value: any) => void
 
@@ -25,11 +26,13 @@ window.fcitx = {
       }
     }
   },
+  commit,
   enable() {
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
     document.addEventListener('keydown', keyEvent)
     document.addEventListener('keyup', keyEvent)
+    focus() // there may be textarea focused before wasm initialized
   },
   disable() {
     document.removeEventListener('focus', focus, true)
