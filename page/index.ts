@@ -1,3 +1,4 @@
+import { blur, focus } from './focus'
 import { keyEvent } from './keycode'
 
 let res: (value: any) => void
@@ -24,7 +25,18 @@ window.fcitx = {
       }
     }
   },
-  keyEvent,
+  enable() {
+    document.addEventListener('focus', focus, true)
+    document.addEventListener('blur', blur, true)
+    document.addEventListener('keydown', keyEvent)
+    document.addEventListener('keyup', keyEvent)
+  },
+  disable() {
+    document.removeEventListener('focus', focus, true)
+    document.removeEventListener('blur', blur, true)
+    document.removeEventListener('keydown', keyEvent)
+    document.removeEventListener('keyup', keyEvent)
+  },
 }
 const apis = [
   'log',

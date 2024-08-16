@@ -2,21 +2,12 @@
 <html>
   <body>
     <textarea></textarea>
+    <input>
+    <button>click me</button>
     <script type="module">
       import { fcitxReady } from "./index.js"
       await fcitxReady
-      const textarea = document.querySelector('textarea')
-      let focus = false
-      textarea.addEventListener('focus', () => {
-        focus = true
-        Module.ccall('focus_in', 'void', [], [])
-      })
-      textarea.addEventListener('blur', () => {
-        focus = false
-        Module.ccall('focus_out', 'void', [], [])
-      })
-      textarea.addEventListener('keydown', fcitx.keyEvent)
-      textarea.addEventListener('keyup', fcitx.keyEvent)
+      window.fcitx.enable()
     </script>
   </body>
 </html>

@@ -1,4 +1,9 @@
+import { getInputElement } from './focus'
+
 export function keyEvent(event: KeyboardEvent) {
+  if (!getInputElement()) {
+    return
+  }
   const isRelease = event.type === 'keyup'
   const { key, code, shiftKey, altKey, ctrlKey, metaKey } = event
   // Host IME
