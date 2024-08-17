@@ -1,5 +1,6 @@
 #include "../wasmfrontend/wasmfrontend.h"
 #include "../webpanel/webpanel.h"
+#include "keyboard.h"
 #include "keycode.h"
 #include <emscripten.h>
 #include <fcitx/instance.h>
@@ -7,9 +8,11 @@
 
 using namespace fcitx;
 
+KeyboardEngineFactory keyboardFactory;
 WasmFrontendFactory wasmFrontendFactory;
 WebPanelFactory webPanelFactory;
 StaticAddonRegistry staticAddons = {
+    std::make_pair<std::string, AddonFactory *>("keyboard", &keyboardFactory),
     std::make_pair<std::string, AddonFactory *>("wasmfrontend",
                                                 &wasmFrontendFactory),
     std::make_pair<std::string, AddonFactory *>("webpanel", &webPanelFactory)};
