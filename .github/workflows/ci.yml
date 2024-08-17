@@ -53,7 +53,7 @@ jobs:
           pushd fcitx5 && git apply ../patches/fcitx5.patch && popd
           PKG_CONFIG_PATH="build/sysroot/usr/share/pkgconfig;build/sysroot/usr/lib/pkgconfig" emcmake cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_FIND_ROOT_PATH=build/sysroot/usr \
+            -DCMAKE_FIND_ROOT_PATH="$(pwd)/build/sysroot/usr" \
             -DCMAKE_INSTALL_PREFIX=/usr
           cmake --build build || true
           DESTDIR=$(pwd)/build/sysroot cmake --install build/fcitx5
