@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
 set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-sSIDE_MODULE")
 set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "-sSIDE_MODULE")
-add_compile_options(-fPIC)
+add_compile_options(-fPIC -fexceptions)
 
 set(fmt_DIR "build/sysroot/usr/lib/cmake/fmt")
 find_package(fmt REQUIRED)
