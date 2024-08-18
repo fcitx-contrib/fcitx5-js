@@ -1,4 +1,4 @@
-import { blur, focus } from './focus'
+import { blur, clickPanel, focus } from './focus'
 import { keyEvent } from './keycode'
 import { commit, placePanel, setPreedit } from './client'
 
@@ -34,6 +34,7 @@ window.fcitx = {
     document.addEventListener('blur', blur, true)
     document.addEventListener('keydown', keyEvent)
     document.addEventListener('keyup', keyEvent)
+    document.querySelector('.fcitx-decoration')?.addEventListener('mousedown', clickPanel)
     focus() // there may be textarea focused before wasm initialized
   },
   disable() {
@@ -41,6 +42,7 @@ window.fcitx = {
     document.removeEventListener('blur', blur, true)
     document.removeEventListener('keydown', keyEvent)
     document.removeEventListener('keyup', keyEvent)
+    document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanel)
   },
 }
 const apis = [

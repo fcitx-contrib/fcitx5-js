@@ -29,6 +29,8 @@ export function setPreedit(text: string, index: number) {
   const start = input.selectionStart! - preeditIndex
   const end = preedit ? start + length : input.selectionEnd!
   input.value = input.value.slice(0, start) + text + input.value.slice(end)
+  // This may be triggered by user clicking panel. Focus to ensure setting selectionEnd works.
+  input.focus()
   input.selectionEnd = start + index
   preedit = text
   preeditIndex = index

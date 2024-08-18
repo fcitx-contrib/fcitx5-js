@@ -1,6 +1,11 @@
 type Input = HTMLInputElement | HTMLTextAreaElement
 
 let input: Input | null = null
+let userClick = false
+
+export function clickPanel() {
+  userClick = true
+}
 
 export function focus() {
   if (!['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '')) {
@@ -12,6 +17,11 @@ export function focus() {
 
 export function blur() {
   if (!input) {
+    return
+  }
+  // Don't call focus_out if user clicks panel.
+  if (userClick) {
+    userClick = false
     return
   }
   input = null
