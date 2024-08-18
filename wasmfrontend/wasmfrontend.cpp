@@ -27,7 +27,7 @@ void WasmFrontend::focusOut() { ic_->focusOut(); }
 
 WasmInputContext::WasmInputContext(WasmFrontend *frontend,
                                    InputContextManager &inputContextManager)
-    : InputContext(inputContextManager, "") {
+    : InputContext(inputContextManager, ""), frontend_(frontend) {
     CapabilityFlags flags = CapabilityFlag::Preedit;
     setCapabilityFlags(flags);
     created();
@@ -37,5 +37,12 @@ WasmInputContext::~WasmInputContext() { destroy(); }
 
 void WasmInputContext::commitStringImpl(const std::string &text) {
     EM_ASM(fcitx.commit(UTF8ToString($0)), text.c_str());
+}
+
+void WasmInputContext::updatePreeditImpl() {
+    auto preedit =
+        frontend_->instance()->outputFilter(this, inputPanel().clientPreedit());
+    EM_ASM(fcitx.setPreedit(UTF8ToString($0), $1), preedit.toString().c_str(),
+           preedit.cursor());
 }
 } // namespace fcitx

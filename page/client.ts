@@ -17,6 +17,23 @@ export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft
   panel.style.left = `${rect.left + left - (anchorLeft - frame.left)}px`
 }
 
+let preedit = ''
+let preeditIndex = 0
+
+export function setPreedit(text: string, index: number) {
+  const input = getInputElement()
+  if (!input) {
+    return
+  }
+  const { length } = preedit
+  const start = input.selectionStart! - preeditIndex
+  const end = preedit ? start + length : input.selectionEnd!
+  input.value = input.value.slice(0, start) + text + input.value.slice(end)
+  input.selectionEnd = start + index
+  preedit = text
+  preeditIndex = index
+}
+
 export function commit(text: string) {
   const input = getInputElement()
   if (!input) {

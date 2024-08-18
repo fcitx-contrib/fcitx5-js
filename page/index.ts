@@ -1,6 +1,6 @@
 import { blur, focus } from './focus'
 import { keyEvent } from './keycode'
-import { commit, placePanel } from './client'
+import { commit, placePanel, setPreedit } from './client'
 
 let res: (value: any) => void
 
@@ -27,6 +27,7 @@ window.fcitx = {
     }
   },
   placePanel,
+  setPreedit,
   commit,
   enable() {
     document.addEventListener('focus', focus, true)

@@ -14,6 +14,8 @@ class WasmInputContext;
 class WasmFrontend : public AddonInstance {
   public:
     WasmFrontend(Instance *instance);
+    Instance *instance() { return instance_; }
+
     void reloadConfig() override {}
     void save() override {}
     const Configuration *getConfig() const override { return nullptr; }
@@ -47,6 +49,9 @@ class WasmInputContext : public InputContext {
     void commitStringImpl(const std::string &text) override;
     void deleteSurroundingTextImpl(int offset, unsigned int size) override {}
     void forwardKeyImpl(const ForwardKeyEvent &key) override {}
-    void updatePreeditImpl() override {};
+    void updatePreeditImpl() override;
+
+  private:
+    WasmFrontend *frontend_;
 };
 } // namespace fcitx
