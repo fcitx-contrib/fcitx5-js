@@ -106,97 +106,96 @@ index d524dfa2..524a26fa 100644
  
 diff --git a/src/lib/fcitx-utils/event_js.cpp b/src/lib/fcitx-utils/event_js.cpp
 new file mode 100644
-index 00000000..1fbfd5f8
+index 00000000..bd50690e
 --- /dev/null
 +++ b/src/lib/fcitx-utils/event_js.cpp
-@@ -0,0 +1,144 @@
+@@ -0,0 +1,139 @@
++#include <cassert>
++#include <emscripten.h>
 +#include "event.h"
 +#include "log.h"
 +
 +namespace fcitx {
 +
 +template <typename Interface>
-+struct SDEventSourceBase : public Interface {
++struct JSEventSourceBase : public Interface {
 +public:
-+    ~SDEventSourceBase() override {
-+    }
++    ~JSEventSourceBase() override {}
 +
-+    bool isEnabled() const override {
-+        return true;
-+    }
++    bool isEnabled() const override { return enabled_; }
 +
-+    void setEnabled(bool enabled) override {
-+    }
++    void setEnabled(bool enabled) override { enabled_ = enabled; }
 +
-+    bool isOneShot() const override {
-+        return true;
-+    }
++    bool isOneShot() const override { return oneShot_; }
 +
-+    void setOneShot() override {
-+    }
++    void setOneShot() override { oneShot_ = true; }
++
++private:
++    bool enabled_ = false;
++    bool oneShot_ = false;
 +};
 +
-+struct SDEventSource : public SDEventSourceBase<EventSource> {
-+    SDEventSource(EventCallback _callback)
++struct JSEventSource : public JSEventSourceBase<EventSource> {
++    JSEventSource(EventCallback _callback)
 +        : callback_(std::make_shared<EventCallback>(std::move(_callback))) {}
 +
 +    std::shared_ptr<EventCallback> callback_;
 +};
 +
-+struct SDEventSourceIO : public SDEventSourceBase<EventSourceIO> {
-+    SDEventSourceIO(IOCallback _callback) {}
++struct JSEventSourceIO : public JSEventSourceBase<EventSourceIO> {
++    JSEventSourceIO(IOCallback _callback) {}
 +
-+    int fd() const override {
-+        return 0;
-+    }
++    int fd() const override { return 0; }
 +
-+    void setFd(int fd) override {
-+    }
++    void setFd(int fd) override {}
 +
-+    IOEventFlags events() const override {
-+        return IOEventFlag::In;
-+    }
++    IOEventFlags events() const override { return IOEventFlag::In; }
 +
-+    void setEvents(IOEventFlags flags) override {
-+    }
++    void setEvents(IOEventFlags flags) override {}
 +
-+    IOEventFlags revents() const override {
-+        return IOEventFlag::In;
-+    }
++    IOEventFlags revents() const override { return IOEventFlag::In; }
 +};
 +
-+struct SDEventSourceTime : public SDEventSourceBase<EventSourceTime> {
-+    SDEventSourceTime(TimeCallback _callback)
-+        : callback_(std::make_shared<TimeCallback>(std::move(_callback))) {}
++void TimeEventCallback(void *arg);
 +
-+    uint64_t time() const override {
-+        uint64_t time;
-+        return time;
++struct JSEventSourceTime : public JSEventSourceBase<EventSourceTime> {
++    JSEventSourceTime(TimeCallback _callback, uint64_t time, clockid_t clockid)
++        : callback_(std::make_shared<TimeCallback>(std::move(_callback))),
++          time_(time), clockid_(clockid) {
++        assert(clockid == CLOCK_MONOTONIC);
++        setOneShot();
 +    }
 +
-+    void setTime(uint64_t time) override {
++    void setOneShot() override {
++        int t = std::max<int64_t>(0, time_ - now(CLOCK_MONOTONIC)) / 1000;
++        emscripten_async_call(TimeEventCallback, this, t);
 +    }
 +
-+    uint64_t accuracy() const override {
-+        uint64_t time;
-+        return time;
-+    }
++    uint64_t time() const override { return time_; }
 +
-+    void setAccuracy(uint64_t time) override {
-+    }
++    void setTime(uint64_t time) override { assert(false); }
 +
-+    clockid_t clock() const override {
-+        clockid_t clock;
-+        return clock;
-+    }
++    uint64_t accuracy() const override { return 0; }
++
++    void setAccuracy(uint64_t time) override {}
++
++    clockid_t clock() const override { return clockid_; }
 +
 +    std::shared_ptr<TimeCallback> callback_;
++
++private:
++    uint64_t time_;
++    clockid_t clockid_;
 +};
++
++void TimeEventCallback(void *arg) {
++    auto source = static_cast<JSEventSourceTime *>(arg);
++    (*source->callback_)(source, source->time());
++}
 +
 +class EventLoopPrivate {
 +public:
-+    EventLoopPrivate() {
-+    }
++    EventLoopPrivate() {}
 +
 +    ~EventLoopPrivate() {}
 +};
@@ -205,53 +204,49 @@ index 00000000..1fbfd5f8
 +
 +EventLoop::~EventLoop() = default;
 +
-+const char *EventLoop::impl() { return "sd-event"; }
++const char *EventLoop::impl() { return "js-event"; }
 +
-+void *EventLoop::nativeHandle() {
-+    FCITX_D();
-+    return nullptr;
-+}
++void *EventLoop::nativeHandle() { return nullptr; }
 +
-+bool EventLoop::exec() {
-+    FCITX_D();
-+    return true;
-+}
++bool EventLoop::exec() { return true; }
 +
-+void EventLoop::exit() {
-+    FCITX_D();
-+}
++void EventLoop::exit() {}
 +
 +std::unique_ptr<EventSourceIO> EventLoop::addIOEvent(int fd, IOEventFlags flags,
 +                                                     IOCallback callback) {
 +    FCITX_D();
-+    auto source = std::make_unique<SDEventSourceIO>(std::move(callback));
++    auto source = std::make_unique<JSEventSourceIO>(std::move(callback));
 +    return source;
 +}
 +
 +std::unique_ptr<EventSourceTime>
 +EventLoop::addTimeEvent(clockid_t clock, uint64_t usec, uint64_t accuracy,
 +                        TimeCallback callback) {
-+    FCITX_D();
-+    auto source = std::make_unique<SDEventSourceTime>(std::move(callback));
++    auto source =
++        std::make_unique<JSEventSourceTime>(std::move(callback), usec, clock);
 +    return source;
 +}
 +
 +std::unique_ptr<EventSource> EventLoop::addExitEvent(EventCallback callback) {
 +    FCITX_D();
-+    auto source = std::make_unique<SDEventSource>(std::move(callback));
++    auto source = std::make_unique<JSEventSource>(std::move(callback));
 +    return source;
 +}
 +
 +std::unique_ptr<EventSource> EventLoop::addDeferEvent(EventCallback callback) {
-+    FCITX_D();
-+    auto source = std::make_unique<SDEventSource>(std::move(callback));
-+    return source;
++    return addTimeEvent(
++        CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
++        [callback = std::move(callback)](EventSourceTime *source, uint64_t) {
++            return callback(source);
++        });
 +}
 +
 +std::unique_ptr<EventSource> EventLoop::addPostEvent(EventCallback callback) {
-+    FCITX_D();
-+    auto source = std::make_unique<SDEventSource>(std::move(callback));
-+    return source;
++    return addTimeEvent(
++        CLOCK_MONOTONIC, now(CLOCK_MONOTONIC), 0,
++        [callback = std::move(callback)](EventSourceTime *source, uint64_t) {
++            return callback(source);
++        });
 +}
 +} // namespace fcitx
 diff --git a/src/lib/fcitx/CMakeLists.txt b/src/lib/fcitx/CMakeLists.txt
