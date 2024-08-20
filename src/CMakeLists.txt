@@ -1,6 +1,7 @@
 add_executable(Fcitx5
     fcitx.cpp
     keycode.cpp
+    input_method.cpp
 )
 
 target_include_directories(Fcitx5 PRIVATE

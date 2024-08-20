@@ -4,9 +4,8 @@
 #include "keycode.h"
 #include <emscripten.h>
 #include <fcitx/instance.h>
-#include <iostream>
 
-using namespace fcitx;
+namespace fcitx {
 
 KeyboardEngineFactory keyboardFactory;
 WasmFrontendFactory wasmFrontendFactory;
@@ -43,3 +42,4 @@ int main() {
     return 0;
 }
 }
+} // namespace fcitx
