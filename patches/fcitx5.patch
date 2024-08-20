@@ -106,7 +106,7 @@ index d524dfa2..524a26fa 100644
  
 diff --git a/src/lib/fcitx-utils/event_js.cpp b/src/lib/fcitx-utils/event_js.cpp
 new file mode 100644
-index 00000000..bd50690e
+index 00000000..68f7ee7f
 --- /dev/null
 +++ b/src/lib/fcitx-utils/event_js.cpp
 @@ -0,0 +1,139 @@
@@ -173,7 +173,7 @@ index 00000000..bd50690e
 +
 +    uint64_t time() const override { return time_; }
 +
-+    void setTime(uint64_t time) override { assert(false); }
++    void setTime(uint64_t time) override { time_ = time; }
 +
 +    uint64_t accuracy() const override { return 0; }
 +
