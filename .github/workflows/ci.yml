@@ -60,7 +60,6 @@ jobs:
           DESTDIR=$(pwd)/build/sysroot cmake --install build/wasmfrontend
           DESTDIR=$(pwd)/build/sysroot cmake --install build/webpanel
           cmake --build build
-          pnpm run build
           tar chjvf fcitx5-js.tar.bz2 preview
           cd build/sysroot/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib
 

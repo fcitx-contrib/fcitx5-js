@@ -43,4 +43,16 @@ add_subdirectory(wasmfrontend)
 add_subdirectory(fcitx5-webview)
 add_subdirectory(webpanel)
 
+file(GLOB JS_SOURCES CONFIGURE_DEPENDS "page/*")
+add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/index.js
+    COMMAND pnpm run build
+    DEPENDS ${JS_SOURCES}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMENT "Generating the index.js..."
+)
+add_custom_target(GeneratePostJS ALL
+    DEPENDS ${PROJECT_BINARY_DIR}/index.js
+)
+
 add_subdirectory(src)

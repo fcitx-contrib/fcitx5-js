@@ -3,10 +3,10 @@ import { build } from 'esbuild'
 await build({
   entryPoints: ['page/index.ts'],
   bundle: true,
-  outfile: 'preview/index.js',
+  outfile: 'build/index.js',
   target: 'es2020',
   format: 'esm',
   platform: 'browser',
   minify: true,
-  sourcemap: true,
+  sourcemap: false, // meaningless as index.js is appended to Fcitx5.js
 })
