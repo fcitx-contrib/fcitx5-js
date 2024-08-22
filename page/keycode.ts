@@ -1,3 +1,4 @@
+import Module from './module'
 import { getInputElement } from './focus'
 
 export function keyEvent(event: KeyboardEvent) {
@@ -12,7 +13,7 @@ export function keyEvent(event: KeyboardEvent) {
   }
   const capsLock = event.getModifierState('CapsLock')
   const modifiers = Number(shiftKey) | Number(capsLock) << 1 | Number(ctrlKey) << 2 | Number(altKey) << 3 | Number(metaKey) << 6
-  if (window.Module.ccall('process_key', 'bool', ['string', 'string', 'number', 'bool'], [key, code, modifiers, isRelease])) {
+  if (Module.ccall('process_key', 'bool', ['string', 'string', 'number', 'bool'], [key, code, modifiers, isRelease])) {
     event.preventDefault()
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "fcitx5-js",
   "version": "0.1.0",
-  "main": "dist/index.js",
+  "main": "dist/Fcitx5.js",
   "description": "Fcitx5 as a JavaScript library",
   "type": "module",
   "files": [

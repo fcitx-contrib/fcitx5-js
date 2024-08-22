@@ -16,6 +16,8 @@ target_link_libraries(Fcitx5
     "-sALLOW_MEMORY_GROWTH=1"
     "-sMAXIMUM_MEMORY=4GB"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','FS']"
+    "-sENVIRONMENT=web" # disable require("ws") in Fcitx5.js which is rejected by project user's bundler
+    "--extern-post-js ${PROJECT_BINARY_DIR}/index.js"
     "--preload-file ${PROJECT_BINARY_DIR}/sysroot/usr/share/fcitx5@/usr/share/fcitx5"
     "--preload-file ${PROJECT_BINARY_DIR}/sysroot/usr/share/X11@/usr/share/X11"
     "--preload-file ${PROJECT_BINARY_DIR}/sysroot${ISOCODES_ISO3166_JSON}@${ISOCODES_ISO3166_JSON}"
@@ -28,3 +30,5 @@ target_link_libraries(Fcitx5
     webpanel
     wasmfrontend
 )
+
+add_dependencies(Fcitx5 GeneratePostJS)

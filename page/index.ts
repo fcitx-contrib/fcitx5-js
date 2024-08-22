@@ -1,3 +1,4 @@
+import Module from './module'
 import { blur, clickPanel, focus } from './focus'
 import { keyEvent } from './keycode'
 import { commit, placePanel, setPreedit } from './client'
@@ -63,18 +64,10 @@ const apis = [
 ]
 for (const api of apis) {
   const name = `_${api}`
-  window.fcitx[name] = (...args) => window.Module.ccall('web_action', 'void', ['string', 'string'], [name, JSON.stringify(args)])
+  window.fcitx[name] = (...args) => Module.ccall('web_action', 'void', ['string', 'string'], [name, JSON.stringify(args)])
 }
 
-window.Module = { ...window.Module, ...{
-  onRuntimeInitialized() {
-    res(null)
-  },
-} }
-
-const script = document.createElement('script')
-script.src = './Fcitx5.js'
-document.body.append(script)
+Module.onRuntimeInitialized = () => res(null)
 
 export {
   fcitxReady,
