@@ -76,5 +76,5 @@ jobs:
           prerelease: true
           title: "Nightly Build"
           files: |
-            fcitx5-js.tar.bz2
+            fcitx5-js-*.tgz
             fcitx5-js-dev.tar.bz2
