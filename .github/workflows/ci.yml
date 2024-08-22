@@ -60,7 +60,7 @@ jobs:
           DESTDIR=$(pwd)/build/sysroot cmake --install build/wasmfrontend
           DESTDIR=$(pwd)/build/sysroot cmake --install build/webpanel
           cmake --build build
-          tar chjvf fcitx5-js.tar.bz2 preview
+          npm pack
           cd build/sysroot/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib
 
       - name: Setup tmate session

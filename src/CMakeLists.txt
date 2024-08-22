@@ -17,6 +17,7 @@ target_link_libraries(Fcitx5
     "-sMAXIMUM_MEMORY=4GB"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','FS']"
     "-sENVIRONMENT=web" # disable require("ws") in Fcitx5.js which is rejected by project user's bundler
+    "--extern-pre-js ${PROJECT_SOURCE_DIR}/page/pre.js"
     "--extern-post-js ${PROJECT_BINARY_DIR}/index.js"
     "--preload-file ${PROJECT_BINARY_DIR}/sysroot/usr/share/fcitx5@/usr/share/fcitx5"
     "--preload-file ${PROJECT_BINARY_DIR}/sysroot/usr/share/X11@/usr/share/X11"
