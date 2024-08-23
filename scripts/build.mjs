@@ -1,12 +1,22 @@
 import { build } from 'esbuild'
 
-await build({
-  entryPoints: ['page/index.ts'],
+const common = {
   bundle: true,
-  outfile: 'build/index.js',
   target: 'es2020',
   format: 'esm',
   platform: 'browser',
-  minify: true,
+  minify: false, // avoid name conflict since pre.js and index.js are simply concatenated
   sourcemap: false, // meaningless as index.js is appended to Fcitx5.js
+}
+
+await build({
+  ...common,
+  entryPoints: ['page/index.ts'],
+  outfile: 'build/index.js',
+})
+
+await build({
+  ...common,
+  entryPoints: ['page/pre.ts'],
+  outfile: 'build/pre.js',
 })
