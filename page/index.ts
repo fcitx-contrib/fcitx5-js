@@ -1,7 +1,7 @@
 import Module from './module'
 import { blur, clickPanel, focus } from './focus'
 import { keyEvent } from './keycode'
-import { commit, placePanel, setPreedit } from './client'
+import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { currentInputMethod, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
 
 let res: (value: any) => void
@@ -27,8 +27,10 @@ window.fcitx = {
           break
       }
     }
+    hidePanel()
   },
   placePanel,
+  hidePanel,
   setPreedit,
   commit,
   setCurrentInputMethod,
