@@ -38,6 +38,8 @@ ____ commit pre|edit ____
   // This may be triggered by user clicking panel. Focus to ensure setting selectionEnd works.
   input.focus()
   input.selectionEnd = start + commitText.length + index
+  // For vue-based input, this is needed to synchronize state.
+  input.dispatchEvent(new Event('change'))
   preedit = preeditText
   preeditIndex = index
 }
