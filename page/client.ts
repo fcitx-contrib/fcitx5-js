@@ -20,28 +20,34 @@ export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft
 let preedit = ''
 let preeditIndex = 0
 
-export function setPreedit(text: string, index: number) {
+function changeInput(commitText: string, preeditText: string, index: number) {
+/*
+____ pre|edit ____
+    ^        ^
+  start     end
+
+____ commit pre|edit ____
+*/
   const input = getInputElement()
   if (!input) {
     return
   }
-  const { length } = preedit
   const start = input.selectionStart! - preeditIndex
-  const end = preedit ? start + length : input.selectionEnd!
-  input.value = input.value.slice(0, start) + text + input.value.slice(end)
+  const end = preedit ? start + preedit.length : input.selectionEnd!
+  input.value = input.value.slice(0, start) + commitText + preeditText + input.value.slice(end)
   // This may be triggered by user clicking panel. Focus to ensure setting selectionEnd works.
   input.focus()
-  input.selectionEnd = start + index
-  preedit = text
+  input.selectionEnd = start + commitText.length + index
+  // For vue-based input, this is needed to synchronize state.
+  input.dispatchEvent(new Event('change'))
+  preedit = preeditText
   preeditIndex = index
 }
 
+export function setPreedit(text: string, index: number) {
+  changeInput('', text, index)
+}
+
 export function commit(text: string) {
-  const input = getInputElement()
-  if (!input) {
-    return
-  }
-  const { selectionStart, selectionEnd } = input
-  input.value = input.value.slice(0, selectionStart!) + text + input.value.slice(selectionEnd!)
-  input.selectionEnd = selectionStart! + text.length
+  changeInput(text, '', 0)
 }
