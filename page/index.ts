@@ -10,6 +10,8 @@ const fcitxReady = new Promise((resolve) => {
   res = resolve
 })
 
+let statusAreaCallback = () => {}
+
 window.fcitx = {
   createPanel(html: string) {
     const tree = document.createElement('div')
@@ -51,6 +53,12 @@ window.fcitx = {
     document.removeEventListener('keydown', keyEvent)
     document.removeEventListener('keyup', keyEvent)
     document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanel)
+  },
+  setStatusAreaCallback(callback: () => void) {
+    statusAreaCallback = callback
+  },
+  updateStatusArea() {
+    statusAreaCallback()
   },
 }
 const apis = [
