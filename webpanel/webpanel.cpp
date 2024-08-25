@@ -1,3 +1,4 @@
+#include <emscripten.h>
 #include <fcitx/inputpanel.h>
 
 #include "webpanel.h"
@@ -359,8 +360,7 @@ void WebPanel::update(UserInterfaceComponent component,
         break;
     }
     case UserInterfaceComponent::StatusArea:
-        // No need to implement.  MacOS will always try to fetch new
-        // data, and we don't try to cache anything.
+        EM_ASM(fcitx.updateStatusArea());
         break;
     }
 }

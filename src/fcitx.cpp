@@ -38,7 +38,6 @@ int main() {
     addonMgr.registerDefaultLoader(&staticAddons);
     instance->exec();
     frontend = dynamic_cast<WasmFrontend *>(addonMgr.addon("wasmfrontend"));
-    instance->setCurrentInputMethod("hallelujah");
     return 0;
 }
 }
