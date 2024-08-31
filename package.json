@@ -13,7 +13,7 @@
     "lint:fix": "eslint page --fix",
     "check": "tsc --noEmit",
     "build": "node scripts/build.mjs",
-    "prepack": "rm -rf dist && cp -rL preview dist"
+    "prepack": "rm -rf dist && cp -rL preview dist && cp page/Fcitx5.d.ts dist"
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {

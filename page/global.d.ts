@@ -1,3 +1,5 @@
+import type { FCITX } from './Fcitx5.d.ts'
+
 declare global {
   type WASM_TYPE = 'void' | 'bool' | 'number' | 'string'
   interface EM_MODULE {
@@ -5,7 +7,7 @@ declare global {
     onRuntimeInitialized: () => void
   }
   interface Window {
-    fcitx: { [key: string]: (...args: any[]) => void }
+    fcitx: { [key: string]: (...args: any[]) => void } & FCITX
   }
 }
 
