@@ -13,6 +13,7 @@ static nlohmann::json json_describe_im(const fcitx::InputMethodEntry *entry) {
     j["displayName"] = entry->nativeName() != "" ? entry->nativeName()
                        : entry->name() != ""     ? entry->name()
                                                  : entry->uniqueName();
+    j["languageCode"] = entry->languageCode();
     return j;
 }
 
@@ -58,6 +59,18 @@ EMSCRIPTEN_KEEPALIVE void set_input_methods(const char *json) {
     }
     imMgr.setGroup(group);
     imMgr.save();
+}
+
+EMSCRIPTEN_KEEPALIVE const char *get_all_input_methods() {
+    static std::string ret;
+    nlohmann::json j;
+    auto &imMgr = instance->inputMethodManager();
+    imMgr.foreachEntries([&j](const fcitx::InputMethodEntry &entry) {
+        j.push_back(json_describe_im(&entry));
+        return true;
+    });
+    ret = j.dump();
+    return ret.c_str();
 }
 }
 } // namespace fcitx
