@@ -1,3 +1,21 @@
+type Child = ({
+  Description: string
+  Option: string
+  Type: string
+  Value: string
+} & ({
+  Children: null
+  DefaultValue: any
+} | {
+  Children: Child[]
+}) & { [key: string]: any })
+
+export type Config = {
+  Children: Child[]
+} | {
+  ERROR: string
+}
+
 export interface FCITX {
   enable: () => void
   disable: () => void
@@ -8,6 +26,8 @@ export interface FCITX {
   getAllInputMethods: () => { name: string, displayName: string, languageCode: string }[]
   setStatusAreaCallback: (callback: () => void) => void
   updateStatusArea: () => void
+  getConfig: (uri: string) => Config
+  setConfig: (uri: string, json: object) => void
 }
 
 export const fcitxReady: Promise<null>

@@ -3,6 +3,7 @@ import { blur, clickPanel, focus } from './focus'
 import { keyEvent } from './keycode'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
+import { getConfig, setConfig } from './config'
 
 let res: (value: any) => void
 
@@ -40,6 +41,8 @@ window.fcitx = {
   getInputMethods,
   setInputMethods,
   getAllInputMethods,
+  getConfig,
+  setConfig,
   enable() {
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
