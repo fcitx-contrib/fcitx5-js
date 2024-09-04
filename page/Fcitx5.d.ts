@@ -28,6 +28,7 @@ export interface FCITX {
   updateStatusArea: () => void
   getConfig: (uri: string) => Config
   setConfig: (uri: string, json: object) => void
+  jsKeyToFcitxString: (event: KeyboardEvent) => string
 }
 
 export const fcitxReady: Promise<null>

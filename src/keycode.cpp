@@ -1,4 +1,5 @@
 #include "keycode.h"
+#include <emscripten.h>
 #include <fcitx-utils/log.h>
 
 namespace fcitx {
@@ -223,5 +224,14 @@ Key js_key_to_fcitx_key(const std::string &key, const std::string &code,
                         uint32_t modifiers) {
     return Key{js_key_to_fcitx_keysym(key, code), KeyStates{modifiers},
                js_keycode_to_fcitx_keycode(code)};
+}
+
+extern "C" {
+EMSCRIPTEN_KEEPALIVE const char *
+js_key_to_fcitx_string(const char *key, const char *code, uint32_t modifiers) {
+    static std::string ret;
+    ret = js_key_to_fcitx_key(key, code, modifiers).normalize().toString();
+    return ret.c_str();
+}
 }
 } // namespace fcitx
