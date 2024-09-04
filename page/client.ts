@@ -7,6 +7,8 @@ let y: number | null = null
 let preedit = ''
 let preeditIndex = 0
 
+const textEncoder = new TextEncoder()
+
 export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft: number) {
   const input = getInputElement()
   if (!input) {
@@ -48,16 +50,26 @@ ____ commit pre|edit ____
   if (!input) {
     return
   }
+
+  // Convert UTF-8 index to JS string index
+  let i = 0
+  for (let cursor = 0; i < preeditText.length; ++i) {
+    if (cursor === index) {
+      break
+    }
+    cursor += textEncoder.encode(preeditText[i]).length
+  }
+
   const start = input.selectionStart! - preeditIndex
   const end = preedit ? start + preedit.length : input.selectionEnd!
   input.value = input.value.slice(0, start) + commitText + preeditText + input.value.slice(end)
   // This may be triggered by user clicking panel. Focus to ensure setting selectionEnd works.
   input.focus()
-  input.selectionEnd = start + commitText.length + index
+  input.selectionStart = input.selectionEnd = start + commitText.length + i
   // For vue-based input, this is needed to synchronize state.
   input.dispatchEvent(new Event('change'))
   preedit = preeditText
-  preeditIndex = index
+  preeditIndex = i
 }
 
 export function setPreedit(text: string, index: number) {
