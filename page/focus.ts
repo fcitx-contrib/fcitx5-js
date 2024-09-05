@@ -1,4 +1,5 @@
 import Module from './module'
+import { resetPreedit } from './client'
 
 type Input = HTMLInputElement | HTMLTextAreaElement
 
@@ -28,6 +29,7 @@ export function blur() {
   }
   input = null
   Module.ccall('focus_out', 'void', [], [])
+  resetPreedit()
 }
 
 export function getInputElement(): Input | null {

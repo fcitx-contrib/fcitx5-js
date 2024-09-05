@@ -79,3 +79,8 @@ export function setPreedit(text: string, index: number) {
 export function commit(text: string) {
   changeInput(text, '', 0)
 }
+
+export function resetPreedit() {
+  preedit = ''
+  preeditIndex = 0
+}
