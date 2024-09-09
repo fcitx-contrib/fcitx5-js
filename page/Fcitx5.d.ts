@@ -16,6 +16,14 @@ export type Config = {
   ERROR: string
 }
 
+export interface MenuAction {
+  id: number
+  desc: string
+  checked?: boolean
+  separator?: boolean
+  children?: MenuAction[]
+}
+
 export interface FCITX {
   enable: () => void
   disable: () => void
@@ -29,6 +37,8 @@ export interface FCITX {
   getConfig: (uri: string) => Config
   setConfig: (uri: string, json: object) => void
   jsKeyToFcitxString: (event: KeyboardEvent) => string
+  getMenuActions: () => MenuAction[]
+  activateMenuAction: (id: number) => void
 }
 
 export const fcitxReady: Promise<null>
