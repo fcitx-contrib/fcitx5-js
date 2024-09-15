@@ -131,7 +131,8 @@ WebPanel::WebPanel(Instance *instance)
         EventType::InputContextKeyEvent, EventWatcherPhase::PreInputMethod,
         [this](Event &event) {
             auto &keyEvent = static_cast<KeyEvent &>(event);
-            if (keyEvent.key().checkKeyList(*config_.advanced->copyHtml)) {
+            const auto key = keyEvent.key();
+            if (key.checkKeyList(*config_.advanced->copyHtml)) {
                 if (keyEvent.isRelease()) {
                     return;
                 }
@@ -141,7 +142,7 @@ WebPanel::WebPanel(Instance *instance)
                 return keyEvent.filterAndAccept();
             }
             if (scrollState_ == candidate_window::scroll_state_t::ready &&
-                keyEvent.key().checkKeyList(*config_.scrollMode->expand)) {
+                key.checkKeyList(*config_.scrollMode->expand)) {
                 if (keyEvent.isRelease()) {
                     return;
                 }
@@ -166,7 +167,7 @@ WebPanel::WebPanel(Instance *instance)
                          candidate_window::scroll_key_action_t::six},
                     };
                 for (const auto &pair : selectMap) {
-                    if (keyEvent.key().check(pair.first)) {
+                    if (key.check(pair.first)) {
                         if (keyEvent.isRelease()) {
                             return;
                         }
@@ -197,7 +198,7 @@ WebPanel::WebPanel(Instance *instance)
                          candidate_window::scroll_key_action_t::commit},
                     }; // Can't be static because config could be modified.
                 for (const auto &pair : actionMap) {
-                    if (keyEvent.key().checkKeyList(*pair.first)) {
+                    if (key.checkKeyList(*pair.first)) {
                         if (!keyEvent.isRelease()) {
                             window_->scroll_key_action(pair.second);
                         }
@@ -206,12 +207,34 @@ WebPanel::WebPanel(Instance *instance)
                         return keyEvent.filterAndAccept();
                     }
                 }
-                if (keyEvent.key().checkKeyList(
-                        *config_.scrollMode->collapse)) {
+                if (key.checkKeyList(*config_.scrollMode->collapse)) {
                     if (keyEvent.isRelease()) {
                         return;
                     }
                     collapse();
+                    return keyEvent.filterAndAccept();
+                }
+                // Karabiner-Elements defines Hyper as Ctrl+Alt+Shift+Cmd, but
+                // its combinations cause fcitx5-rime to reset candidates. This
+                // is because librime's process_key returns 0 event if a key
+                // event (Shift) is handled, thus fcitx5-rime can't use the
+                // retval to decide update UI or not.
+                static std::vector<Key> hyperModifiers = {
+                    Key("Super+Super_L"),
+                    Key("Control+Super+Control_L"),
+                    Key("Control+Alt+Super+Alt_L"),
+                    Key("Control+Alt+Shift+Super+Shift_L"),
+                    Key("Alt+Shift+Super+Control_L"),
+                    Key("Alt+Super+Shift_L"),
+                    Key("Super+Alt_L"),
+                    Key("Super_L"),
+                    Key("Control+Control_L"),
+                    Key("Control+Alt+Alt_L"),
+                    Key("Control+Alt+Super+Super_L"),
+                    Key("Alt+Super+Control_L"),
+                }; // keys received by Fcitx5 when CapsLock (Hyper) is pressed
+                if (*config_.scrollMode->optimizeForHyperKey &&
+                    key.checkKeyList(hyperModifiers)) {
                     return keyEvent.filterAndAccept();
                 }
             }
