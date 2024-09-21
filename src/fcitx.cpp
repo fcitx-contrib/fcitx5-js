@@ -4,6 +4,7 @@
 #include "keycode.h"
 #include <emscripten.h>
 #include <fcitx/instance.h>
+#include <sys/stat.h>
 
 namespace fcitx {
 
@@ -32,6 +33,8 @@ EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
 }
 
 int main() {
+    umask(007); // Fix config file's mode
+    StandardPath::global().syncUmask();
     Log::setLogRule("*=5,notimedate");
     instance = std::make_unique<Instance>(0, nullptr);
     auto &addonMgr = instance->addonManager();
