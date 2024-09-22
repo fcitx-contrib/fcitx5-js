@@ -7,7 +7,7 @@ declare global {
     onRuntimeInitialized: () => void
   }
   interface Window {
-    fcitx: { [key: string]: (...args: any[]) => void } & FCITX
+    fcitx: { [key: string]: any } & FCITX
   }
 }
 

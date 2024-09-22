@@ -1,39 +1,41 @@
 import getCaretCoordinates from 'textarea-caret'
 import { getInputElement } from './focus'
 
-let x: number | null = null
-let y: number | null = null
+let x = 0
+let y = 0
 
 let preedit = ''
 let preeditIndex = 0
 
 const textEncoder = new TextEncoder()
 
-export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft: number) {
+export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft: number, dragging: boolean) {
   const input = getInputElement()
   if (!input) {
     return
   }
   const rect = input.getBoundingClientRect()
-  const { top, left, height } = getCaretCoordinates(input, input.selectionStart! - preeditIndex)
+  const { top, left, height } = getCaretCoordinates(input, input.selectionStart! - (window.fcitx.followCursor ? 0 : preeditIndex))
   const h = height /* NaN if no line-height is set */ || Number(getComputedStyle(input).fontSize.slice(0, -'px'.length))
   const panel = <HTMLElement>document.querySelector('#fcitx-theme')
   const frame = panel.getBoundingClientRect()
   panel.style.opacity = '1'
   panel.style.position = 'absolute'
   panel.style.height = '0' // let mouse event pass through
-  const originX = (x ?? rect.left + left - (anchorLeft - frame.left)) + dx
-  const originY = (y ?? rect.top + top - (anchorTop - frame.top) + h) + dy
-  if (x === null || dx !== 0 || dy !== 0) { // drag
-    x = originX
-    y = originY
+  if (dragging) {
+    x += dx
+    y += dy
   }
-  panel.style.top = `${originY}px`
-  panel.style.left = `${originX}px`
+  else {
+    x = rect.left + left - (anchorLeft - frame.left)
+    y = rect.top + top - (anchorTop - frame.top) + h
+  }
+  panel.style.top = `${y}px`
+  panel.style.left = `${x}px`
 }
 
 export function hidePanel() {
-  x = y = null
+  x = y = 0
   const panel = <HTMLElement>document.querySelector('#fcitx-theme')
   panel.style.opacity = '0'
 }

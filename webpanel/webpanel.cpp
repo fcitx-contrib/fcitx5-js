@@ -416,6 +416,7 @@ void WebPanel::showAsync(bool show) {
     std::weak_ptr<candidate_window::CandidateWindow> weakWindow = window_;
     if (auto window = weakWindow.lock()) {
         if (show) {
+            EM_ASM(fcitx.followCursor = $0, *config_.basic->followCursor);
             window->show(0, 0);
         } else {
             window->hide();

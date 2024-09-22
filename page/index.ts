@@ -68,6 +68,7 @@ window.fcitx = {
   updateStatusArea() {
     statusAreaCallback()
   },
+  followCursor: false,
 }
 const apis = [
   'log',
@@ -82,7 +83,7 @@ const apis = [
 ]
 for (const api of apis) {
   const name = `_${api}`
-  window.fcitx[name] = (...args) => Module.ccall('web_action', 'void', ['string', 'string'], [name, JSON.stringify(args)])
+  window.fcitx[name] = (...args: any[]) => Module.ccall('web_action', 'void', ['string', 'string'], [name, JSON.stringify(args)])
 }
 
 Module.onRuntimeInitialized = () => res(null)
