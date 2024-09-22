@@ -1,10 +1,13 @@
 #include <emscripten.h>
 #include <fcitx/inputpanel.h>
+#include <nlohmann/json.hpp>
 
 #include "webpanel.h"
 #include "webview_candidate_window.hpp"
 
 namespace fcitx {
+
+extern nlohmann::json configValueToJson(const Configuration &config);
 
 WebPanel::WebPanel(Instance *instance)
     : instance_(instance),
@@ -126,7 +129,7 @@ WebPanel::WebPanel(Instance *instance)
             FCITX_ERROR() << "action candidate index out of range";
         }
     });
-    window_->set_init_callback([this]() { reloadConfig(); });
+    reloadConfig();
     eventHandler_ = instance_->watchEvent(
         EventType::InputContextKeyEvent, EventWatcherPhase::PreInputMethod,
         [this](Event &event) {
@@ -251,8 +254,8 @@ void WebPanel::updateConfig() {
                                              HighlightMarkStyle::Text
                                          ? config_.highlight->markText.value()
                                          : "");
-    // auto style = configValueToJson(config_).dump();
-    // window_->set_style(style.c_str());
+    auto style = configValueToJson(config_).dump();
+    window_->set_style(style.c_str());
 }
 
 void WebPanel::reloadConfig() {
