@@ -139,6 +139,37 @@ EMSCRIPTEN_KEEPALIVE bool set_config(const char *uri_, const char *json_) {
         return false;
     }
 }
+
+const char *addon_category_name[] = {"Input Method", "Frontend", "Loader",
+                                     "Module", "UI"};
+
+EMSCRIPTEN_KEEPALIVE const char *get_addons() noexcept {
+    static std::string ret;
+    auto j = nlohmann::json::array();
+    for (auto category :
+         {fcitx::AddonCategory::Frontend, fcitx::AddonCategory::Loader,
+          fcitx::AddonCategory::Module}) {
+        auto addons = nlohmann::json::array();
+        auto names = instance->addonManager().addonNames(category);
+        for (const auto &name : names) {
+            const auto *info = instance->addonManager().addonInfo(name);
+            if (!info || !info->isConfigurable()) {
+                continue;
+            }
+            addons.push_back(
+                nlohmann::json{{"id", info->uniqueName()},
+                               {"name", info->name().match()},
+                               {"comment", info->comment().match()}});
+        }
+        if (!addons.empty()) {
+            j.push_back({{"id", category},
+                         {"name", addon_category_name[(int)category]},
+                         {"addons", addons}});
+        }
+    }
+    ret = j.dump();
+    return ret.c_str();
+}
 }
 
 void jsonFillRawConfigValues(const nlohmann::json &j, RawConfig &config) {

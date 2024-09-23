@@ -7,3 +7,7 @@ export function getConfig(uri: string) {
 export function setConfig(uri: string, json: object) {
   return Module.ccall('set_config', 'void', ['string', 'string'], [uri, JSON.stringify(json)])
 }
+
+export function getAddons() {
+  return JSON.parse(Module.ccall('get_addons', 'string', [], []))
+}

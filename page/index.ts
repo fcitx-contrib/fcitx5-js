@@ -3,7 +3,7 @@ import { blur, clickPanel, focus } from './focus'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
-import { getConfig, setConfig } from './config'
+import { getAddons, getConfig, setConfig } from './config'
 import { activateMenuAction, getMenuActions } from './action'
 
 let res: (value: any) => void
@@ -44,6 +44,7 @@ window.fcitx = {
   getAllInputMethods,
   getConfig,
   setConfig,
+  getAddons,
   jsKeyToFcitxString,
   getMenuActions,
   activateMenuAction,

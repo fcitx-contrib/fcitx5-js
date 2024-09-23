@@ -24,6 +24,16 @@ export interface MenuAction {
   children?: MenuAction[]
 }
 
+interface AddonCategory {
+  addons: {
+    comment: string
+    id: string
+    name: string
+  }[]
+  id: number
+  name: string
+}
+
 export interface FCITX {
   enable: () => void
   disable: () => void
@@ -36,6 +46,7 @@ export interface FCITX {
   updateStatusArea: () => void
   getConfig: (uri: string) => Config
   setConfig: (uri: string, json: object) => void
+  getAddons: () => AddonCategory[]
   jsKeyToFcitxString: (event: KeyboardEvent) => string
   getMenuActions: () => MenuAction[]
   activateMenuAction: (id: number) => void
