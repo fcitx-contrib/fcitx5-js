@@ -331,6 +331,10 @@ void WebPanel::update(UserInterfaceComponent component,
                     candidate_window::scroll_state_t::scrolling) {
                     return expand();
                 }
+                if (*config_.scrollMode->autoExpand) {
+                    scrollState_ = candidate_window::scroll_state_t::scrolling;
+                    return expand();
+                }
                 scrollState_ = candidate_window::scroll_state_t::ready;
             } else {
                 scrollState_ = candidate_window::scroll_state_t::none;
@@ -466,7 +470,8 @@ void WebPanel::scroll(int start, int count) {
 }
 
 void WebPanel::expand() {
-    scroll(0, 42); // Hard-coded like fcitx5-webview
+    scroll(0, 6 * (*config_.scrollMode->maxRowCount +
+                   1)); // Hard-coded like fcitx5-webview
 }
 
 void WebPanel::collapse() {
