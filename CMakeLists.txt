@@ -11,7 +11,12 @@ set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-sSIDE_MODULE")
 set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "-sSIDE_MODULE")
 add_compile_options(-fPIC -fexceptions)
 
-set(fmt_DIR "build/sysroot/usr/lib/cmake/fmt")
+set(PREBUILDER_LIB_DIR "${PROJECT_BINARY_DIR}/sysroot/usr/lib")
+set(PREBUILDER_SHARE_DIR "${PROJECT_BINARY_DIR}/sysroot/usr/share")
+
+set(ENV{PKG_CONFIG_PATH} "${PREBUILDER_LIB_DIR}/pkgconfig:${PREBUILDER_SHARE_DIR}/pkgconfig")
+
+set(fmt_DIR "${PREBUILDER_LIB_DIR}/cmake/fmt")
 find_package(fmt REQUIRED)
 set(ECM_DIR "/usr/share/ECM/cmake")
 
