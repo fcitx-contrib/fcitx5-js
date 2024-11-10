@@ -1,4 +1,4 @@
-add_library(webpanel STATIC webpanel.cpp)
+add_library(webpanel STATIC webpanel.cpp tunnel.cpp)
 target_link_libraries(webpanel Fcitx5::Core WebviewCandidateWindow)
 target_include_directories(webpanel PRIVATE
     "${PROJECT_SOURCE_DIR}/fcitx5-webview/include"

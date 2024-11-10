@@ -1,16 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index ac1e1dcb..b4641520 100644
+index aa90bad4..b4641520 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -36,6 +36,7 @@ option(ENABLE_XDGAUTOSTART "Enable xdg autostart desktop file installation" On)
- option(USE_FLATPAK_ICON "Use flatpak icon name for desktop files" Off)
- option(ENABLE_EMOJI "Enable emoji module" On)
- option(ENABLE_LIBUUID "Use libuuid for uuid generation" On)
-+option(BUILD_SPELL_DICT "Build en_dict.fscd for English spell check" On)
- set(NO_PREEDIT_APPS "gvim.*,wps.*,wpp.*,et.*" CACHE STRING "Disable preedit for follwing app by default.")
- 
- if (ENABLE_EMOJI)
-@@ -69,7 +70,7 @@ if (NOT TARGET Systemd::Systemd)
+@@ -70,7 +70,7 @@ if (NOT TARGET Systemd::Systemd)
          pkg_get_variable(DBUS_SYSTEM_BUS_DEFAULT_ADDRESS "dbus-1" "system_bus_default_address")
      endif()
  
@@ -19,19 +11,6 @@ index ac1e1dcb..b4641520 100644
          if (NOT (TARGET PkgConfig::LibUV))
              pkg_check_modules(LibUV REQUIRED IMPORTED_TARGET "libuv")
          endif()
-diff --git a/cmake/Fcitx5CompilerSettings.cmake b/cmake/Fcitx5CompilerSettings.cmake
-index 66136f0b..5e766d30 100644
---- a/cmake/Fcitx5CompilerSettings.cmake
-+++ b/cmake/Fcitx5CompilerSettings.cmake
-@@ -8,7 +8,7 @@ set(CMAKE_C_STANDARD 99)
- set(CMAKE_C_FLAGS "-Wall -Wextra ${CMAKE_C_FLAGS}")
- set(CMAKE_CXX_FLAGS "-Wall -Wextra ${CMAKE_CXX_FLAGS}")
- 
--if(NOT APPLE)
-+if(NOT APPLE AND NOT EMSCRIPTEN)
-     set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined -Wl,--as-needed ${CMAKE_SHARED_LINKER_FLAGS}")
-     set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--no-undefined -Wl,--as-needed ${CMAKE_MODULE_LINKER_FLAGS}")
- endif()
 diff --git a/src/lib/fcitx-config/CMakeLists.txt b/src/lib/fcitx-config/CMakeLists.txt
 index 85c9865b..3a995ca1 100644
 --- a/src/lib/fcitx-config/CMakeLists.txt
@@ -91,19 +70,6 @@ index dd67e07d..21680660 100644
      if (ENABLE_DBUS)
          target_link_libraries(Fcitx5Utils PRIVATE PkgConfig::DBus)
      endif()
-diff --git a/src/lib/fcitx-utils/endian_p.h b/src/lib/fcitx-utils/endian_p.h
-index d524dfa2..524a26fa 100644
---- a/src/lib/fcitx-utils/endian_p.h
-+++ b/src/lib/fcitx-utils/endian_p.h
-@@ -8,7 +8,7 @@
- #define _FCITX_UTILS_ENDIAN_P_H_
- 
- #include <cstdint>
--#if defined(__linux__) || defined(__GLIBC__)
-+#if defined(__linux__) || defined(__GLIBC__) || defined(__EMSCRIPTEN__)
- #include <endian.h>
- #elif defined(__APPLE__)
- 
 diff --git a/src/lib/fcitx-utils/event_js.cpp b/src/lib/fcitx-utils/event_js.cpp
 new file mode 100644
 index 00000000..68f7ee7f
@@ -263,20 +229,3 @@ index df15dd57..36312bab 100644
    EXPORT_NAME Core
    )
  target_include_directories(Fcitx5Core PUBLIC
-diff --git a/src/modules/spell/CMakeLists.txt b/src/modules/spell/CMakeLists.txt
-index 094e1a58..ab1ce4df 100644
---- a/src/modules/spell/CMakeLists.txt
-+++ b/src/modules/spell/CMakeLists.txt
-@@ -17,6 +17,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/spell.conf" DESTINATION "${FCITX_INST
-         COMPONENT config)
- fcitx5_export_module(Spell TARGET spell BUILD_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}" HEADERS spell_public.h INSTALL)
- 
-+if (BUILD_SPELL_DICT)
-  set(DICT_COMP_SRC
-   comp_spell_dict.cpp
-   )
-@@ -46,3 +47,4 @@ add_custom_command(
-   "${SPELL_EN_DICT_SRC}" "${SPELL_EN_DICT}")
- add_custom_target(spell_en_dict ALL DEPENDS "${SPELL_EN_DICT}")
- install(FILES "${SPELL_EN_DICT}" DESTINATION "${FCITX_INSTALL_PKGDATADIR}/spell")
-+endif()
