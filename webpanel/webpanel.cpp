@@ -5,6 +5,10 @@
 #include "webpanel.h"
 #include "webview_candidate_window.hpp"
 
+bool f5m_is_linear_layout = false;
+bool f5m_is_vertical_rl = false;
+bool f5m_is_vertical_lr = false;
+
 namespace fcitx {
 
 extern nlohmann::json configValueToJson(const Configuration &config);
