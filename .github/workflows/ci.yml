@@ -51,7 +51,7 @@ jobs:
           export EMCC_FORCE_STDLIBS=libc++
           export FCITX_DISTRIBUTION=fcitx5-js
           pushd fcitx5 && git apply ../patches/fcitx5.patch && popd
-          PKG_CONFIG_PATH="build/sysroot/usr/share/pkgconfig;build/sysroot/usr/lib/pkgconfig" emcmake cmake -B build -G Ninja \
+          emcmake cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_FIND_ROOT_PATH="$(pwd)/build/sysroot/usr" \
             -DCMAKE_INSTALL_PREFIX=/usr
