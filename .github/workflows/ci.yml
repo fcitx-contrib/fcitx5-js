@@ -32,10 +32,7 @@ jobs:
           pnpm --prefix=fcitx5-webview i
 
       - name: Lint
-        run: |
-          find src wasmfrontend webpanel -name '*.h' -o -name '*.cpp' | xargs clang-format -Werror --dry-run
-          pnpm run lint
-          pnpm run check
+        run: ./scripts/lint.sh
 
       - name: Install emsdk
         run: |
@@ -46,7 +43,7 @@ jobs:
 
       - name: Build
         run: |
-          ./install-deps.sh
+          ./scripts/install-deps.sh
           . emsdk/emsdk_env.sh
           export EMCC_FORCE_STDLIBS=libc++
           export FCITX_DISTRIBUTION=fcitx5-js

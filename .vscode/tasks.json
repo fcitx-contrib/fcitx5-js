@@ -1,0 +1,64 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Install dependencies",
+            "command": "./scripts/install-deps.sh",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Configure",
+            "command": "emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_ROOT_PATH=\"$(pwd)/build/sysroot/usr\" -DCMAKE_INSTALL_PREFIX=/usr",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Build",
+            "command": "cmake --build build",
+            "options": {
+                "env": {
+                    "EMCC_FORCE_STDLIBS": "libc++",
+                    "FCITX_DISTRIBUTION": "fcitx5-js"
+                }
+            },
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Install",
+            "command": "cmake --install build/fcitx5 && cmake --install build/wasmfrontend && cmake --install build/webpanel",
+            "options": {
+                "env": {
+                    "DESTDIR": "${workspaceFolder}/build/sysroot"
+                }
+            },
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Format",
+            "command": "./scripts/format.sh",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Lint",
+            "command": "./scripts/lint.sh",
+            "group": {
+                "kind": "build"
+            }
+        }
+    ]
+}
