@@ -1,8 +1,10 @@
 #include "../wasmfrontend/wasmfrontend.h"
 #include "../webpanel/webpanel.h"
+#include "event_js.h"
 #include "keyboard.h"
 #include "keycode.h"
 #include <emscripten.h>
+#include <fcitx-utils/event.h>
 #include <fcitx/instance.h>
 #include <sys/stat.h>
 
@@ -36,6 +38,8 @@ int main() {
     umask(007); // Fix config file's mode
     StandardPath::global().syncUmask();
     Log::setLogRule("*=5,notimedate");
+    EventLoop::setEventLoopFactory(
+        [] { return std::make_unique<JSEventLoop>(); });
     instance = std::make_unique<Instance>(0, nullptr);
     auto &addonMgr = instance->addonManager();
     addonMgr.registerDefaultLoader(&staticAddons);
