@@ -1,10 +1,10 @@
-import Module from './module'
-import { blur, clickPanel, focus } from './focus'
-import { jsKeyToFcitxString, keyEvent } from './keycode'
-import { commit, hidePanel, placePanel, setPreedit } from './client'
-import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
-import { getAddons, getConfig, setConfig } from './config'
 import { activateMenuAction, getMenuActions } from './action'
+import { commit, hidePanel, placePanel, setPreedit } from './client'
+import { getAddons, getConfig, setConfig } from './config'
+import { blur, clickPanel, focus } from './focus'
+import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
+import { jsKeyToFcitxString, keyEvent } from './keycode'
+import Module from './module'
 
 let res: (value: any) => void
 

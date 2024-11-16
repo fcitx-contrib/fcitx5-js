@@ -1,5 +1,5 @@
-import Module from './module'
 import { getInputElement } from './focus'
+import Module from './module'
 
 function extract(event: KeyboardEvent): [string, string, number] | undefined {
   const { key, code, shiftKey, altKey, ctrlKey, metaKey } = event
