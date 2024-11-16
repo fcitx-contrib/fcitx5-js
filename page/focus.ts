@@ -1,5 +1,5 @@
-import Module from './module'
 import { resetPreedit } from './client'
+import Module from './module'
 
 type Input = HTMLInputElement | HTMLTextAreaElement
 
