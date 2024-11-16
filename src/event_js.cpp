@@ -5,12 +5,6 @@
 
 namespace fcitx {
 
-std::unique_ptr<EventLoopInterface> createDefaultEventLoop() {
-    return std::make_unique<JSEventLoop>();
-}
-
-const char *defaultEventLoopImplementation() { return "js"; }
-
 template <typename Interface> struct JSEventSourceBase : public Interface {
   public:
     ~JSEventSourceBase() override {}

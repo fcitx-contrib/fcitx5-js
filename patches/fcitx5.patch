@@ -13,10 +13,10 @@ index 85c9865b..3a995ca1 100644
    )
  target_include_directories(Fcitx5Config PUBLIC
 diff --git a/src/lib/fcitx-utils/CMakeLists.txt b/src/lib/fcitx-utils/CMakeLists.txt
-index a1f18886..6f9a5832 100644
+index 4fe67c8d..f5a8e66b 100644
 --- a/src/lib/fcitx-utils/CMakeLists.txt
 +++ b/src/lib/fcitx-utils/CMakeLists.txt
-@@ -119,8 +119,7 @@ ecm_setup_version(PROJECT
+@@ -121,8 +121,7 @@ ecm_setup_version(PROJECT
  
  add_library(Fcitx5Utils SHARED ${FCITX_UTILS_SOURCES})
  set_target_properties(Fcitx5Utils
