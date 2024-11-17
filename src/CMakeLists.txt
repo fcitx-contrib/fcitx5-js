@@ -4,6 +4,7 @@ add_executable(Fcitx5
     input_method.cpp
     config.cpp
     action.cpp
+    event_js.cpp
 )
 
 target_include_directories(Fcitx5 PRIVATE

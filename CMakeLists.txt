@@ -42,6 +42,7 @@ set(XKEYBOARDCONFIG_XKBBASE "${CMAKE_INSTALL_PREFIX}/share/X11/xkb")
 set(XKEYBOARDCONFIG_DATADIR "${CMAKE_INSTALL_PREFIX}/share")
 
 set(CMAKE_INSTALL_LIBDATADIR "${CMAKE_INSTALL_PREFIX}/lib")
+set(EVENT_LOOP_BACKEND "none" CACHE STRING "")
 add_subdirectory(fcitx5)
 
 add_subdirectory(wasmfrontend)
