@@ -14,11 +14,8 @@ add_compile_options(-fPIC -fexceptions)
 set(PREBUILDER_LIB_DIR "${PROJECT_BINARY_DIR}/sysroot/usr/lib")
 set(PREBUILDER_SHARE_DIR "${PROJECT_BINARY_DIR}/sysroot/usr/share")
 
+set(ENV{PKG_CONFIG_SYSROOT_DIR} "${PROJECT_BINARY_DIR}/sysroot")
 set(ENV{PKG_CONFIG_PATH} "${PREBUILDER_LIB_DIR}/pkgconfig:${PREBUILDER_SHARE_DIR}/pkgconfig")
-
-set(fmt_DIR "${PREBUILDER_LIB_DIR}/cmake/fmt")
-find_package(fmt REQUIRED)
-set(ECM_DIR "/usr/share/ECM/cmake")
 
 option(ENABLE_TEST "" OFF)
 option(ENABLE_COVERAGE "" OFF)
