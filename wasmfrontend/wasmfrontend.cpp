@@ -46,3 +46,5 @@ void WasmInputContext::updatePreeditImpl() {
            preedit.cursor());
 }
 } // namespace fcitx
+
+FCITX_ADDON_FACTORY_V2(wasmfrontend, fcitx::WasmFrontendFactory);

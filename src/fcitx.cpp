@@ -1,23 +1,19 @@
 #include "../wasmfrontend/wasmfrontend.h"
-#include "../webpanel/webpanel.h"
 #include "event_js.h"
-#include "keyboard.h"
 #include "keycode.h"
 #include <emscripten.h>
 #include <fcitx-utils/event.h>
+#include <fcitx-utils/standardpath.h>
 #include <fcitx/instance.h>
 #include <sys/stat.h>
 
 namespace fcitx {
 
-KeyboardEngineFactory keyboardFactory;
-WasmFrontendFactory wasmFrontendFactory;
-WebPanelFactory webPanelFactory;
-StaticAddonRegistry staticAddons = {
-    std::make_pair<std::string, AddonFactory *>("keyboard", &keyboardFactory),
-    std::make_pair<std::string, AddonFactory *>("wasmfrontend",
-                                                &wasmFrontendFactory),
-    std::make_pair<std::string, AddonFactory *>("webpanel", &webPanelFactory)};
+StaticAddonRegistry staticAddons;
+
+FCITX_IMPORT_ADDON_FACTORY(staticAddons, keyboard);
+FCITX_IMPORT_ADDON_FACTORY(staticAddons, wasmfrontend);
+FCITX_IMPORT_ADDON_FACTORY(staticAddons, webpanel);
 
 std::unique_ptr<Instance> instance;
 WasmFrontend *frontend;

@@ -8,9 +8,7 @@ add_executable(Fcitx5
 )
 
 target_include_directories(Fcitx5 PRIVATE
-    "${PROJECT_SOURCE_DIR}/fcitx5/src/im/keyboard"
-    "${PROJECT_SOURCE_DIR}/fcitx5/src/modules/quickphrase"
-    "${CMAKE_CURRENT_BINARY_DIR}/../fcitx5"
+    "${PROJECT_BINARY_DIR}/fcitx5"
 )
 
 target_link_libraries(Fcitx5
