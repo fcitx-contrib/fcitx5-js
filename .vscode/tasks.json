@@ -12,7 +12,7 @@
         {
             "type": "shell",
             "label": "Configure",
-            "command": "emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_ROOT_PATH=\"$(pwd)/build/sysroot/usr\" -DCMAKE_INSTALL_PREFIX=/usr",
+            "command": "emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release",
             "group": {
                 "kind": "build"
             }
@@ -25,19 +25,6 @@
                 "env": {
                     "EMCC_FORCE_STDLIBS": "libc++",
                     "FCITX_DISTRIBUTION": "fcitx5-js"
-                }
-            },
-            "group": {
-                "kind": "build"
-            }
-        },
-        {
-            "type": "shell",
-            "label": "Install",
-            "command": "cmake --install build/fcitx5 && cmake --install build/wasmfrontend && cmake --install build/webpanel",
-            "options": {
-                "env": {
-                    "DESTDIR": "${workspaceFolder}/build/sysroot"
                 }
             },
             "group": {

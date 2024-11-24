@@ -25,7 +25,6 @@ jobs:
         run: |
           sudo apt install -y clang-format \
             ninja-build \
-            extra-cmake-modules \
             gettext
           npm i -g pnpm
           pnpm i
@@ -49,13 +48,7 @@ jobs:
           export FCITX_DISTRIBUTION=fcitx5-js
           pushd fcitx5 && git apply ../patches/fcitx5.patch && popd
           emcmake cmake -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_FIND_ROOT_PATH="$(pwd)/build/sysroot/usr" \
-            -DCMAKE_INSTALL_PREFIX=/usr
-          cmake --build build || true
-          DESTDIR=$(pwd)/build/sysroot cmake --install build/fcitx5
-          DESTDIR=$(pwd)/build/sysroot cmake --install build/wasmfrontend
-          DESTDIR=$(pwd)/build/sysroot cmake --install build/webpanel
+            -DCMAKE_BUILD_TYPE=Release
           cmake --build build
           npm pack
           cd build/sysroot/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib

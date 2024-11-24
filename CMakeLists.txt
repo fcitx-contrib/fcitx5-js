@@ -11,8 +11,13 @@ set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-sSIDE_MODULE")
 set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "-sSIDE_MODULE")
 add_compile_options(-fPIC -fexceptions)
 
-set(PREBUILDER_LIB_DIR "${PROJECT_BINARY_DIR}/sysroot/usr/lib")
-set(PREBUILDER_SHARE_DIR "${PROJECT_BINARY_DIR}/sysroot/usr/share")
+set(CMAKE_INSTALL_PREFIX /usr)
+
+set(FIND_ROOT_PATH "${PROJECT_BINARY_DIR}/sysroot/usr")
+set(PREBUILDER_LIB_DIR "${FIND_ROOT_PATH}/lib")
+set(PREBUILDER_SHARE_DIR "${FIND_ROOT_PATH}/share")
+
+list(APPEND CMAKE_FIND_ROOT_PATH "${FIND_ROOT_PATH}")
 
 set(ENV{PKG_CONFIG_SYSROOT_DIR} "${PROJECT_BINARY_DIR}/sysroot")
 set(ENV{PKG_CONFIG_PATH} "${PREBUILDER_LIB_DIR}/pkgconfig:${PREBUILDER_SHARE_DIR}/pkgconfig")
@@ -46,16 +51,17 @@ add_subdirectory(wasmfrontend)
 add_subdirectory(fcitx5-webview)
 add_subdirectory(webpanel)
 
+# Force cmake to re-link Fcitx5.js when non-cpp files are changed.
+set(DUMMY_CPP "${PROJECT_BINARY_DIR}/dummy.cpp")
+
 file(GLOB JS_SOURCES CONFIGURE_DEPENDS "page/*")
 add_custom_command(
-    OUTPUT ${PROJECT_BINARY_DIR}/pre.js ${PROJECT_BINARY_DIR}/index.js
-    COMMAND pnpm run build
-    DEPENDS ${JS_SOURCES}
+    OUTPUT ${DUMMY_CPP}
+    COMMAND pnpm run build && ./scripts/install.sh
+    DEPENDS ${JS_SOURCES} clipboard imselector spell quickphrase unicode webpanel wasmfrontend
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    COMMENT "Generating the pre.js and index.js..."
+    COMMENT "Generating the pre.js, index.js and installing shared libraries"
 )
-add_custom_target(GeneratePostJS ALL
-    DEPENDS ${PROJECT_BINARY_DIR}/pre.js ${PROJECT_BINARY_DIR}/index.js
-)
+add_custom_target(NonCppDependencies ALL DEPENDS ${DUMMY_CPP})
 
 add_subdirectory(src)
