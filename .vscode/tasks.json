@@ -12,7 +12,7 @@
         {
             "type": "shell",
             "label": "Configure",
-            "command": "emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release",
+            "command": "emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug",
             "group": {
                 "kind": "build"
             }
