@@ -30,9 +30,11 @@ target_link_libraries(Fcitx5
     "-Lfcitx5/src/lib/fcitx-utils"
     "-Lfcitx5/src/lib/fcitx-config"
     Fcitx5::Core
-    keyboard
-    webpanel
-    wasmfrontend
+)
+
+fcitx5_import_addons(Fcitx5
+    REGISTRY_VARNAME getStaticAddon
+    ADDONS keyboard webpanel wasmfrontend
 )
 
 add_dependencies(Fcitx5 NonCppDependencies)

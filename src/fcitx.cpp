@@ -7,13 +7,9 @@
 #include <fcitx/instance.h>
 #include <sys/stat.h>
 
+FCITX_DEFINE_STATIC_ADDON_REGISTRY(getStaticAddon)
+
 namespace fcitx {
-
-StaticAddonRegistry staticAddons;
-
-FCITX_IMPORT_ADDON_FACTORY(staticAddons, keyboard);
-FCITX_IMPORT_ADDON_FACTORY(staticAddons, wasmfrontend);
-FCITX_IMPORT_ADDON_FACTORY(staticAddons, webpanel);
 
 std::unique_ptr<Instance> instance;
 WasmFrontend *frontend;
@@ -38,7 +34,7 @@ int main() {
         [] { return std::make_unique<JSEventLoop>(); });
     instance = std::make_unique<Instance>(0, nullptr);
     auto &addonMgr = instance->addonManager();
-    addonMgr.registerDefaultLoader(&staticAddons);
+    addonMgr.registerDefaultLoader(&getStaticAddon());
     instance->exec();
     frontend = dynamic_cast<WasmFrontend *>(addonMgr.addon("wasmfrontend"));
     return 0;

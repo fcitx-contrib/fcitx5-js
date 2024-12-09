@@ -48,6 +48,11 @@ set(CMAKE_INSTALL_LIBDATADIR "${CMAKE_INSTALL_PREFIX}/lib")
 set(EVENT_LOOP_BACKEND "none" CACHE STRING "")
 add_subdirectory(fcitx5)
 
+# Disable multiple so and symlink.
+set_target_properties(Fcitx5Config Fcitx5Utils Fcitx5Core
+    PROPERTIES NO_SONAME TRUE
+)
+
 add_subdirectory(wasmfrontend)
 add_subdirectory(fcitx5-webview)
 add_subdirectory(webpanel)
