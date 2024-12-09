@@ -46,7 +46,6 @@ jobs:
           . emsdk/emsdk_env.sh
           export EMCC_FORCE_STDLIBS=libc++
           export FCITX_DISTRIBUTION=fcitx5-js
-          pushd fcitx5 && git apply ../patches/fcitx5.patch && popd
           emcmake cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release
           cmake --build build
