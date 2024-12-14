@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     env:
-      EMSCRIPTEN_VERSION: '3.1.71'
+      EMSCRIPTEN_VERSION: '3.1.74'
     steps:
       - uses: actions/checkout@v4
         with:
