@@ -34,6 +34,18 @@ interface AddonCategory {
   name: string
 }
 
+interface FS {
+  mkdir: (path: string) => void
+  readdir: (path: string) => string[]
+  writeFile: (path: string, data: Uint8Array) => void
+}
+
+interface EM_MODULE {
+  ccall: (name: string, retType: WASM_TYPE, argsType: WASM_TYPE[], args: any[]) => any
+  onRuntimeInitialized: () => void
+  FS: FS
+}
+
 export interface FCITX {
   enable: () => void
   disable: () => void
@@ -50,6 +62,9 @@ export interface FCITX {
   jsKeyToFcitxString: (event: KeyboardEvent) => string
   getMenuActions: () => MenuAction[]
   activateMenuAction: (id: number) => void
+  installPlugin: (name: string, buffer: ArrayBuffer) => void
+  getInstalledPlugins: () => string[]
+  Module: EM_MODULE
 }
 
 export const fcitxReady: Promise<null>

@@ -4,6 +4,7 @@
 #include <emscripten.h>
 #include <fcitx-utils/event.h>
 #include <fcitx-utils/standardpath.h>
+#include <fcitx/inputmethodmanager.h>
 #include <fcitx/instance.h>
 #include <sys/stat.h>
 
@@ -24,6 +25,22 @@ EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
                                       uint32_t modifiers, bool isRelease) {
     return frontend->keyEvent(js_key_to_fcitx_key(key, code, modifiers),
                               isRelease);
+}
+
+EMSCRIPTEN_KEEPALIVE void reload() {
+    instance->reloadConfig();
+    instance->refresh();
+    auto &addonManager = instance->addonManager();
+    for (const auto category :
+         {fcitx::AddonCategory::InputMethod, fcitx::AddonCategory::Frontend,
+          fcitx::AddonCategory::Loader, fcitx::AddonCategory::Module,
+          fcitx::AddonCategory::UI}) {
+        const auto names = addonManager.addonNames(category);
+        for (const auto &name : names) {
+            instance->reloadAddonConfig(name);
+        }
+    }
+    instance->inputMethodManager().load();
 }
 
 int main() {

@@ -1,11 +1,8 @@
-import type { FCITX } from './Fcitx5.d.ts'
+import type { FCITX, EM_MODULE as MODULE } from './Fcitx5.d.ts'
 
 declare global {
   type WASM_TYPE = 'void' | 'bool' | 'number' | 'string'
-  interface EM_MODULE {
-    ccall: (name: string, retType: WASM_TYPE, argsType: WASM_TYPE[], args: any[]) => any
-    onRuntimeInitialized: () => void
-  }
+  type EM_MODULE = MODULE
   interface Window {
     fcitx: { [key: string]: any } & FCITX
   }

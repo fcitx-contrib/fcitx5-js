@@ -5,6 +5,7 @@ import { blur, clickPanel, focus } from './focus'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
 import Module from './module'
+import { getInstalledPlugins, installPlugin } from './plugin'
 
 let res: (value: any) => void
 
@@ -15,6 +16,7 @@ const fcitxReady = new Promise((resolve) => {
 let statusAreaCallback = () => {}
 
 window.fcitx = {
+  Module,
   createPanel(html: string) {
     const tree = document.createElement('div')
     tree.innerHTML = html
@@ -48,6 +50,8 @@ window.fcitx = {
   jsKeyToFcitxString,
   getMenuActions,
   activateMenuAction,
+  installPlugin,
+  getInstalledPlugins,
   enable() {
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
