@@ -21,6 +21,8 @@ EMSCRIPTEN_KEEPALIVE void focus_in() { frontend->focusIn(); }
 
 EMSCRIPTEN_KEEPALIVE void focus_out() { frontend->focusOut(); }
 
+EMSCRIPTEN_KEEPALIVE void reset_input() { frontend->resetInput(); }
+
 EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
                                       uint32_t modifiers, bool isRelease) {
     return frontend->keyEvent(js_key_to_fcitx_key(key, code, modifiers),

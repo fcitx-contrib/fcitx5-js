@@ -10,11 +10,16 @@ export function clickPanel() {
   userClick = true
 }
 
+function resetInput() {
+  Module.ccall('reset_input', 'void', [], [])
+}
+
 export function focus() {
   if (!['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '')) {
     return
   }
   input = <Input>document.activeElement
+  input.addEventListener('mousedown', resetInput)
   Module.ccall('focus_in', 'void', [], [])
 }
 
@@ -27,6 +32,7 @@ export function blur() {
     userClick = false
     return
   }
+  input.removeEventListener('mousedown', resetInput)
   input = null
   Module.ccall('focus_out', 'void', [], [])
   resetPreedit()

@@ -25,6 +25,7 @@ class WasmFrontend : public AddonInstance {
     bool keyEvent(const Key &key, bool isRelease);
     void focusIn();
     void focusOut();
+    void resetInput();
 
   private:
     Instance *instance_;

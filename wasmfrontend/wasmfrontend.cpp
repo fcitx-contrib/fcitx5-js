@@ -25,6 +25,8 @@ void WasmFrontend::focusIn() { ic_->focusIn(); }
 
 void WasmFrontend::focusOut() { ic_->focusOut(); }
 
+void WasmFrontend::resetInput() { ic_->reset(); }
+
 WasmInputContext::WasmInputContext(WasmFrontend *frontend,
                                    InputContextManager &inputContextManager)
     : InputContext(inputContextManager, ""), frontend_(frontend) {
