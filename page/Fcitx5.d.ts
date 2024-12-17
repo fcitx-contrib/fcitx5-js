@@ -62,7 +62,7 @@ export interface FCITX {
   jsKeyToFcitxString: (event: KeyboardEvent) => string
   getMenuActions: () => MenuAction[]
   activateMenuAction: (id: number) => void
-  installPlugin: (name: string, buffer: ArrayBuffer) => void
+  installPlugin: (buffer: ArrayBuffer) => string
   getInstalledPlugins: () => string[]
   Module: EM_MODULE
 }
