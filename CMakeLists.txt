@@ -11,6 +11,11 @@ set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-sSIDE_MODULE")
 set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "-sSIDE_MODULE")
 add_compile_options(-fPIC -fexceptions)
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(-fsanitize=address)
+    add_link_options(-fsanitize=address -gsource-map)
+endif()
+
 set(CMAKE_INSTALL_PREFIX /usr)
 
 set(FIND_ROOT_PATH "${PROJECT_BINARY_DIR}/sysroot/usr")
