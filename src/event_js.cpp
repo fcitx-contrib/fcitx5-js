@@ -43,18 +43,50 @@ struct JSEventSourceIO : public JSEventSourceBase<EventSourceIO> {
     IOEventFlags revents() const override { return IOEventFlag::In; }
 };
 
-void TimeEventCallback(void *arg);
+struct JSEventSourceTime;
+
+// emscripten_async_call needs a C pointer as callback context parameter.
+// The actual event handler needs source and time, so pack them together.
+struct ParameterPack {
+    ParameterPack(std::shared_ptr<TimeCallback> callback)
+        : callback_(callback) {}
+
+    JSEventSourceTime *source_ = nullptr; // nullptr means not scheduled.
+    std::shared_ptr<TimeCallback> callback_;
+    int time_ = 0;
+};
+
+void timeEventCallback(void *arg);
 
 struct JSEventSourceTime : public JSEventSourceBase<EventSourceTime> {
     JSEventSourceTime(TimeCallback _callback, uint64_t time, clockid_t clockid)
         : callback_(std::make_shared<TimeCallback>(std::move(_callback))),
-          time_(time), clockid_(clockid) {
+          time_(time), clockid_(clockid), pack_(new ParameterPack(callback_)) {
         setOneShot();
+    }
+
+    ~JSEventSourceTime() override {
+        if (pack_->source_) {
+            // Callback is scheduled, so tell it to delete instead of execute.
+            pack_->source_ = nullptr;
+        } else {
+            // No callback scheduled. Delete the only reference.
+            delete pack_;
+        }
     }
 
     void setOneShot() override {
         int t = std::max<int64_t>(0, time_ - now(CLOCK_MONOTONIC)) / 1000;
-        emscripten_async_call(TimeEventCallback, this, t);
+        if (pack_->source_) {
+            pack_->source_ = nullptr;
+            pack_ = new ParameterPack(callback_);
+        }
+        pack_->source_ = this;
+        pack_->time_ = t;
+        // pack_ is manually dynamically allocated, so even if
+        // emscripten_async_call provides a return value from setTimeout, we
+        // can't call clearTimeout, otherwise pack_ is leaked.
+        emscripten_async_call(timeEventCallback, pack_, t);
     }
 
     uint64_t time() const override { return time_; }
@@ -72,11 +104,18 @@ struct JSEventSourceTime : public JSEventSourceBase<EventSourceTime> {
   private:
     uint64_t time_;
     clockid_t clockid_;
+    ParameterPack *pack_;
 };
 
-void TimeEventCallback(void *arg) {
-    auto source = static_cast<JSEventSourceTime *>(arg);
-    (*source->callback_)(source, source->time());
+void timeEventCallback(void *arg) {
+    auto pack = static_cast<ParameterPack *>(arg);
+    if (pack->source_) {
+        (*pack->callback_)(pack->source_, pack->time_);
+        pack->source_ = nullptr;
+    } else {
+        // Source is deleted before timeout so delete instead of execute.
+        delete pack;
+    }
 }
 
 std::unique_ptr<EventSourceIO>
