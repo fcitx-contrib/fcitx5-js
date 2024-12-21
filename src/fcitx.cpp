@@ -48,7 +48,11 @@ EMSCRIPTEN_KEEPALIVE void reload() {
 int main() {
     umask(007); // Fix config file's mode
     StandardPath::global().syncUmask();
+#ifdef NDEBUG
+    Log::setLogRule("*=4,notimedate");
+#else
     Log::setLogRule("*=5,notimedate");
+#endif
     EventLoop::setEventLoopFactory(
         [] { return std::make_unique<JSEventLoop>(); });
     instance = std::make_unique<Instance>(0, nullptr);
