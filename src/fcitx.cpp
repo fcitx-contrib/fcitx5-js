@@ -58,7 +58,7 @@ int main() {
     instance = std::make_unique<Instance>(0, nullptr);
     auto &addonMgr = instance->addonManager();
     addonMgr.registerDefaultLoader(&getStaticAddon());
-    instance->exec();
+    instance->initialize(); // Unnecessary to call exec.
     frontend = dynamic_cast<WasmFrontend *>(addonMgr.addon("wasmfrontend"));
     return 0;
 }

@@ -8,6 +8,10 @@ WasmFrontend::WasmFrontend(Instance *instance)
     : instance_(instance),
       focusGroup_("wasm", instance->inputContextManager()) {
     createInputContext();
+    // Make mostRecentInputContext not null so that current IM info can be
+    // retrieved on load finish, even if no DOM element can be actually focused
+    // (e.g. when focusing on address bar).
+    focusIn();
 }
 
 void WasmFrontend::createInputContext() {
