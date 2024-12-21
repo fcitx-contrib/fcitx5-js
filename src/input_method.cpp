@@ -30,19 +30,14 @@ EMSCRIPTEN_KEEPALIVE const char *current_input_method() {
 
 EMSCRIPTEN_KEEPALIVE const char *get_input_methods() {
     static std::string ret;
-    nlohmann::json j;
+    auto j = nlohmann::json::array();
     auto &imMgr = instance->inputMethodManager();
     auto group = imMgr.currentGroup();
-    bool empty = true;
     for (const auto &im : group.inputMethodList()) {
         auto entry = imMgr.entry(im.name());
         if (!entry)
             continue;
-        empty = false;
         j.push_back(json_describe_im(entry));
-    }
-    if (empty) { // j is not treated array
-        return "[]";
     }
     ret = j.dump();
     return ret.c_str();
@@ -63,7 +58,7 @@ EMSCRIPTEN_KEEPALIVE void set_input_methods(const char *json) {
 
 EMSCRIPTEN_KEEPALIVE const char *get_all_input_methods() {
     static std::string ret;
-    nlohmann::json j;
+    auto j = nlohmann::json::array();
     auto &imMgr = instance->inputMethodManager();
     imMgr.foreachEntries([&j](const fcitx::InputMethodEntry &entry) {
         j.push_back(json_describe_im(&entry));

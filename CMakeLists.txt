@@ -11,7 +11,13 @@ set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-sSIDE_MODULE")
 set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "-sSIDE_MODULE")
 add_compile_options(-fPIC -fexceptions)
 
+option(RIME_ONLY "Disable components unused by rime" OFF)
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
+
+if (RIME_ONLY)
+    option(ENABLE_KEYBOARD "" OFF)
+endif()
+
 if (ENABLE_ASAN)
     # Very slow. Not recommended to use with chinese-addons.
     add_compile_options(-fsanitize=address)
