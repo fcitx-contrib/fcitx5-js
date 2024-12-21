@@ -11,9 +11,15 @@ set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-sSIDE_MODULE")
 set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "-sSIDE_MODULE")
 add_compile_options(-fPIC -fexceptions)
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
+if (ENABLE_ASAN)
+    # Very slow. Not recommended to use with chinese-addons.
     add_compile_options(-fsanitize=address)
-    add_link_options(-fsanitize=address -gsource-map)
+    add_link_options(-fsanitize=address)
+endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_link_options(-gsource-map)
 endif()
 
 set(CMAKE_INSTALL_PREFIX /usr)

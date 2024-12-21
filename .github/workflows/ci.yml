@@ -44,11 +44,9 @@ jobs:
         run: |
           ./scripts/install-deps.sh
           . emsdk/emsdk_env.sh
-          export EMCC_FORCE_STDLIBS=libc++
-          export FCITX_DISTRIBUTION=fcitx5-js
           emcmake cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release
-          cmake --build build
+          EMCC_FORCE_STDLIBS=libc++ FCITX_DISTRIBUTION=fcitx5-js cmake --build build
           npm pack
           cd build/sysroot/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib
 

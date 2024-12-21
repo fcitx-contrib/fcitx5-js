@@ -12,7 +12,15 @@
         {
             "type": "shell",
             "label": "Configure",
-            "command": "emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug",
+            "command": "rm -f build/CMakeCache.txt && emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Configure with ASAN",
+            "command": "rm -f build/CMakeCache.txt && emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_ASAN=ON",
             "group": {
                 "kind": "build"
             }
@@ -27,6 +35,22 @@
                     "FCITX_DISTRIBUTION": "fcitx5-js"
                 }
             },
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Preview",
+            "command": "npx serve -l 9000 -S preview",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Pack",
+            "command": "npm pack",
             "group": {
                 "kind": "build"
             }
