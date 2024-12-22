@@ -22,8 +22,7 @@ set(EXE_LINK_OPTIONS
     "-sENVIRONMENT=web" # disable require("ws") in Fcitx5.js which is rejected by project user's bundler
     "--extern-pre-js ${PROJECT_BINARY_DIR}/pre.js"
     "--extern-post-js ${PROJECT_BINARY_DIR}/index.js"
-    "-Lfcitx5/src/lib/fcitx-utils"
-    "-Lfcitx5/src/lib/fcitx-config"
+    "-L${PROJECT_BINARY_DIR}/sysroot/usr/lib"
     Fcitx5::Core
 )
 
