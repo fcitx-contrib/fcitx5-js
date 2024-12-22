@@ -53,6 +53,7 @@ window.fcitx = {
   installPlugin,
   getInstalledPlugins,
   enable() {
+    Module.ccall('init', 'void', [], [])
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
     document.addEventListener('keydown', keyEvent)

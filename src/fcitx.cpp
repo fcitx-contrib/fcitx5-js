@@ -29,23 +29,10 @@ EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
                               isRelease);
 }
 
-EMSCRIPTEN_KEEPALIVE void reload() {
-    instance->reloadConfig();
-    instance->refresh();
-    auto &addonManager = instance->addonManager();
-    for (const auto category :
-         {fcitx::AddonCategory::InputMethod, fcitx::AddonCategory::Frontend,
-          fcitx::AddonCategory::Loader, fcitx::AddonCategory::Module,
-          fcitx::AddonCategory::UI}) {
-        const auto names = addonManager.addonNames(category);
-        for (const auto &name : names) {
-            instance->reloadAddonConfig(name);
-        }
+EMSCRIPTEN_KEEPALIVE void init() {
+    if (instance) {
+        return;
     }
-    instance->inputMethodManager().load();
-}
-
-int main() {
     umask(007); // Fix config file's mode
     StandardPath::global().syncUmask();
 #ifdef NDEBUG
@@ -60,7 +47,25 @@ int main() {
     addonMgr.registerDefaultLoader(&getStaticAddon());
     instance->initialize(); // Unnecessary to call exec.
     frontend = dynamic_cast<WasmFrontend *>(addonMgr.addon("wasmfrontend"));
-    return 0;
+}
+
+EMSCRIPTEN_KEEPALIVE void reload() {
+    if (!instance) { // Pre-install plugins.
+        return init();
+    }
+    instance->reloadConfig();
+    instance->refresh();
+    auto &addonManager = instance->addonManager();
+    for (const auto category :
+         {fcitx::AddonCategory::InputMethod, fcitx::AddonCategory::Frontend,
+          fcitx::AddonCategory::Loader, fcitx::AddonCategory::Module,
+          fcitx::AddonCategory::UI}) {
+        const auto names = addonManager.addonNames(category);
+        for (const auto &name : names) {
+            instance->reloadAddonConfig(name);
+        }
+    }
+    instance->inputMethodManager().load();
 }
 }
 } // namespace fcitx
