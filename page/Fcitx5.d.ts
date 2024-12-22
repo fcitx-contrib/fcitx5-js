@@ -64,6 +64,7 @@ export interface FCITX {
   activateMenuAction: (id: number) => void
   installPlugin: (buffer: ArrayBuffer) => string
   getInstalledPlugins: () => string[]
+  unzip: (buffer: ArrayBuffer, dir: string) => void
   Module: EM_MODULE
 }
 

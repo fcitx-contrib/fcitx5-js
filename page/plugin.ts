@@ -14,8 +14,29 @@ function addDefaultIMs(byteArray: Uint8Array) {
   window.fcitx.setInputMethods([...currentInputMethods, ...inputMethods.filter(im => !currentInputMethods.includes(im))])
 }
 
-export function installPlugin(buffer: ArrayBuffer) {
+function distributeFiles(manifest: UZIP.UZIPFiles, dir: string) {
+  Object.entries(manifest).forEach(([path, data]) => {
+    const absolutePath = `${dir}/${path}`
+    if (path.endsWith('/')) {
+      mkdirP(absolutePath)
+    }
+    else {
+      Module.FS.writeFile(absolutePath, data)
+    }
+  })
+}
+
+export function unzip(buffer: ArrayBuffer, dir: string) {
   // UZIP hangs on empty zip.
+  if (!buffer.byteLength) {
+    return
+  }
+  const manifest = UZIP.parse(buffer)
+  distributeFiles(manifest, dir)
+}
+
+// Like unzip, but do some sanity checks for plugins.
+export function installPlugin(buffer: ArrayBuffer) {
   if (buffer.byteLength < 1024) {
     throw new Error('Invalid plugin')
   }
@@ -29,15 +50,7 @@ export function installPlugin(buffer: ArrayBuffer) {
   if (!byteArray) {
     throw new Error('Invalid plugin')
   }
-  Object.entries(manifest).forEach(([path, data]) => {
-    const absolutePath = `/usr/${path}`
-    if (path.endsWith('/')) {
-      mkdirP(absolutePath)
-    }
-    else {
-      Module.FS.writeFile(absolutePath, data)
-    }
-  })
+  distributeFiles(manifest, '/usr')
   reload()
   addDefaultIMs(byteArray)
   return name

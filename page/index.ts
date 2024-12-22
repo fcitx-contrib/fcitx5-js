@@ -5,7 +5,7 @@ import { blur, clickPanel, focus } from './focus'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
 import Module from './module'
-import { getInstalledPlugins, installPlugin } from './plugin'
+import { getInstalledPlugins, installPlugin, unzip } from './plugin'
 
 let res: (value: any) => void
 
@@ -52,6 +52,7 @@ window.fcitx = {
   activateMenuAction,
   installPlugin,
   getInstalledPlugins,
+  unzip,
   enable() {
     Module.ccall('init', 'void', [], [])
     document.addEventListener('focus', focus, true)
