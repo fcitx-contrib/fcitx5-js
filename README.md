@@ -2,7 +2,7 @@
 
 [Fcitx5](https://github.com/fcitx/fcitx5) input method framework ported to JavaScript with WebAssembly.
 
-The project provides an npm package `fcitx5-js-*.tgz`, which powers derivative apps for end user.
+The project provides an npm package `fcitx5-js.tgz`, which powers derivative apps for end user.
 
 Derivative | Note
 -|-

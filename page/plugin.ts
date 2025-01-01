@@ -1,9 +1,10 @@
 import UZIP from 'uzip'
 import { lsDir, mkdirP } from './fs'
+import { getLocale } from './locale'
 import Module from './module'
 
 function reload() {
-  Module.ccall('reload', 'void', [], [])
+  Module.ccall('reload', 'void', ['string'], [getLocale()])
 }
 
 const textDecoder = new TextDecoder()
@@ -45,7 +46,7 @@ export function installPlugin(buffer: ArrayBuffer) {
   if (names.length !== 1) {
     throw new Error('Invalid plugin')
   }
-  const name = names[0]
+  const name = names[0] as string
   const byteArray = manifest[`plugin/${name}.json`]
   if (!byteArray) {
     throw new Error('Invalid plugin')

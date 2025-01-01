@@ -48,7 +48,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release
           EMCC_FORCE_STDLIBS=libc++ FCITX_DISTRIBUTION=fcitx5-js cmake --build build
           npm pack
-          cd build/sysroot/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib
+          mv fcitx5-js-*.tgz fcitx5-js.tgz
+          cd build/destdir/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib
 
       - name: Setup tmate session
         if: ${{ failure() }}
@@ -63,5 +64,5 @@ jobs:
           prerelease: true
           title: "Nightly Build"
           files: |
-            fcitx5-js-*.tgz
+            fcitx5-js.tgz
             fcitx5-js-dev.tar.bz2

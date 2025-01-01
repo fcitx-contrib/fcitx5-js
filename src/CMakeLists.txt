@@ -22,9 +22,12 @@ set(EXE_LINK_OPTIONS
     "-sENVIRONMENT=web" # disable require("ws") in Fcitx5.js which is rejected by project user's bundler
     "--extern-pre-js ${PROJECT_BINARY_DIR}/pre.js"
     "--extern-post-js ${PROJECT_BINARY_DIR}/index.js"
-    "-L${PROJECT_BINARY_DIR}/sysroot/usr/lib"
+    "-L${PROJECT_BINARY_DIR}/destdir/usr/lib"
     Fcitx5::Core
 )
+
+set(INSTALL_LIB_DIR "${PROJECT_BINARY_DIR}/destdir/usr/lib")
+set(INSTALL_SHARE_DIR "${PROJECT_BINARY_DIR}/destdir/usr/share")
 
 set(STATIC_ADDONS webpanel wasmfrontend)
 
@@ -32,7 +35,7 @@ if (RIME_ONLY)
     foreach(ADDON ${STATIC_ADDONS})
         # Very small so use embed.
         list(APPEND EXE_LINK_OPTIONS
-            "--embed-file ${PREBUILDER_SHARE_DIR}/fcitx5/addon/${ADDON}.conf@/usr/share/fcitx5/addon/${ADDON}.conf"
+            "--embed-file ${INSTALL_SHARE_DIR}/fcitx5/addon/${ADDON}.conf@/usr/share/fcitx5/addon/${ADDON}.conf"
         )
     endforeach()
 else()
@@ -40,8 +43,9 @@ else()
         "--preload-file ${PREBUILDER_SHARE_DIR}/X11@/usr/share/X11"
         "--preload-file ${PROJECT_BINARY_DIR}/sysroot${ISOCODES_ISO3166_JSON}@${ISOCODES_ISO3166_JSON}"
         "--preload-file ${PROJECT_BINARY_DIR}/sysroot${ISOCODES_ISO639_JSON}@${ISOCODES_ISO639_JSON}"
-        "--preload-file ${PREBUILDER_SHARE_DIR}/fcitx5@/usr/share/fcitx5"
-        "--preload-file ${PREBUILDER_LIB_DIR}/fcitx5@/usr/lib/fcitx5"
+        "--preload-file ${INSTALL_SHARE_DIR}/locale@/usr/share/locale"
+        "--preload-file ${INSTALL_SHARE_DIR}/fcitx5@/usr/share/fcitx5"
+        "--preload-file ${INSTALL_LIB_DIR}/fcitx5@/usr/lib/fcitx5"
     )
     list(APPEND STATIC_ADDONS keyboard)
 endif()

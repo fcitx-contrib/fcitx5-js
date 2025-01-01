@@ -4,6 +4,7 @@ import { getAddons, getConfig, setConfig } from './config'
 import { blur, clickPanel, focus } from './focus'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
+import { getLocale } from './locale'
 import Module from './module'
 import { getInstalledPlugins, installPlugin, unzip } from './plugin'
 
@@ -54,7 +55,7 @@ window.fcitx = {
   getInstalledPlugins,
   unzip,
   enable() {
-    Module.ccall('init', 'void', [], [])
+    Module.ccall('init', 'void', ['string'], [getLocale()])
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
     document.addEventListener('keydown', keyEvent)

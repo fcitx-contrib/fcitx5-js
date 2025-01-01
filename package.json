@@ -17,11 +17,11 @@
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "@antfu/eslint-config": "^3.12.0",
+    "@antfu/eslint-config": "^3.12.1",
     "@types/textarea-caret": "^3.0.3",
     "@types/uzip": "^0.20201231.2",
     "error-stack-parser": "^2.1.4",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.24.2",
     "eslint": "^9.17.0",
     "serve": "^14.2.4",
     "textarea-caret": "^3.1.0",

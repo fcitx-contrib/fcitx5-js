@@ -29,7 +29,7 @@ EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
                               isRelease);
 }
 
-EMSCRIPTEN_KEEPALIVE void init() {
+EMSCRIPTEN_KEEPALIVE void init(const char *locale) {
     if (instance) {
         return;
     }
@@ -40,6 +40,9 @@ EMSCRIPTEN_KEEPALIVE void init() {
 #else
     Log::setLogRule("*=5,notimedate");
 #endif
+
+    setlocale(LC_ALL, locale); // emscripten musl specific.
+
     EventLoop::setEventLoopFactory(
         [] { return std::make_unique<JSEventLoop>(); });
     instance = std::make_unique<Instance>(0, nullptr);
@@ -49,9 +52,9 @@ EMSCRIPTEN_KEEPALIVE void init() {
     frontend = dynamic_cast<WasmFrontend *>(addonMgr.addon("wasmfrontend"));
 }
 
-EMSCRIPTEN_KEEPALIVE void reload() {
+EMSCRIPTEN_KEEPALIVE void reload(const char *locale) {
     if (!instance) { // Pre-install plugins.
-        return init();
+        return init(locale);
     }
     instance->reloadConfig();
     instance->refresh();
