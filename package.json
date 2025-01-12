@@ -13,7 +13,8 @@
     "lint:fix": "eslint page --fix",
     "check": "tsc --noEmit",
     "build": "node scripts/build.mjs",
-    "prepack": "bash scripts/prepack.sh"
+    "prepack": "bash scripts/prepack.sh",
+    "postpack": "bash scripts/postpack.sh"
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {

@@ -50,7 +50,7 @@
         {
             "type": "shell",
             "label": "Pack",
-            "command": "npm pack && mv fcitx5-js-*.tgz fcitx5-js.tgz",
+            "command": "npm pack",
             "group": {
                 "kind": "build"
             }
