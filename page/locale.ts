@@ -1,7 +1,13 @@
 import { lsDir } from './fs'
 
 export function getLocale() {
-  const supported = lsDir('/usr/share/locale')
+  let supported: string[]
+  try {
+    supported = lsDir('/usr/share/locale')
+  }
+  catch {
+    supported = []
+  }
   for (const language of navigator.languages) {
     if (language === 'zh-HK' || language === 'zh-TW') {
       return 'zh_TW'
