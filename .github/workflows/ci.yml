@@ -8,10 +8,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Install dependencies
+        run: |
+          sudo apt install -y clang-format
+          npm i -g pnpm
+          pnpm i
+
+      - name: Lint
+        run: ./scripts/lint.sh
+
+  build:
+    runs-on: ${{ matrix.os }}
+    needs: lint
     env:
-      EMSCRIPTEN_VERSION: '4.0.0'
+      EMSCRIPTEN_VERSION: '4.0.2'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04 }
+          - { os: macos-15 }
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,17 +46,25 @@ jobs:
         with:
           node-version: 22.x
 
-      - name: Install dependencies
+      - name: Install dependencies (Ubuntu)
+        if: ${{ matrix.os == 'ubuntu-24.04' }}
         run: |
-          sudo apt install -y clang-format \
+          sudo apt install -y \
             ninja-build \
             gettext
+
+      - name: Install dependencies (macOS)
+        if: ${{ matrix.os == 'macos-15' }}
+        env:
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+        run: |
+          brew install ninja
+
+      - name: Install node dependencies
+        run: |
           npm i -g pnpm
           pnpm i
           pnpm --prefix=fcitx5-webview i
-
-      - name: Lint
-        run: ./scripts/lint.sh
 
       - name: Install emsdk
         run: |
@@ -48,15 +81,50 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release
           EMCC_FORCE_STDLIBS=libc++ FCITX_DISTRIBUTION=fcitx5-js cmake --build build
           npm pack
-          mv fcitx5-js-*.tgz fcitx5-js.tgz
-          cd build/destdir/usr && tar cjvf ../../../fcitx5-js-dev.tar.bz2 include lib
+
+      - name: Package dev tarball
+        env:
+          LC_ALL: C
+        run: |
+          if [[ $(uname) == 'Darwin' ]]; then
+            tar=gtar
+          else
+            tar=tar
+          fi
+          cd build/destdir/usr && $tar cj \
+            --sort=name --mtime=@0 \
+            --numeric-owner --owner=0 --group=0 --mode=go+u,go-w \
+            -f ../../../fcitx5-js-dev.tar.bz2 include lib
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ matrix.os }}
+          path: |
+            fcitx5-js.tgz
+            fcitx5-js-dev.tar.bz2
 
       - name: Setup tmate session
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
 
+  compare:
+    needs: build
+    if: ${{ github.ref != 'refs/heads/master' }}
+    uses: ./.github/workflows/compare.yml
+
+  release:
+    if: ${{ github.ref == 'refs/heads/master' }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: artifact-ubuntu*
+          merge-multiple: true
+
       - name: Release
-        if: ${{ github.ref == 'refs/heads/master' }}
         uses: 'marvinpinto/action-automatic-releases@latest'
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}

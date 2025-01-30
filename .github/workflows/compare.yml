@@ -1,0 +1,73 @@
+name: Compare
+
+on:
+  workflow_call:
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact built on Ubuntu
+        uses: actions/download-artifact@v4
+        with:
+          pattern: artifact-ubuntu*
+          merge-multiple: true
+
+      - name: Extract and rename
+        run: |
+          mkdir ubuntu ubuntu-dev
+          tar xf fcitx5-js.tgz -C ubuntu
+          tar xf fcitx5-js-dev.tar.bz2 -C ubuntu-dev
+          mv fcitx5-js.tgz fcitx5-js-ubuntu.tgz
+          mv fcitx5-js-dev.tar.bz2 fcitx5-js-dev-ubuntu.tar.bz2
+
+      - name: Download artifact built on macOS
+        uses: actions/download-artifact@v4
+        with:
+          pattern: artifact-macos*
+          merge-multiple: true
+
+      - name: Extract and rename
+        run: |
+          mkdir macos macos-dev
+          tar xf fcitx5-js.tgz -C macos
+          tar xf fcitx5-js-dev.tar.bz2 -C macos-dev
+          mv fcitx5-js.tgz fcitx5-js-macos.tgz
+          mv fcitx5-js-dev.tar.bz2 fcitx5-js-dev-macos.tar.bz2
+
+      - name: Compare
+        run: |
+          echo "## fcitx5-js.tgz comparison:" >> summary.md
+          diff -r ubuntu macos >> summary.md || true
+          if diff fcitx5-js-ubuntu.tgz fcitx5-js-macos.tgz; then
+            echo "Same tgz." >> summary.md
+          else
+            echo "Different tgz." >> summary.md
+          fi
+          echo "## fcitx5-js-dev.tar.bz2 comparison:" >> summary.md
+          diff -r ubuntu-dev macos-dev >> summary.md || true
+          if diff fcitx5-js-dev-ubuntu.tar.bz2 fcitx5-js-dev-macos.tar.bz2; then
+            echo "Same dev tarball." >> summary.md
+          else
+            echo "Different dev tarball." >> summary.md
+          fi
+
+      - name: Find comment
+        uses: peter-evans/find-comment@v3
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: "fcitx5-js.tgz comparison"
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          body-path: summary.md
+          edit-mode: replace
+
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
