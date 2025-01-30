@@ -87,9 +87,11 @@ jobs:
           LC_ALL: C
         run: |
           if [[ $(uname) == 'Darwin' ]]; then
-            alias tar=gtar
+            tar=gtar
+          else
+            tar=tar
           fi
-          cd build/destdir/usr && tar cj \
+          cd build/destdir/usr && $tar cj \
             --sort=name --mtime=@0 \
             --numeric-owner --owner=0 --group=0 --mode=go+u,go-w \
             -f ../../../fcitx5-js-dev.tar.bz2 include lib
