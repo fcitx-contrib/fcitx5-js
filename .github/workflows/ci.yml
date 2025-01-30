@@ -30,7 +30,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: lint
     env:
-      EMSCRIPTEN_VERSION: '3.1.74'
+      EMSCRIPTEN_VERSION: '4.0.0'
     strategy:
       fail-fast: false
       matrix:
