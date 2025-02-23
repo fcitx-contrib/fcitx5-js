@@ -104,6 +104,11 @@ jobs:
             fcitx5-js.tgz
             fcitx5-js-dev.tar.bz2
 
+      - name: Test
+        run: |
+          npx playwright install
+          pnpm run test
+
       - name: Setup tmate session
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
