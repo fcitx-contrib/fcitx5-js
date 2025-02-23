@@ -25,6 +25,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^3.12.1",
     "@playwright/test": "^1.50.1",
+    "@types/node": "^22.13.5",
     "@types/textarea-caret": "^3.0.3",
     "@types/uzip": "^0.20201231.2",
     "error-stack-parser": "^2.1.4",
