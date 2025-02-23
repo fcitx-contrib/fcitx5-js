@@ -9,5 +9,5 @@
     "esModuleInterop": true,
     "isolatedModules": true
   },
-  "include": ["page/*.ts"]
+  "include": ["page/*.ts", "tests/*.ts"]
 }

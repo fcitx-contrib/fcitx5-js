@@ -8,3 +8,4 @@ node_modules
 pnpm-lock.yaml
 preview/index.js
 preview/index.js.map
+test-results
