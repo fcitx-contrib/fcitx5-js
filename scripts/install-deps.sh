@@ -1,6 +1,5 @@
 deps=(
   ecm
-  fmt
   iso-codes
   json
   json-c
