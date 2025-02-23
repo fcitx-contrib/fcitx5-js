@@ -6,9 +6,9 @@
     <button>click me</button>
     <script type="module">
       import { fcitxReady } from "./Fcitx5.js"
+      window.fcitxReady = fcitxReady
       await fcitxReady
       window.fcitx.enable()
-      window.fcitx.setInputMethods(['pinyin'])
     </script>
   </body>
 </html>

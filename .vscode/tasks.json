@@ -42,7 +42,7 @@
         {
             "type": "shell",
             "label": "Preview",
-            "command": "npx serve -l 9000 -S preview",
+            "command": "pnpm run preview",
             "group": {
                 "kind": "build"
             }
@@ -67,6 +67,14 @@
             "type": "shell",
             "label": "Lint",
             "command": "./scripts/lint.sh",
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Test",
+            "command": "pnpm run test",
             "group": {
                 "kind": "build"
             }
