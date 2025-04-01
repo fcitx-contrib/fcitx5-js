@@ -9,5 +9,7 @@
     "esModuleInterop": true,
     "isolatedModules": true
   },
-  "include": ["page/*.ts", "tests/*.ts"]
+  "include": ["page/*.ts", "tests/*.ts"],
+  "exclude": ["page/worker.ts", "page/non-dom.d.ts"],
+  "references": [{ "path": "./tsconfig.worker.json" }]
 }

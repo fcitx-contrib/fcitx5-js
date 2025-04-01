@@ -35,16 +35,27 @@ interface AddonCategory {
 }
 
 interface FS {
+  isDir: (mode: number) => boolean
+  lstat: (path: string) => { mode: number }
   mkdir: (path: string) => void
+  readFile: (path: string) => Uint8Array
   readdir: (path: string) => string[]
+  rmdir: (path: string) => void
+  unlink: (path: string) => void
   writeFile: (path: string, data: Uint8Array) => void
 }
 
-interface EM_MODULE {
+type WASM_TYPE = 'void' | 'bool' | 'number' | 'string'
+
+export interface EM_MODULE {
   ccall: (name: string, retType: WASM_TYPE, argsType: WASM_TYPE[], args: any[]) => any
+  locateFile: (file: string) => string
   onRuntimeInitialized: () => void
   FS: FS
 }
+
+export type SyncCallback = (path: string) => void
+export type AsyncCallback = (path: string) => Promise<void> | void
 
 export interface FCITX {
   enable: () => void
@@ -65,6 +76,9 @@ export interface FCITX {
   installPlugin: (buffer: ArrayBuffer) => string
   getInstalledPlugins: () => string[]
   unzip: (buffer: ArrayBuffer, dir: string) => void
+  mkdirP: (path: string) => void
+  rmR: (path: string) => void
+  traverseAsync: (preDirCallback: AsyncCallback | undefined, fileCallback: AsyncCallback, postDirCallback: AsyncCallback | undefined) => (path: string) => Promise<void>
   Module: EM_MODULE
 }
 

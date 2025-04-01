@@ -29,7 +29,7 @@ EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
                               isRelease);
 }
 
-EMSCRIPTEN_KEEPALIVE void init(const char *locale) {
+EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker) {
     if (instance) {
         return;
     }
@@ -45,7 +45,15 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale) {
 
     EventLoop::setEventLoopFactory(
         [] { return std::make_unique<JSEventLoop>(); });
-    instance = std::make_unique<Instance>(0, nullptr);
+    if (worker) {
+        char arg0[] = "fcitx5-js";
+        char arg1[] = "--disable=all";
+        char arg2[] = "--enable=rime";
+        char *argv[] = {arg0, arg1, arg2};
+        instance = std::make_unique<Instance>(FCITX_ARRAY_SIZE(argv), argv);
+    } else {
+        instance = std::make_unique<Instance>(0, nullptr);
+    }
     auto &addonMgr = instance->addonManager();
     addonMgr.registerDefaultLoader(&getStaticAddon());
     instance->initialize(); // Unnecessary to call exec.
@@ -54,7 +62,7 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale) {
 
 EMSCRIPTEN_KEEPALIVE void reload(const char *locale) {
     if (!instance) { // Pre-install plugins.
-        return init(locale);
+        return init(locale, false);
     }
     instance->reloadConfig();
     instance->refresh();

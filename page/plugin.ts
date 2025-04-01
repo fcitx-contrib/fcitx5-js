@@ -3,7 +3,7 @@ import { lsDir, mkdirP } from './fs'
 import { getLocale } from './locale'
 import Module from './module'
 
-function reload() {
+export function reload() {
   Module.ccall('reload', 'void', ['string'], [getLocale()])
 }
 

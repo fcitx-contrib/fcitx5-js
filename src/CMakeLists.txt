@@ -19,7 +19,7 @@ set(EXE_LINK_OPTIONS
     "-sALLOW_MEMORY_GROWTH=1"
     "-sMAXIMUM_MEMORY=4GB"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','FS']"
-    "-sENVIRONMENT=web" # disable require("ws") in Fcitx5.js which is rejected by project user's bundler
+    "-sENVIRONMENT=web,worker" # disable require("ws") in Fcitx5.js which is rejected by project user's bundler
     "--extern-pre-js ${PROJECT_BINARY_DIR}/pre.js"
     "--extern-post-js ${PROJECT_BINARY_DIR}/index.js"
     "-L${PROJECT_BINARY_DIR}/destdir/usr/lib"
