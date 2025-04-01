@@ -23,7 +23,7 @@ await build({
 
 await build({
   ...common,
-  bundle: false, // This ensures worker and main shares the same Fcitx5.js which minimizes bandwidth.
+  bundle: false, // This ensures worker and main share the same Fcitx5.js which minimizes bandwidth.
   entryPoints: ['page/worker.ts'],
   outfile: 'build/worker.js'
 })
