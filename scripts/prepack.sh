@@ -12,3 +12,4 @@ for ext in data js wasm wasm.map; do
 done
 
 cp page/Fcitx5.d.ts dist
+cp build/worker.js dist

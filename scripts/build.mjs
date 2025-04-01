@@ -20,3 +20,10 @@ await build({
   entryPoints: ['page/pre.ts'],
   outfile: 'build/pre.js',
 })
+
+await build({
+  ...common,
+  bundle: false, // This ensures worker and main shares the same Fcitx5.js which minimizes bandwidth.
+  entryPoints: ['page/worker.ts'],
+  outfile: 'build/worker.js'
+})

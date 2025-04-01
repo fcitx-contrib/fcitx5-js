@@ -2,11 +2,13 @@ import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
 import { blur, clickPanel, focus } from './focus'
+import { mkdirP, rmR, traverseAsync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
 import { getLocale } from './locale'
 import Module from './module'
 import { getInstalledPlugins, installPlugin, unzip } from './plugin'
+import { deployRimeInWorker } from './workerAPI'
 
 let res: (value: any) => void
 
@@ -16,7 +18,7 @@ const fcitxReady = new Promise((resolve) => {
 
 let statusAreaCallback = () => {}
 
-window.fcitx = {
+globalThis.fcitx = {
   Module,
   createPanel(html: string) {
     const tree = document.createElement('div')
@@ -55,7 +57,10 @@ window.fcitx = {
   getInstalledPlugins,
   unzip,
   enable() {
-    Module.ccall('init', 'void', ['string'], [getLocale()])
+    Module.ccall('init', 'void', ['string', 'bool'], [getLocale(), globalThis.fcitx.isWorker])
+    if (globalThis.fcitx.isWorker) {
+      return
+    }
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
     document.addEventListener('keydown', keyEvent)
@@ -64,6 +69,9 @@ window.fcitx = {
     focus() // there may be textarea focused before wasm initialized
   },
   disable() {
+    if (globalThis.fcitx.isWorker) {
+      return
+    }
     document.removeEventListener('focus', focus, true)
     document.removeEventListener('blur', blur, true)
     document.removeEventListener('keydown', keyEvent)
@@ -76,6 +84,15 @@ window.fcitx = {
   updateStatusArea() {
     statusAreaCallback()
   },
+  mkdirP,
+  rmR,
+  traverseAsync,
+  deployRimeInWorker,
+  // Private field that indicates whether spawn a worker in current environment.
+  // On f5o main thread set true to enable worker. On worker thread this is always false.
+  useWorker: false,
+  // @ts-expect-error uncertain environment
+  isWorker: typeof globalThis.WorkerGlobalScope !== 'undefined',
   followCursor: false,
 }
 const apis = [
@@ -91,7 +108,7 @@ const apis = [
 ]
 for (const api of apis) {
   const name = `_${api}`
-  window.fcitx[name] = (...args: any[]) => Module.ccall('web_action', 'void', ['string', 'string'], [name, JSON.stringify(args)])
+  globalThis.fcitx[name] = (...args: any[]) => Module.ccall('web_action', 'void', ['string', 'string'], [name, JSON.stringify(args)])
 }
 
 Module.onRuntimeInitialized = () => res(null)
