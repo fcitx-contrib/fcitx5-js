@@ -56,6 +56,7 @@ export interface EM_MODULE {
 
 export type SyncCallback = (path: string) => void
 export type AsyncCallback = (path: string) => Promise<void> | void
+export type NotificationCallback = (name: string, icon: string, body: string, timeout: number) => void
 
 export interface FCITX {
   enable: () => void
@@ -79,6 +80,8 @@ export interface FCITX {
   mkdirP: (path: string) => void
   rmR: (path: string) => void
   traverseAsync: (preDirCallback: AsyncCallback | undefined, fileCallback: AsyncCallback, postDirCallback: AsyncCallback | undefined) => (path: string) => Promise<void>
+  setNotificationCallback: (callback: NotificationCallback) => void
+  notify: NotificationCallback
   Module: EM_MODULE
 }
 

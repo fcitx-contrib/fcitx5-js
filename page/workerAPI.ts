@@ -19,6 +19,11 @@ function ensureWorker() {
       case 'WRITE_FILE':
         globalThis.fcitx.Module.FS.writeFile(data.data.path, new Uint8Array(data.data.buffer))
         break
+      case 'NOTIFY': {
+        const { name, icon, body, timeout } = data.data
+        globalThis.fcitx.notify(name, icon, body, timeout)
+        break
+      }
       case 'DONE':
         res(data)
         break

@@ -48,7 +48,7 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker) {
     if (worker) {
         char arg0[] = "fcitx5-js";
         char arg1[] = "--disable=all";
-        char arg2[] = "--enable=rime";
+        char arg2[] = "--enable=rime,notifications";
         char *argv[] = {arg0, arg1, arg2};
         instance = std::make_unique<Instance>(FCITX_ARRAY_SIZE(argv), argv);
     } else {

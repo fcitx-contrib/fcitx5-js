@@ -1,3 +1,4 @@
+import type { NotificationCallback } from './Fcitx5'
 import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
@@ -17,6 +18,7 @@ const fcitxReady = new Promise((resolve) => {
 })
 
 let statusAreaCallback = () => {}
+let notificationCallback: NotificationCallback = () => {}
 
 globalThis.fcitx = {
   Module,
@@ -83,6 +85,12 @@ globalThis.fcitx = {
   },
   updateStatusArea() {
     statusAreaCallback()
+  },
+  setNotificationCallback(callback: NotificationCallback) {
+    notificationCallback = callback
+  },
+  notify(name: string, icon: string, body: string, timeout: number) {
+    notificationCallback(name, icon, body, timeout)
   },
   mkdirP,
   rmR,
