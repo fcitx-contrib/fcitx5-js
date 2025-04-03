@@ -13,6 +13,14 @@ declare global {
       buffer: ArrayBuffer
     }
   } | {
+    type: 'NOTIFY'
+    data: {
+      name: string
+      icon: string
+      body: string
+      timeout: number
+    }
+  } | {
     type: 'DEPLOY'
   } | {
     type: 'DONE'

@@ -71,6 +71,7 @@ set_target_properties(Fcitx5Config Fcitx5Utils Fcitx5Core
 )
 
 add_subdirectory(wasmfrontend)
+add_subdirectory(wasmnotifications)
 add_subdirectory(fcitx5-webview)
 add_subdirectory(webpanel)
 
@@ -81,7 +82,7 @@ file(GLOB JS_SOURCES CONFIGURE_DEPENDS "page/*")
 add_custom_command(
     OUTPUT ${DUMMY_CPP}
     COMMAND pnpm run build && ./scripts/install.sh
-    DEPENDS ${JS_SOURCES} clipboard imselector spell quickphrase unicode webpanel wasmfrontend
+    DEPENDS ${JS_SOURCES} clipboard imselector spell quickphrase unicode webpanel wasmfrontend notifications
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Generating the pre.js, index.js and installing shared libraries"
 )

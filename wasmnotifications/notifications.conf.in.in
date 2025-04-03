@@ -1,0 +1,7 @@
+[Addon]
+Name=WASM Notification
+Type=StaticLibrary
+Library=libwasmnotifications
+Category=Module
+Version=@PROJECT_VERSION@
+Configurable=True

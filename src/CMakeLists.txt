@@ -47,7 +47,7 @@ else()
         "--preload-file ${INSTALL_SHARE_DIR}/fcitx5@/usr/share/fcitx5"
         "--preload-file ${INSTALL_LIB_DIR}/fcitx5@/usr/lib/fcitx5"
     )
-    list(APPEND STATIC_ADDONS keyboard)
+    list(APPEND STATIC_ADDONS keyboard notifications)
 endif()
 
 target_link_libraries(Fcitx5 ${EXE_LINK_OPTIONS})
