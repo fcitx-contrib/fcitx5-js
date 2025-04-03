@@ -3,7 +3,7 @@
 #include <fcitx-utils/eventloopinterface.h>
 
 namespace fcitx {
-class JSEventLoop : public EventLoopInterface {
+class JSEventLoop : public EventLoopInterfaceV2 {
   public:
     JSEventLoop() = default;
     ~JSEventLoop() override = default;
@@ -20,5 +20,7 @@ class JSEventLoop : public EventLoopInterface {
     std::unique_ptr<EventSource> addExitEvent(EventCallback callback) override;
     std::unique_ptr<EventSource> addDeferEvent(EventCallback callback) override;
     std::unique_ptr<EventSource> addPostEvent(EventCallback callback) override;
+    std::unique_ptr<EventSourceAsync>
+    addAsyncEvent(EventCallback callback) override;
 };
 } // namespace fcitx
