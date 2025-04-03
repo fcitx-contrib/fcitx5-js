@@ -29,6 +29,18 @@ struct JSEventSource : public JSEventSourceBase<EventSource> {
     std::shared_ptr<EventCallback> callback_;
 };
 
+struct JSEventSourceAsync : public JSEventSourceBase<EventSourceAsync> {
+    JSEventSourceAsync(EventCallback _callback)
+        : callback_(std::make_shared<EventCallback>(std::move(_callback))) {}
+
+    void send() override {
+        // This is synchronous but probably not a big deal for JS.
+        (*callback_)(nullptr);
+    }
+
+    std::shared_ptr<EventCallback> callback_;
+};
+
 struct JSEventSourceIO : public JSEventSourceBase<EventSourceIO> {
     JSEventSourceIO(IOCallback _callback) {}
 
@@ -149,6 +161,12 @@ JSEventLoop::addDeferEvent(EventCallback callback) {
 std::unique_ptr<EventSource> JSEventLoop::addPostEvent(EventCallback callback) {
     FCITX_ERROR() << "Not implemented";
     return nullptr;
+}
+
+std::unique_ptr<EventSourceAsync>
+JSEventLoop::addAsyncEvent(EventCallback callback) {
+    auto source = std::make_unique<JSEventSourceAsync>(std::move(callback));
+    return source;
 }
 
 } // namespace fcitx
