@@ -60,6 +60,7 @@ async function deploy() {
       deployed = true
     }
     await copyDir('/usr/share/rime-data')
+    await copyDir('/usr/share/locale')
     await copyDir('/home/web_user/.local/share/fcitx5/rime').catch()
     await execute({ type: 'DEPLOY' })
     reload()
