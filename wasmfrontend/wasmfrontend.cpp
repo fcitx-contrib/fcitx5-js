@@ -7,6 +7,9 @@ namespace fcitx {
 WasmFrontend::WasmFrontend(Instance *instance)
     : instance_(instance),
       focusGroup_("wasm", instance->inputContextManager()) {
+    eventHandler_ = instance_->watchEvent(
+        EventType::InputContextInputMethodActivated, EventWatcherPhase::Default,
+        [this](Event &event) { EM_ASM(fcitx.updateInputMethods()); });
     createInputContext();
     // Make mostRecentInputContext not null so that current IM info can be
     // retrieved on load finish, even if no DOM element can be actually focused

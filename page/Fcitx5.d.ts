@@ -66,6 +66,8 @@ export interface FCITX {
   getInputMethods: () => { name: string, displayName: string }[]
   setInputMethods: (ims: string[]) => void
   getAllInputMethods: () => { name: string, displayName: string, languageCode: string }[]
+  setInputMethodsCallback: (callback: () => void) => void
+  updateInputMethods: () => void
   setStatusAreaCallback: (callback: () => void) => void
   updateStatusArea: () => void
   getConfig: (uri: string) => Config

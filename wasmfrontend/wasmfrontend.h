@@ -31,6 +31,7 @@ class WasmFrontend : public AddonInstance {
     Instance *instance_;
     FocusGroup focusGroup_;
     WasmInputContext *ic_;
+    std::unique_ptr<HandlerTableEntry<EventHandler>> eventHandler_;
 };
 
 class WasmFrontendFactory : public AddonFactory {
