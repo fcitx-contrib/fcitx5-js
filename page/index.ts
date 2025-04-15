@@ -17,6 +17,7 @@ const fcitxReady = new Promise((resolve) => {
   res = resolve
 })
 
+let inputMethodsCallback = () => {}
 let statusAreaCallback = () => {}
 let notificationCallback: NotificationCallback = () => {}
 
@@ -79,6 +80,12 @@ globalThis.fcitx = {
     document.removeEventListener('keydown', keyEvent)
     document.removeEventListener('keyup', keyEvent)
     document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanel)
+  },
+  setInputMethodsCallback(callback: () => void) {
+    inputMethodsCallback = callback
+  },
+  updateInputMethods() {
+    inputMethodsCallback()
   },
   setStatusAreaCallback(callback: () => void) {
     statusAreaCallback = callback
