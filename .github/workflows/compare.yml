@@ -10,7 +10,7 @@ jobs:
       - name: Download artifact built on Ubuntu
         uses: actions/download-artifact@v4
         with:
-          pattern: artifact-ubuntu*
+          pattern: artifact-ubuntu-24.04
           merge-multiple: true
 
       - name: Extract and rename
