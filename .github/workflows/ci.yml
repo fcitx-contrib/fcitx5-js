@@ -36,6 +36,7 @@ jobs:
       matrix:
         include:
           - { os: ubuntu-24.04 }
+          - { os: ubuntu-24.04-arm }
           - { os: macos-15 }
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +48,7 @@ jobs:
           node-version: 22.x
 
       - name: Install dependencies (Ubuntu)
-        if: ${{ matrix.os == 'ubuntu-24.04' }}
+        if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt install -y \
             ninja-build \
@@ -127,7 +128,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          pattern: artifact-ubuntu*
+          pattern: artifact-ubuntu-24.04
           merge-multiple: true
 
       - name: Release
