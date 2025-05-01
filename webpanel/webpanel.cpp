@@ -40,7 +40,6 @@ WebPanel::WebPanel(Instance *instance)
             FCITX_ERROR() << "select candidate index out of range";
         }
     });
-    // Doesn't have any effect now.
     window_->set_highlight_callback([this](int index) {
         auto ic = instance_->mostRecentInputContext();
         const auto &list = ic->inputPanel().candidateList();
@@ -218,7 +217,10 @@ WebPanel::WebPanel(Instance *instance)
                     if (keyEvent.isRelease()) {
                         return;
                     }
-                    collapse();
+                    // Instead of directly calling collapse, let webview handle
+                    // animation and call it.
+                    window_->scroll_key_action(
+                        candidate_window::scroll_key_action_t::collapse);
                     return keyEvent.filterAndAccept();
                 }
                 // Karabiner-Elements defines Hyper as Ctrl+Alt+Shift+Cmd, but
