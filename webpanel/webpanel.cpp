@@ -217,8 +217,10 @@ WebPanel::WebPanel(Instance *instance)
                     if (keyEvent.isRelease()) {
                         return;
                     }
-                    // Instead of directly calling collapse, let webview handle animation and call it.
-                    window_->scroll_key_action(candidate_window::scroll_key_action_t::collapse);
+                    // Instead of directly calling collapse, let webview handle
+                    // animation and call it.
+                    window_->scroll_key_action(
+                        candidate_window::scroll_key_action_t::collapse);
                     return keyEvent.filterAndAccept();
                 }
                 // Karabiner-Elements defines Hyper as Ctrl+Alt+Shift+Cmd, but
