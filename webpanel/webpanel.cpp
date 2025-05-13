@@ -3,7 +3,6 @@
 #include <nlohmann/json.hpp>
 
 #include "webpanel.h"
-#include "webview_candidate_window.hpp"
 
 bool f5m_is_linear_layout = false;
 bool f5m_is_vertical_rl = false;
@@ -142,9 +141,7 @@ WebPanel::WebPanel(Instance *instance)
                 if (keyEvent.isRelease()) {
                     return;
                 }
-                static_cast<candidate_window::WebviewCandidateWindow *>(
-                    window_.get())
-                    ->copy_html();
+                window_->copy_html();
                 return keyEvent.filterAndAccept();
             }
             if (scrollState_ == candidate_window::scroll_state_t::ready &&
@@ -449,7 +446,7 @@ void WebPanel::updateClient(InputContext *ic) {}
 /// Before calling this, the panel states must already be initialized
 /// synchronously, by using set_candidates, etc.
 void WebPanel::showAsync(bool show) {
-    std::weak_ptr<candidate_window::CandidateWindow> weakWindow = window_;
+    std::weak_ptr<candidate_window::WebviewCandidateWindow> weakWindow = window_;
     if (auto window = weakWindow.lock()) {
         if (show) {
             EM_ASM(fcitx.followCursor = $0, *config_.basic->followCursor);
