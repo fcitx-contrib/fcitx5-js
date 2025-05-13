@@ -446,7 +446,8 @@ void WebPanel::updateClient(InputContext *ic) {}
 /// Before calling this, the panel states must already be initialized
 /// synchronously, by using set_candidates, etc.
 void WebPanel::showAsync(bool show) {
-    std::weak_ptr<candidate_window::WebviewCandidateWindow> weakWindow = window_;
+    std::weak_ptr<candidate_window::WebviewCandidateWindow> weakWindow =
+        window_;
     if (auto window = weakWindow.lock()) {
         if (show) {
             EM_ASM(fcitx.followCursor = $0, *config_.basic->followCursor);
