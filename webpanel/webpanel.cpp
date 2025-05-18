@@ -49,7 +49,11 @@ WebPanel::WebPanel(Instance *instance)
             if (!bulkCursor) {
                 return;
             }
-            return bulkCursor->setGlobalCursorIndex(index);
+            try {
+                bulkCursor->setGlobalCursorIndex(index);
+            } catch (const std::invalid_argument &e) {
+                FCITX_ERROR() << "highlight candidate index out of range";
+            }
         }
     });
     window_->set_page_callback([this](bool next) {
@@ -462,10 +466,10 @@ void WebPanel::scroll(int start, int count) {
     if (scrollState_ == candidate_window::scroll_state_t::none) {
         return;
     }
-    auto ic = instance_->mostRecentInputContext();
     if (start < 0) { // collapse
         return collapse();
     }
+    auto ic = instance_->mostRecentInputContext();
     const auto &list = ic->inputPanel().candidateList();
     if (!list) {
         return;
