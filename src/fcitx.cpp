@@ -35,6 +35,7 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker) {
     }
     umask(007); // Fix config file's mode
     StandardPath::global().syncUmask();
+    StandardPaths::global().syncUmask();
 #ifdef NDEBUG
     Log::setLogRule("*=4,notimedate");
 #else
