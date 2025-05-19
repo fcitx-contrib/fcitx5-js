@@ -1,5 +1,5 @@
 import getCaretCoordinates from 'textarea-caret'
-import { getInputElement } from './focus'
+import { getInputElement, setSpellCheck } from './focus'
 
 let x = 0
 let y = 0
@@ -72,6 +72,7 @@ ____ commit pre|edit ____
   input.dispatchEvent(new Event('change'))
   preedit = preeditText
   preeditIndex = i
+  setSpellCheck(!preedit)
 }
 
 export function setPreedit(text: string, index: number) {
