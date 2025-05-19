@@ -38,7 +38,10 @@ interface FS {
   isDir: (mode: number) => boolean
   lstat: (path: string) => { mode: number }
   mkdir: (path: string) => void
-  readFile: (path: string) => Uint8Array
+  readFile: {
+    (path: string): Uint8Array
+    (path: string, options: { encoding: 'utf8' }): string
+  }
   readdir: (path: string) => string[]
   rmdir: (path: string) => void
   unlink: (path: string) => void
