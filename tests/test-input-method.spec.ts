@@ -8,7 +8,7 @@ test('Generate profile', async ({ page }) => {
     window.fcitx.setInputMethods(['keyboard-th'])
   })
   expect(await page.evaluate(() => window.fcitx.Module.FS.readFile('/home/web_user/.config/fcitx5/profile', { encoding: 'utf8' }))).toEqual(
-`[Groups/0]
+    `[Groups/0]
 # Group Name
 Name=Default
 # Layout
@@ -25,5 +25,6 @@ Layout=
 [GroupOrder]
 0=Default
 
-`)
+`,
+  )
 })
