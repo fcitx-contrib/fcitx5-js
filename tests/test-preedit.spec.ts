@@ -64,7 +64,7 @@ test('Underline', async ({ page }) => {
   await page.evaluate(() => {
     window.fcitx.setPreedit('', 0)
   })
-  await expect(underline, 'Clearing preedit should clear underline').toHaveCount(0)
+  await expect(underline, 'Clearing preedit should clear underline').not.toBeAttached()
 
   await page.evaluate(() => {
     window.fcitx.setPreedit('aaa', 0)
@@ -89,5 +89,5 @@ test('Underline', async ({ page }) => {
   expect(aBox.width, '啊 should be wider than a').toBeGreaterThan(secondBox.width)
 
   await page.locator('input').click()
-  expect(underline, 'Focusing out should clear underline').toHaveCount(0)
+  expect(underline, 'Focusing out should clear underline').not.toBeAttached()
 })
