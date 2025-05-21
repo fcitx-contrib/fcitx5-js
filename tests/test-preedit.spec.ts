@@ -89,5 +89,5 @@ test('Underline', async ({ page }) => {
   expect(aBox.width, '啊 should be wider than a').toBeGreaterThan(secondBox.width)
 
   await page.locator('input').click()
-  expect(underline, 'Focusing out should clear underline').not.toBeAttached()
+  await expect(underline, 'Focusing out should clear underline').not.toBeAttached()
 })
