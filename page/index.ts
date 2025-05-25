@@ -2,9 +2,10 @@ import type { NotificationCallback } from './Fcitx5'
 import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
-import { blur, clickPanel, focus } from './focus'
+import { blur, clickPanelOrKeyboard, focus } from './focus'
 import { mkdirP, rmR, traverseAsync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
+import { createKeyboard } from './keyboard'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
 import { getLocale } from './locale'
 import Module from './module'
@@ -64,11 +65,12 @@ globalThis.fcitx = {
     if (globalThis.fcitx.isWorker) {
       return
     }
+    createKeyboard()
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
     document.addEventListener('keydown', keyEvent)
     document.addEventListener('keyup', keyEvent)
-    document.querySelector('.fcitx-decoration')?.addEventListener('mousedown', clickPanel)
+    document.querySelector('.fcitx-decoration')?.addEventListener('mousedown', clickPanelOrKeyboard)
     focus() // there may be textarea focused before wasm initialized
   },
   disable() {
@@ -79,7 +81,7 @@ globalThis.fcitx = {
     document.removeEventListener('blur', blur, true)
     document.removeEventListener('keydown', keyEvent)
     document.removeEventListener('keyup', keyEvent)
-    document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanel)
+    document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanelOrKeyboard)
   },
   setInputMethodsCallback(callback: () => void) {
     inputMethodsCallback = callback

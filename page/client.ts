@@ -128,8 +128,6 @@ ____ commit pre|edit ____
   const end = preedit ? start + preedit.length : input.selectionEnd!
   const newStart = start + commitText.length
   input.value = input.value.slice(0, start) + commitText + preeditText + input.value.slice(end)
-  // This may be triggered by user clicking panel. Focus to ensure setting selectionEnd works.
-  input.focus()
   input.selectionStart = input.selectionEnd = newStart + i
   // For vue-based input, this is needed to synchronize state.
   input.dispatchEvent(new Event('change'))

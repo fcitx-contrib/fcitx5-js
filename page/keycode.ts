@@ -12,6 +12,10 @@ function extract(event: KeyboardEvent): [string, string, number] | undefined {
   return [key, code, modifiers]
 }
 
+export function processKey(key: string, code: string, modifiers: number, isRelease: boolean): boolean {
+  return Module.ccall('process_key', 'bool', ['string', 'string', 'number', 'bool'], [key, code, modifiers, isRelease])
+}
+
 export function keyEvent(event: KeyboardEvent) {
   if (!getInputElement()) {
     return
@@ -21,7 +25,7 @@ export function keyEvent(event: KeyboardEvent) {
     return
   }
   const isRelease = event.type === 'keyup'
-  if (Module.ccall('process_key', 'bool', ['string', 'string', 'number', 'bool'], [...extracted, isRelease])) {
+  if (processKey(...extracted, isRelease)) {
     event.preventDefault()
   }
 }

@@ -27,7 +27,7 @@ test('keyboard-us', async ({ page }) => {
 test('keyboard-th', async ({ page }) => {
   await init(page)
 
-  await page.evaluate(async () => {
+  await page.evaluate(() => {
     window.fcitx.setInputMethods(['keyboard-th'])
   })
   const textarea = page.locator('textarea')
