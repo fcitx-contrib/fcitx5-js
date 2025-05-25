@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - uses: actions/setup-node@v4
         with:
@@ -21,6 +23,8 @@ jobs:
         run: |
           sudo apt install -y clang-format
           npm i -g pnpm
+          pnpm --prefix=fcitx5-keyboard-web i
+          pnpm --prefix=fcitx5-keyboard-web run build
           pnpm i
 
       - name: Lint
@@ -64,6 +68,8 @@ jobs:
       - name: Install node dependencies
         run: |
           npm i -g pnpm
+          pnpm --prefix=fcitx5-keyboard-web i
+          pnpm --prefix=fcitx5-keyboard-web run build
           pnpm i
           pnpm --prefix=fcitx5-webview i
 
