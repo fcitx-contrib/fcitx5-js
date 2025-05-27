@@ -3,7 +3,7 @@
 #include "keycode.h"
 #include <emscripten.h>
 #include <fcitx-utils/event.h>
-#include <fcitx-utils/standardpath.h>
+#include <fcitx-utils/standardpaths.h>
 #include <fcitx/inputmethodmanager.h>
 #include <fcitx/instance.h>
 #include <sys/stat.h>
@@ -34,7 +34,6 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker) {
         return;
     }
     umask(007); // Fix config file's mode
-    StandardPath::global().syncUmask();
     StandardPaths::global().syncUmask();
 #ifdef NDEBUG
     Log::setLogRule("*=4,notimedate");

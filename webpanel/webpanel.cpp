@@ -455,7 +455,7 @@ void WebPanel::showAsync(bool show) {
     if (auto window = weakWindow.lock()) {
         if (show) {
             EM_ASM(fcitx.followCursor = $0, *config_.basic->followCursor);
-            window->show(0, 0);
+            window->show(0, 0, 0);
         } else {
             window->hide();
         }
