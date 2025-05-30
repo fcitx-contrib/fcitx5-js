@@ -1,10 +1,11 @@
 import UZIP from 'uzip'
 import { lsDir, mkdirP } from './fs'
+import { hasTouch } from './keyboard'
 import { getLocale } from './locale'
 import Module from './module'
 
 export function reload() {
-  Module.ccall('reload', 'void', ['string'], [getLocale()])
+  Module.ccall('reload', 'void', ['string', 'bool'], [getLocale(), hasTouch])
 }
 
 const textDecoder = new TextDecoder()

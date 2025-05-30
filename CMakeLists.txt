@@ -39,6 +39,8 @@ list(APPEND CMAKE_FIND_ROOT_PATH "${FIND_ROOT_PATH}")
 set(ENV{PKG_CONFIG_SYSROOT_DIR} "${PROJECT_BINARY_DIR}/sysroot")
 set(ENV{PKG_CONFIG_PATH} "${PREBUILDER_LIB_DIR}/pkgconfig:${PREBUILDER_SHARE_DIR}/pkgconfig")
 
+find_package(nlohmann_json)
+
 option(ENABLE_TESTING_ADDONS "" OFF)
 option(ENABLE_TEST "" OFF)
 option(ENABLE_COVERAGE "" OFF)
@@ -72,6 +74,7 @@ set_target_properties(Fcitx5Config Fcitx5Utils Fcitx5Core
 
 add_subdirectory(wasmfrontend)
 add_subdirectory(wasmnotifications)
+add_subdirectory(webkeyboard)
 add_subdirectory(fcitx5-webview)
 add_subdirectory(webpanel)
 
@@ -82,7 +85,7 @@ file(GLOB JS_SOURCES CONFIGURE_DEPENDS "page/*")
 add_custom_command(
     OUTPUT ${DUMMY_CPP}
     COMMAND pnpm run build && ./scripts/install.sh
-    DEPENDS ${JS_SOURCES} clipboard imselector spell quickphrase unicode webpanel wasmfrontend notifications
+    DEPENDS ${JS_SOURCES} clipboard imselector spell quickphrase unicode webpanel webkeyboard wasmfrontend notifications
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Generating the pre.js, index.js and installing shared libraries"
 )

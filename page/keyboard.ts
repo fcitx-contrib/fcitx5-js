@@ -1,12 +1,12 @@
-import { setBuiltInLayout, setClient } from 'fcitx5-keyboard-web'
-import { clickPanelOrKeyboard, getInputElement } from './focus'
+import { onMessage, setBuiltInLayout, setClient } from 'fcitx5-keyboard-web'
+import { getInputElement, resetInput } from './focus'
 import { processKey } from './keycode'
 
 let keyboardShown = false
 const keyboardId = 'fcitx-virtual-keyboard'
 const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
 
-export const hasTouch = /iPad|iPhone|iPod|Android/.test(navigator.userAgent)
+export const hasTouch = /Android|iPhone|iPad|iPod/.test(navigator.userAgent)
 
 function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string) {
   input.value = value
@@ -32,6 +32,10 @@ function simulate(key: string, code: string) {
   }
 }
 
+export function sendEventToKeyboard(message: string) {
+  onMessage(message)
+}
+
 export function createKeyboard() {
   if (document.getElementById(keyboardId)) {
     return
@@ -45,20 +49,36 @@ export function createKeyboard() {
   keyboard.style.bottom = hiddenBottom
   keyboard.style.position = 'fixed'
   keyboard.style.transition = 'bottom 0.5s'
-  keyboard.addEventListener('touchstart', clickPanelOrKeyboard)
   document.body.appendChild(keyboard)
+  setBuiltInLayout(keyboardId, 'qwerty')
   setClient({
     sendEvent(event) {
       switch (event.type) {
+        case 'ASK_CANDIDATE_ACTIONS':
+          return fcitx.Module.ccall('ask_candidate_actions', 'void', ['number'], [event.data])
+        case 'CANDIDATE_ACTION':
+          return fcitx.Module.ccall('activate_candidate_action', 'void', ['number', 'number'], [event.data.index, event.data.id])
+        case 'COLLAPSE':
+          return getInputElement()?.blur()
         case 'COMMIT':
-          simulate(event.data, '')
-          break
+          resetInput()
+          return simulate(event.data, '')
+        case 'GLOBE':
+          return fcitx.Module.ccall('toggle', 'void', [], [])
         case 'KEY_DOWN':
         case 'KEY_UP':
           if (!processKey(event.data.key, event.data.code, 0, event.type === 'KEY_UP')) {
             simulate(event.data.key, event.data.code)
           }
           break
+        case 'SCROLL':
+          return fcitx.Module.ccall('scroll', 'void', ['number', 'number'], [event.data.start, event.data.count])
+        case 'SELECT_CANDIDATE':
+          return fcitx.Module.ccall('select_candidate', 'void', ['number'], [event.data])
+        case 'SET_INPUT_METHOD':
+          return fcitx.setCurrentInputMethod(event.data)
+        case 'STATUS_AREA_ACTION':
+          return fcitx.Module.ccall('activate_status_area_action', 'void', ['number'], [event.data])
       }
     },
   })
@@ -70,7 +90,6 @@ export function showKeyboard() {
   }
   keyboardShown = true
   const keyboard = document.getElementById(keyboardId)!
-  setBuiltInLayout(keyboardId, 'qwerty')
   keyboard.style.bottom = '0'
 }
 

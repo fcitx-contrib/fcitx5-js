@@ -26,6 +26,17 @@ test('Touching keyboard remains focus', async ({ page }) => {
   await expectKeyboardShown(page)
 })
 
+test('Touching collapse loses focus', async ({ page }) => {
+  await init(page)
+  const textarea = page.locator('textarea')
+  await textarea.tap()
+  await expectKeyboardShown(page)
+
+  await page.locator('.fcitx-keyboard-toolbar .fcitx-keyboard-toolbar-button').last().tap()
+  await expect(textarea).not.toBeFocused()
+  await expect(page.locator('#fcitx-virtual-keyboard')).toHaveCSS('bottom', /^-2\d\d(\.\d+)?px$/)
+})
+
 test('Touching input switches focus', async ({ page }) => {
   await init(page)
 
