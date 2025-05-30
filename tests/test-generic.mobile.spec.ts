@@ -7,8 +7,9 @@ test('keyboard-us', async ({ page }) => {
   const textarea = page.locator('textarea')
   await textarea.tap()
   await expectKeyboardShown(page)
+  await expect(page.locator('.fcitx-keyboard-space')).toHaveText('Keyboard - English (US)')
 
-  await tapKeyboard(page, 'a')
+  await tapKeyboard(page, 'a@')
   await expect(textarea).toHaveValue('a')
 
   await tapKeyboard(page, page.locator('.fcitx-keyboard-key.fcitx-keyboard-backspace'))
@@ -24,6 +25,7 @@ test('keyboard-th', async ({ page }) => {
   const textarea = page.locator('textarea')
   await textarea.tap()
   await expectKeyboardShown(page)
+  await expect(page.locator('.fcitx-keyboard-space')).toHaveText('Keyboard - Thai')
 
   await tapKeyboard(page, 'l')
   await expect(textarea).toHaveValue('ส')

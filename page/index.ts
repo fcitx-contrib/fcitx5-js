@@ -2,10 +2,10 @@ import type { NotificationCallback } from './Fcitx5'
 import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
-import { blur, clickPanelOrKeyboard, focus } from './focus'
+import { blur, clickPanel, focus } from './focus'
 import { mkdirP, rmR, traverseAsync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
-import { createKeyboard } from './keyboard'
+import { createKeyboard, hasTouch, sendEventToKeyboard } from './keyboard'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
 import { getLocale } from './locale'
 import Module from './module'
@@ -46,6 +46,7 @@ globalThis.fcitx = {
   hidePanel,
   setPreedit,
   commit,
+  sendEventToKeyboard,
   setCurrentInputMethod,
   currentInputMethod,
   getInputMethods,
@@ -61,16 +62,18 @@ globalThis.fcitx = {
   getInstalledPlugins,
   unzip,
   enable() {
-    Module.ccall('init', 'void', ['string', 'bool'], [getLocale(), globalThis.fcitx.isWorker])
+    if (!globalThis.fcitx.isWorker) {
+      createKeyboard() // Must be called before init as webkeyboard will manipulate DOM.
+    }
+    Module.ccall('init', 'void', ['string', 'bool', 'bool'], [getLocale(), globalThis.fcitx.isWorker, hasTouch])
     if (globalThis.fcitx.isWorker) {
       return
     }
-    createKeyboard()
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
     document.addEventListener('keydown', keyEvent)
     document.addEventListener('keyup', keyEvent)
-    document.querySelector('.fcitx-decoration')?.addEventListener('mousedown', clickPanelOrKeyboard)
+    document.querySelector('.fcitx-decoration')?.addEventListener('mousedown', clickPanel)
     focus() // there may be textarea focused before wasm initialized
   },
   disable() {
@@ -81,13 +84,14 @@ globalThis.fcitx = {
     document.removeEventListener('blur', blur, true)
     document.removeEventListener('keydown', keyEvent)
     document.removeEventListener('keyup', keyEvent)
-    document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanelOrKeyboard)
+    document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanel)
   },
   setInputMethodsCallback(callback: () => void) {
     inputMethodsCallback = callback
   },
   updateInputMethods() {
     inputMethodsCallback()
+    sendEventToKeyboard(JSON.stringify({ type: 'INPUT_METHODS', data: { currentInputMethod: globalThis.fcitx.currentInputMethod(), inputMethods: globalThis.fcitx.getInputMethods() } }))
   },
   setStatusAreaCallback(callback: () => void) {
     statusAreaCallback = callback

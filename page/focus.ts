@@ -17,11 +17,11 @@ export function setSpellCheck(spellCheck: boolean) {
   input.spellcheck = spellCheck ? originalSpellCheck : false
 }
 
-export function clickPanelOrKeyboard() {
+export function clickPanel() {
   userClick = true
 }
 
-function resetInput() {
+export function resetInput() {
   Module.ccall('reset_input', 'void', [], [])
 }
 
