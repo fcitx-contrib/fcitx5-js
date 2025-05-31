@@ -2,6 +2,17 @@ import type { Locator } from '@playwright/test'
 import { expect, test } from '@playwright/test'
 import { getBox, init } from './util'
 
+test('Cursor with emoji', async ({ page }) => {
+  await init(page)
+
+  const textarea = page.locator('textarea')
+  await textarea.click()
+  await page.evaluate(() => {
+    window.fcitx.setPreedit('🐦‍🔥she', 13)
+  })
+  expect(await textarea.evaluate((el: HTMLTextAreaElement) => el.selectionStart)).toBe('🐦‍🔥sh'.length)
+})
+
 function getSpellCheck(locator: Locator) {
   return locator.evaluate((el: HTMLElement) => el.spellcheck)
 }

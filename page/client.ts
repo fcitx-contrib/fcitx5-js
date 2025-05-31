@@ -1,5 +1,6 @@
 import getCaretCoordinates from 'textarea-caret'
 import { getInputElement, setSpellCheck } from './focus'
+import { graphemeIndices } from './unicode'
 
 let x = 0
 let y = 0
@@ -116,12 +117,14 @@ ____ commit pre|edit ____
   }
 
   // Convert UTF-8 index to JS string index
-  let i = 0
-  for (let cursor = 0; i < preeditText.length; ++i) {
-    if (cursor === index) {
+  let i = preeditText.length
+  const indices = graphemeIndices(preeditText)
+  for (const idx of indices) {
+    const { length } = textEncoder.encode(preeditText.slice(0, idx))
+    if (length === index) {
+      i = idx
       break
     }
-    cursor += textEncoder.encode(preeditText[i]).length
   }
 
   const start = input.selectionStart! - preeditIndex
