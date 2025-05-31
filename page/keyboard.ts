@@ -1,6 +1,7 @@
 import { onMessage, setBuiltInLayout, setClient } from 'fcitx5-keyboard-web'
 import { getInputElement, resetInput } from './focus'
 import { processKey } from './keycode'
+import { graphemeIndices } from './unicode'
 
 let keyboardShown = false
 const keyboardId = 'fcitx-virtual-keyboard'
@@ -27,7 +28,10 @@ function simulate(key: string, code: string) {
   }
   switch (code) {
     case 'Backspace':
-      updateInput(input, preText.slice(0, cursor - 1) + postText)
+      if (preText) {
+        const indices = graphemeIndices(preText)
+        updateInput(input, preText.slice(0, indices[indices.length - 1]) + postText)
+      }
       break
   }
 }
