@@ -40,6 +40,11 @@ globalThis.fcitx = {
           break
       }
     }
+    if (navigator.userAgent.includes('Firefox')) {
+      // Firefox doesn't support assigning numeric scrollbar width. Event the thinnest scrollbar
+      // pushes the 6th candidate to next row. Set it none to mitigate.
+      (document.querySelector('.fcitx-hoverables') as HTMLElement).style.scrollbarWidth = 'none'
+    }
     hidePanel()
   },
   placePanel,
