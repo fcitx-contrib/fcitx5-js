@@ -8,6 +8,10 @@ export async function init(page: Page) {
   })
 }
 
+export function browserName(page: Page) {
+  return page.context().browser()!.browserType().name()
+}
+
 export async function getBox(locator: Locator) {
   return (await locator.boundingBox())!
 }
