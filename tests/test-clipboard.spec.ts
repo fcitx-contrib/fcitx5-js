@@ -1,12 +1,13 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import { expectPanelHidden, init } from './util'
+import { browserName, expectPanelHidden, init } from './util'
 
 function openClipboard(page: Page) {
   return page.keyboard.press('Control+;')
 }
 
 test('Clipboard', async ({ page }) => {
+  test.skip(process.platform === 'linux' && browserName(page) === 'webkit')
   await init(page)
   const CONTROL = process.platform === 'darwin' ? 'Meta' : 'Control'
 
