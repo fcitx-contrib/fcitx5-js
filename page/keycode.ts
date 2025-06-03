@@ -1,6 +1,8 @@
 import { getInputElement } from './focus'
 import Module from './module'
 
+const isApple = navigator.userAgent.includes('Mac OS X')
+
 function extract(event: KeyboardEvent): [string, string, number] | undefined {
   const { key, code, shiftKey, altKey, ctrlKey, metaKey } = event
   // Host IME
@@ -17,7 +19,8 @@ export function processKey(key: string, code: string, modifiers: number, isRelea
 }
 
 export function keyEvent(event: KeyboardEvent) {
-  if (!getInputElement()) {
+  const input = getInputElement()
+  if (!input) {
     return
   }
   const extracted = extract(event)
@@ -25,6 +28,13 @@ export function keyEvent(event: KeyboardEvent) {
     return
   }
   const isRelease = event.type === 'keyup'
+  // Write clipboard for Ctrl/Cmd + C/X
+  if (!isRelease && ['c', 'x'].includes(extracted[0]) && ((isApple && extracted[2] === (1 << 6)) || (!isApple && extracted[2] === (1 << 2)))) {
+    const selectedText = input.value.substring(input.selectionStart ?? 0, input.selectionEnd ?? 0)
+    if (selectedText) {
+      Module.ccall('write_clipboard', 'void', ['string'], [selectedText])
+    }
+  }
   if (processKey(...extracted, isRelease)) {
     event.preventDefault()
   }

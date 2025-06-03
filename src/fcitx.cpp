@@ -1,3 +1,4 @@
+#include "../fcitx5/src/modules/clipboard/clipboard_public.h"
 #include "../wasmfrontend/wasmfrontend.h"
 #include "../webkeyboard/webkeyboard.h"
 #include "event_js.h"
@@ -18,6 +19,7 @@ namespace fcitx {
 std::unique_ptr<Instance> instance;
 WasmFrontend *frontend;
 WebKeyboard *ui;
+AddonInstance *clipboard;
 
 void notify_main_async(const std::string &str);
 
@@ -142,6 +144,10 @@ EMSCRIPTEN_KEEPALIVE void scroll(int start, int count) {
     ui->scroll(start, count);
 }
 
+EMSCRIPTEN_KEEPALIVE void write_clipboard(const char *text) {
+    clipboard->call<IClipboard::setClipboardV2>("", text, false);
+}
+
 EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker, bool touch) {
     if (instance) {
         return;
@@ -175,6 +181,7 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker, bool touch) {
     instance->initialize(); // Unnecessary to call exec.
     frontend = dynamic_cast<WasmFrontend *>(addonMgr.addon("wasmfrontend"));
     ui = dynamic_cast<WebKeyboard *>(addonMgr.addon("webkeyboard"));
+    clipboard = addonMgr.addon("clipboard", true);
 }
 
 EMSCRIPTEN_KEEPALIVE void reload(const char *locale, bool touch) {
