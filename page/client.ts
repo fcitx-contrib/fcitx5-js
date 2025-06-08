@@ -1,4 +1,5 @@
 import getCaretCoordinates from 'textarea-caret'
+import { getFontSize, UNDERLINE_OFFSET_RATIO } from './caret'
 import { getInputElement, setSpellCheck } from './focus'
 import { graphemeIndices } from './unicode'
 
@@ -9,14 +10,9 @@ let preedit = ''
 let preeditIndex = 0
 
 // compared with macOS pinyin
-const UNDERLINE_OFFSET = 1
 const CANDIDATE_WINDOW_OFFSET = 6
 
 const textEncoder = new TextEncoder()
-
-function getFontSize(element: HTMLElement) {
-  return Number.parseFloat(getComputedStyle(element).fontSize)
-}
 
 export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft: number, dragging: boolean) {
   const input = getInputElement()
@@ -92,14 +88,14 @@ function drawPreeditUnderline(input: HTMLElement, start: number) {
       // getCaretCoordinates can't tell the position of the end of previous line,
       // because it's equivalent to the start of next line, which is the actual place
       // that new character is written. So we need to calculate width of the last character.
-      drawUnderline(box.top + rowTop + fontSize + UNDERLINE_OFFSET, box.left + rowLeft, lastLeft - rowLeft + getTextWidth(input, preedit[i - 1]), color)
+      drawUnderline(box.top + rowTop + fontSize * (1 + UNDERLINE_OFFSET_RATIO), box.left + rowLeft, lastLeft - rowLeft + getTextWidth(input, preedit[i - 1]), color)
       rowTop = top
       rowLeft = lastLeft
     }
     lastLeft = left
   }
   if (lastLeft !== endLeft) {
-    drawUnderline(box.top + endTop + fontSize + UNDERLINE_OFFSET, box.left + lastLeft, endLeft - lastLeft, color)
+    drawUnderline(box.top + endTop + fontSize * (1 + UNDERLINE_OFFSET_RATIO), box.left + lastLeft, endLeft - lastLeft, color)
   }
 }
 
