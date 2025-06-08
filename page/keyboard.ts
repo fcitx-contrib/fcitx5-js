@@ -9,8 +9,9 @@ const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
 
 export const hasTouch = /Android|iPhone|iPad|iPod/.test(navigator.userAgent)
 
-function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string) {
+function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string, selectionStart?: number) {
   input.value = value
+  input.selectionStart = input.selectionEnd = selectionStart ?? value.length
   input.dispatchEvent(new Event('change'))
 }
 
@@ -30,7 +31,8 @@ function simulate(key: string, code: string) {
     case 'Backspace':
       if (preText) {
         const indices = graphemeIndices(preText)
-        updateInput(input, preText.slice(0, indices[indices.length - 1]) + postText)
+        const selectionStart = indices[indices.length - 1]
+        updateInput(input, preText.slice(0, selectionStart) + postText, selectionStart)
       }
       break
   }

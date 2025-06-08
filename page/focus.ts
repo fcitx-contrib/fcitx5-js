@@ -1,3 +1,4 @@
+import { redrawCaret, removeCaret } from './caret'
 import { resetPreedit } from './client'
 import { hasTouch, hideKeyboard, showKeyboard } from './keyboard'
 import Module from './module'
@@ -33,9 +34,12 @@ export function focus() {
   input.addEventListener('mousedown', resetInput)
   if (hasTouch) {
     input.addEventListener('touchstart', resetInput)
+    input.addEventListener('selectionchange', redrawCaret)
+    input.addEventListener('change', redrawCaret) // Needed when deleting the only character.
     originalReadOnly = input.readOnly
     input.readOnly = true
     showKeyboard()
+    redrawCaret({ target: input })
   }
   originalSpellCheck = input.spellcheck
   Module.ccall('focus_in', 'void', [], [])
@@ -55,8 +59,11 @@ export function blur() {
   input.removeEventListener('mousedown', resetInput)
   if (hasTouch) {
     input.removeEventListener('touchstart', resetInput)
+    input.removeEventListener('selectionchange', redrawCaret)
+    input.removeEventListener('change', redrawCaret)
     input.readOnly = originalReadOnly
     hideKeyboard()
+    removeCaret()
   }
   input.spellcheck = originalSpellCheck
   input = null
