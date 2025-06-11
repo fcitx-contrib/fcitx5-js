@@ -55,5 +55,5 @@ test('Touch', async ({ page }) => {
     if (x1 > x0) {
       break
     }
-  }  
+  }
 })

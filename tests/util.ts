@@ -15,7 +15,8 @@ export function browserName(page: Page) {
 export async function getBox(locator: Locator): Promise<{ x: number, y: number, width: number, height: number }> {
   while (true) {
     const box = await locator.boundingBox()
-    if (box) return box
+    if (box)
+      return box
   }
 }
 
