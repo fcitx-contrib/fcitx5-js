@@ -49,6 +49,11 @@ test('Touch', async ({ page }) => {
   expect(x).toEqual(x0)
 
   await textarea.tap()
-  const { x: x1 } = await getBox(caret)
-  expect(x1, 'Tapping on center should effectively change caret position').toBeGreaterThan(x0)
+  while (true) {
+    const { x: x1 } = await getBox(caret)
+    // Tapping on center should effectively change caret position
+    if (x1 > x0) {
+      break
+    }
+  }  
 })
