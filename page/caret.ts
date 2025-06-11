@@ -13,6 +13,7 @@ let show = false
 export function removeCaret() {
   if (timer) {
     window.clearInterval(timer)
+    timer = null
   }
   document.querySelectorAll('.fcitx-mobile-caret').forEach(div => div.remove())
 }

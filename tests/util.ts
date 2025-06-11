@@ -12,8 +12,12 @@ export function browserName(page: Page) {
   return page.context().browser()!.browserType().name()
 }
 
-export async function getBox(locator: Locator) {
-  return (await locator.boundingBox())!
+export async function getBox(locator: Locator): Promise<{ x: number, y: number, width: number, height: number }> {
+  while (true) {
+    const box = await locator.boundingBox()
+    if (box)
+      return box
+  }
 }
 
 // For test, don't let the initial "en" tip on focus affect panel visibility.
