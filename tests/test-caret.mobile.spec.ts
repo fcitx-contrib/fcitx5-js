@@ -43,8 +43,10 @@ test('Touch', async ({ page }) => {
   const caret = page.locator('.fcitx-mobile-caret')
   const { x: x0 } = await getBox(caret)
 
-  await tapKeyboard(page, 'a@')
-  await textarea.evaluate((el: HTMLTextAreaElement) => el.selectionStart = el.selectionEnd = 0)
+  await textarea.evaluate((el: HTMLTextAreaElement) => {
+    el.value = 'a'
+    el.selectionStart = el.selectionEnd = 0
+  })
   const { x } = await getBox(caret)
   expect(x).toEqual(x0)
 
