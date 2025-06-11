@@ -42,7 +42,8 @@ export function focus() {
     redrawCaret({ target: input })
   }
   originalSpellCheck = input.spellcheck
-  Module.ccall('focus_in', 'void', [], [])
+  const isPassword = input.tagName === 'INPUT' && input.type === 'password'
+  Module.ccall('focus_in', 'void', ['bool'], [isPassword])
 }
 
 export function blur() {

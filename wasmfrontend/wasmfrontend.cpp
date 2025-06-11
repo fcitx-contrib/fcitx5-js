@@ -14,7 +14,7 @@ WasmFrontend::WasmFrontend(Instance *instance)
     // Make mostRecentInputContext not null so that current IM info can be
     // retrieved on load finish, even if no DOM element can be actually focused
     // (e.g. when focusing on address bar).
-    focusIn();
+    focusIn(false);
 }
 
 void WasmFrontend::createInputContext() {
@@ -28,7 +28,14 @@ bool WasmFrontend::keyEvent(const Key &key, bool isRelease) {
     return event.accepted();
 }
 
-void WasmFrontend::focusIn() { ic_->focusIn(); }
+void WasmFrontend::focusIn(bool isPassword) {
+    CapabilityFlags flags = CapabilityFlag::Preedit;
+    if (isPassword) {
+        flags |= CapabilityFlag::Password;
+    }
+    ic_->setCapabilityFlags(flags);
+    ic_->focusIn();
+}
 
 void WasmFrontend::focusOut() { ic_->focusOut(); }
 
@@ -37,8 +44,6 @@ void WasmFrontend::resetInput() { ic_->reset(); }
 WasmInputContext::WasmInputContext(WasmFrontend *frontend,
                                    InputContextManager &inputContextManager)
     : InputContext(inputContextManager, ""), frontend_(frontend) {
-    CapabilityFlags flags = CapabilityFlag::Preedit;
-    setCapabilityFlags(flags);
     created();
 }
 
