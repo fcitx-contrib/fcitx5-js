@@ -37,3 +37,23 @@ test('keyboard-th', async ({ page }) => {
   }
   await expect(textarea).toHaveValue('สวัสดี')
 })
+
+test('Password', async ({ page }) => {
+  await init(page)
+
+  const textarea = page.locator('textarea')
+  const input = page.locator('input')
+  input.evaluate((el: HTMLInputElement) => el.type = 'password')
+  await page.evaluate(() => {
+    window.fcitx.setInputMethods(['keyboard-us', 'keyboard-th'])
+    window.fcitx.setCurrentInputMethod('keyboard-th')
+  })
+
+  await input.click()
+  await page.keyboard.press('l')
+  await expect(input).toHaveValue('l')
+
+  await textarea.click()
+  await page.keyboard.press('l')
+  await expect(textarea).toHaveValue('ส')
+})

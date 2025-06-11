@@ -39,7 +39,9 @@ static void answerCandidateAction(ActionableCandidateList *actionableList,
 
 extern "C" {
 
-EMSCRIPTEN_KEEPALIVE void focus_in() { frontend->focusIn(); }
+EMSCRIPTEN_KEEPALIVE void focus_in(bool isPassword) {
+    frontend->focusIn(isPassword);
+}
 
 EMSCRIPTEN_KEEPALIVE void focus_out() { frontend->focusOut(); }
 
