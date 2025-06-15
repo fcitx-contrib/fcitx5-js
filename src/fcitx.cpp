@@ -163,6 +163,7 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker, bool touch) {
 #endif
 
     setlocale(LC_ALL, locale); // emscripten musl specific.
+    setenv("XKB_CONFIG_ROOT", "/usr/share/xkeyboard-config-2", 1);
 
     EventLoop::setEventLoopFactory(
         [] { return std::make_unique<JSEventLoop>(); });

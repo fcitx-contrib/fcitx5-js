@@ -40,7 +40,7 @@ if (RIME_ONLY)
     endforeach()
 else()
     list(APPEND EXE_LINK_OPTIONS
-        "--preload-file ${PREBUILDER_SHARE_DIR}/X11@/usr/share/X11"
+        "--preload-file ${PREBUILDER_SHARE_DIR}/xkeyboard-config-2@/usr/share/xkeyboard-config-2"
         "--preload-file ${PROJECT_BINARY_DIR}/sysroot${ISOCODES_ISO3166_JSON}@${ISOCODES_ISO3166_JSON}"
         "--preload-file ${PROJECT_BINARY_DIR}/sysroot${ISOCODES_ISO639_JSON}@${ISOCODES_ISO639_JSON}"
         "--preload-file ${INSTALL_SHARE_DIR}/locale@/usr/share/locale"
