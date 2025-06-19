@@ -2,7 +2,7 @@ import type { Locator } from '@playwright/test'
 import { expect, test } from '@playwright/test'
 import { getBox, init } from './util'
 
-test('Cursor with emoji', async ({ page }) => {
+test('Caret with emoji', async ({ page }) => {
   await init(page)
 
   const textarea = page.locator('textarea')

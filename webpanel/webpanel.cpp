@@ -254,9 +254,9 @@ WebPanel::WebPanel(Instance *instance)
 void WebPanel::updateConfig() {
     window_->set_layout(config_.typography->layout.value());
     window_->set_theme(config_.basic->theme.value());
-    window_->set_cursor_text(config_.cursor->style.value() == CursorStyle::Text
-                                 ? config_.cursor->text.value()
-                                 : "");
+    window_->set_caret_text(config_.caret->style.value() == CaretStyle::Text
+                                ? config_.caret->text.value()
+                                : "");
     window_->set_highlight_mark_text(config_.highlight->markStyle.value() ==
                                              HighlightMarkStyle::Text
                                          ? config_.highlight->markText.value()
@@ -341,7 +341,7 @@ void WebPanel::update(UserInterfaceComponent component,
                     (writingMode ==
                      candidate_window::writing_mode_t::vertical_lr);
             } else {
-                // Allow -> to move cursor on horizontal+horizontal_tb.
+                // Allow -> to move highlight on horizontal+horizontal_tb.
                 f5m_is_linear_layout = false;
                 f5m_is_vertical_rl = false;
                 f5m_is_vertical_lr = false;
@@ -454,7 +454,7 @@ void WebPanel::showAsync(bool show) {
         window_;
     if (auto window = weakWindow.lock()) {
         if (show) {
-            EM_ASM(fcitx.followCursor = $0, *config_.basic->followCursor);
+            EM_ASM(fcitx.followCaret = $0, *config_.basic->followCaret);
             window->show(0, 0, 0);
         } else {
             window->hide();
