@@ -157,30 +157,27 @@ WebPanel::WebPanel(Instance *instance)
                 return keyEvent.filterAndAccept();
             }
             if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
-                static const std::vector<
-                    std::pair<Key, candidate_window::scroll_key_action_t>>
-                    selectMap = {
-                        {Key(FcitxKey_1),
-                         candidate_window::scroll_key_action_t::one},
-                        {Key(FcitxKey_2),
-                         candidate_window::scroll_key_action_t::two},
-                        {Key(FcitxKey_3),
-                         candidate_window::scroll_key_action_t::three},
-                        {Key(FcitxKey_4),
-                         candidate_window::scroll_key_action_t::four},
-                        {Key(FcitxKey_5),
-                         candidate_window::scroll_key_action_t::five},
-                        {Key(FcitxKey_6),
-                         candidate_window::scroll_key_action_t::six},
+                static const std::vector<candidate_window::scroll_key_action_t>
+                    selectActions = {
+                        candidate_window::scroll_key_action_t::one,
+                        candidate_window::scroll_key_action_t::two,
+                        candidate_window::scroll_key_action_t::three,
+                        candidate_window::scroll_key_action_t::four,
+                        candidate_window::scroll_key_action_t::five,
+                        candidate_window::scroll_key_action_t::six,
+                        candidate_window::scroll_key_action_t::seven,
+                        candidate_window::scroll_key_action_t::eight,
+                        candidate_window::scroll_key_action_t::nine,
+                        candidate_window::scroll_key_action_t::zero,
                     };
-                for (const auto &pair : selectMap) {
-                    if (key.check(pair.first)) {
-                        if (keyEvent.isRelease()) {
-                            return;
-                        }
-                        window_->scroll_key_action(pair.second);
-                        return keyEvent.filterAndAccept();
+                if (int i =
+                        key.keyListIndex(*config_.scrollMode->selectCandidate);
+                    i >= 0 && i < selectActions.size()) {
+                    if (keyEvent.isRelease()) {
+                        return;
                     }
+                    window_->scroll_key_action(selectActions[i]);
+                    return keyEvent.filterAndAccept();
                 }
                 const std::vector<std::pair<
                     Option<KeyList>, candidate_window::scroll_key_action_t>>
@@ -504,8 +501,8 @@ void WebPanel::scroll(int start, int count) {
 }
 
 void WebPanel::expand() {
-    scroll(0, 6 * (*config_.scrollMode->maxRowCount +
-                   1)); // Hard-coded like fcitx5-webview
+    scroll(0, *config_.scrollMode->maxColumnCount *
+                  (*config_.scrollMode->maxRowCount + 1));
 }
 
 void WebPanel::collapse() {
