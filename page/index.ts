@@ -119,7 +119,7 @@ globalThis.fcitx = {
   useWorker: false,
   // @ts-expect-error uncertain environment
   isWorker: typeof globalThis.WorkerGlobalScope !== 'undefined',
-  followCursor: false,
+  followCaret: false,
 }
 const apis = [
   'log',

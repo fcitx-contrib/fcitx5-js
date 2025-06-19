@@ -20,9 +20,9 @@ function simulate(key: string, code: string) {
   if (!input) {
     return
   }
-  const cursor = input.selectionStart!
-  const preText = input.value.slice(0, cursor)
-  const postText = input.value.slice(cursor)
+  const caret = input.selectionStart!
+  const preText = input.value.slice(0, caret)
+  const postText = input.value.slice(caret)
   if (key) {
     updateInput(input, preText + key + postText)
     return
