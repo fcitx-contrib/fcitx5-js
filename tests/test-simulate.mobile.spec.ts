@@ -1,9 +1,13 @@
-import type { Page } from '@playwright/test'
+import type { Locator, Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
 import { expectKeyboardShown, init, tapKeyboard } from './util'
 
 function openEditor(page: Page) {
   return page.locator('.fcitx-keyboard-toolbar-button:nth-child(3)').tap()
+}
+
+function getSelection(locator: Locator): Promise<[number, number]> {
+  return locator.evaluate((el: HTMLTextAreaElement) => [el.selectionStart, el.selectionEnd])
 }
 
 test('Printable', async ({ page }) => {
@@ -39,9 +43,36 @@ test('ArrowLeft and ArrowRight', async ({ page }) => {
   expect(await textarea.evaluate((el: HTMLTextAreaElement) => [el.selectionStart, el.selectionEnd])).toEqual([1, 1])
 
   await right.tap()
-  expect(await textarea.evaluate((el: HTMLTextAreaElement) => [el.selectionStart, el.selectionEnd])).toEqual([3, 3])
+  expect(await getSelection(textarea)).toEqual([3, 3])
   await right.tap()
-  expect(await textarea.evaluate((el: HTMLTextAreaElement) => [el.selectionStart, el.selectionEnd])).toEqual([4, 4])
+  expect(await getSelection(textarea)).toEqual([4, 4])
+})
+
+test('Home and End', async ({ page }) => {
+  await init(page)
+  const textarea = page.locator('textarea')
+  await textarea.tap()
+  await expectKeyboardShown(page)
+  await textarea.evaluate((el: HTMLTextAreaElement) => {
+    el.value = 'ab\ncd'
+    el.selectionStart = el.selectionEnd = 1
+  })
+  await openEditor(page)
+
+  const home = page.locator('.fcitx-keyboard-editor-button-container:nth-child(10)')
+  const end = page.locator('.fcitx-keyboard-editor-button-container:nth-child(11)')
+  await end.tap()
+  expect(await getSelection(textarea)).toEqual([2, 2])
+  await home.tap()
+  expect(await getSelection(textarea)).toEqual([0, 0])
+
+  await textarea.evaluate((el: HTMLTextAreaElement) => {
+    el.selectionStart = el.selectionEnd = 4
+  })
+  await end.tap()
+  expect(await getSelection(textarea)).toEqual([5, 5])
+  await home.tap()
+  expect(await getSelection(textarea)).toEqual([3, 3])
 })
 
 test('Backspace', async ({ page }) => {
