@@ -9,7 +9,7 @@ const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
 
 export const hasTouch = /Android|iPhone|iPad|iPod/.test(navigator.userAgent)
 
-function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string, selectionStart?: number) {
+function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string, selectionStart: number) {
   input.value = value
   input.selectionStart = input.selectionEnd = selectionStart ?? value.length
   input.dispatchEvent(new Event('change'))
@@ -24,15 +24,55 @@ function simulate(key: string, code: string) {
   const preText = input.value.slice(0, caret)
   const postText = input.value.slice(caret)
   if (key) {
-    updateInput(input, preText + key + postText)
+    const pre = preText + key
+    updateInput(input, pre + postText, pre.length)
     return
   }
   switch (code) {
+    case 'ArrowLeft':
+      if (preText) {
+        const indices = graphemeIndices(preText)
+        const selectionStart = indices[indices.length - 1]
+        updateInput(input, preText + postText, selectionStart)
+      }
+      break
+    case 'ArrowRight':
+      if (postText) {
+        const indices = graphemeIndices(postText)
+        const selectionStart = preText.length + (indices[1] ?? postText.length)
+        updateInput(input, preText + postText, selectionStart)
+      }
+      break
     case 'Backspace':
       if (preText) {
         const indices = graphemeIndices(preText)
         const selectionStart = indices[indices.length - 1]
         updateInput(input, preText.slice(0, selectionStart) + postText, selectionStart)
+      }
+      break
+    case 'End':
+      if (postText) {
+        let end = postText.length
+        for (const index of graphemeIndices(postText)) {
+          if (postText[index] === '\n') {
+            end = index
+            break
+          }
+        }
+        updateInput(input, preText + postText, preText.length + end)
+      }
+      break
+    case 'Home':
+      if (preText) {
+        const indices = graphemeIndices(preText)
+        let start = 0
+        for (const index of indices.reverse()) {
+          if (preText[index] === '\n') {
+            start = index + 1
+            break
+          }
+        }
+        updateInput(input, preText + postText, start)
       }
       break
   }
