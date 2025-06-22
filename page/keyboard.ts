@@ -1,4 +1,5 @@
 import { onMessage, setBuiltInLayout, setClient } from 'fcitx5-keyboard-web'
+import getCaretCoordinates from 'textarea-caret'
 import { getInputElement, resetInput } from './focus'
 import { processKey } from './keycode'
 import { graphemeIndices } from './unicode'
@@ -15,6 +16,58 @@ function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: strin
   input.dispatchEvent(new Event('change'))
 }
 
+function getIndexOfPrevRow(input: HTMLInputElement | HTMLTextAreaElement, preText: string): number {
+  if (!preText) {
+    return 0
+  }
+  const indices = graphemeIndices(preText)
+  const { top: caretTop, left: caretLeft } = getCaretCoordinates(input, preText.length)
+  let prevRowTop: number | null = null
+  let lastLeft = caretLeft
+  let lastIndex = preText.length
+  for (const index of indices.reverse()) {
+    const { top, left } = getCaretCoordinates(input, index)
+    if (top < caretTop) {
+      if (prevRowTop === null) {
+        prevRowTop = top
+      }
+      else if (top < prevRowTop || Math.abs(left - caretLeft) > Math.abs(lastLeft - caretLeft)) {
+        break
+      }
+    }
+    lastLeft = left
+    lastIndex = index
+  }
+  return lastIndex
+}
+
+function getIndexOfNextRow(input: HTMLInputElement | HTMLTextAreaElement, preText: string, postText: string): number {
+  if (!postText) {
+    return preText.length
+  }
+  const indices = graphemeIndices(postText)
+  indices.shift()
+  indices.push(postText.length)
+  const { top: caretTop, left: caretLeft } = getCaretCoordinates(input, preText.length)
+  let nextRowTop: number | null = null
+  let lastLeft = caretLeft
+  let lastIndex = 0
+  for (const index of indices) {
+    const { top, left } = getCaretCoordinates(input, preText.length + index)
+    if (top > caretTop) {
+      if (nextRowTop === null) {
+        nextRowTop = top
+      }
+      else if (top > nextRowTop || Math.abs(left - caretLeft) > Math.abs(lastLeft - caretLeft)) {
+        break
+      }
+    }
+    lastLeft = left
+    lastIndex = index
+  }
+  return preText.length + lastIndex
+}
+
 function simulate(key: string, code: string) {
   const input = getInputElement()
   if (!input) {
@@ -29,6 +82,9 @@ function simulate(key: string, code: string) {
     return
   }
   switch (code) {
+    case 'ArrowDown':
+      updateInput(input, preText + postText, getIndexOfNextRow(input, preText, postText))
+      break
     case 'ArrowLeft':
       if (preText) {
         const indices = graphemeIndices(preText)
@@ -42,6 +98,9 @@ function simulate(key: string, code: string) {
         const selectionStart = preText.length + (indices[1] ?? postText.length)
         updateInput(input, preText + postText, selectionStart)
       }
+      break
+    case 'ArrowUp':
+      updateInput(input, preText + postText, getIndexOfPrevRow(input, preText))
       break
     case 'Backspace':
       if (preText) {
