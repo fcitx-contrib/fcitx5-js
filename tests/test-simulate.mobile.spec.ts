@@ -48,6 +48,35 @@ test('ArrowLeft and ArrowRight', async ({ page }) => {
   expect(await getSelection(textarea)).toEqual([4, 4])
 })
 
+test('ArrowUp and ArrowDown', async ({ page }) => {
+  await init(page)
+
+  const textarea = page.locator('textarea')
+  await textarea.tap()
+  await expectKeyboardShown(page)
+  await textarea.evaluate((el: HTMLTextAreaElement) => {
+    el.value = 'mm\nm\nmm'
+    el.selectionStart = el.selectionEnd = 2
+  })
+  await openEditor(page)
+
+  const up = page.locator('.fcitx-keyboard-editor-button-container:nth-child(2)')
+  const down = page.locator('.fcitx-keyboard-editor-button-container:nth-child(4)')
+  await down.tap()
+  expect(await getSelection(textarea)).toEqual([4, 4])
+  await down.tap()
+  expect(await getSelection(textarea)).toEqual([6, 6])
+  await down.tap()
+  expect(await getSelection(textarea)).toEqual([7, 7])
+
+  await up.tap()
+  expect(await getSelection(textarea)).toEqual([4, 4])
+  await up.tap()
+  expect(await getSelection(textarea)).toEqual([1, 1])
+  await up.tap()
+  expect(await getSelection(textarea)).toEqual([0, 0])
+})
+
 test('Home and End', async ({ page }) => {
   await init(page)
   const textarea = page.locator('textarea')
