@@ -1,6 +1,6 @@
 import { redrawCaret, removeCaret } from './caret'
 import { resetPreedit } from './client'
-import { hasTouch, hideKeyboard, showKeyboard } from './keyboard'
+import { hasTouch, hideKeyboard, showKeyboard, updateSelection } from './keyboard'
 import Module from './module'
 
 type Input = HTMLInputElement | HTMLTextAreaElement
@@ -34,6 +34,7 @@ export function focus() {
   input.addEventListener('mousedown', resetInput)
   if (hasTouch) {
     input.addEventListener('touchstart', resetInput)
+    input.addEventListener('selectionchange', updateSelection)
     input.addEventListener('selectionchange', redrawCaret)
     input.addEventListener('change', redrawCaret) // Needed when deleting the only character.
     originalReadOnly = input.readOnly
@@ -60,6 +61,7 @@ export function blur() {
   input.removeEventListener('mousedown', resetInput)
   if (hasTouch) {
     input.removeEventListener('touchstart', resetInput)
+    input.removeEventListener('selectionchange', updateSelection)
     input.removeEventListener('selectionchange', redrawCaret)
     input.removeEventListener('change', redrawCaret)
     input.readOnly = originalReadOnly

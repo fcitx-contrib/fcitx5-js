@@ -10,10 +10,28 @@ const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
 
 export const hasTouch = /Android|iPhone|iPad|iPod/.test(navigator.userAgent)
 
-function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string, selectionStart: number) {
+function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string, selectionStart: number, selectionEnd?: number, selectionDirection?: 'forward' | 'backward' | 'none') {
   input.value = value
-  input.selectionStart = input.selectionEnd = selectionStart ?? value.length
+  input.selectionStart = selectionStart
+  input.selectionEnd = selectionEnd ?? selectionStart
+  if (selectionDirection) {
+    input.selectionDirection = selectionDirection
+  }
   input.dispatchEvent(new Event('change'))
+  input.dispatchEvent(new Event('selectionchange'))
+}
+
+function getIndexOfPrevChar(preText: string): number {
+  if (!preText) {
+    return 0
+  }
+  const indices = graphemeIndices(preText)
+  return indices[indices.length - 1]
+}
+
+function getIndexOfNextChar(preText: string, postText: string): number {
+  const indices = graphemeIndices(postText)
+  return preText.length + (indices[1] ?? postText.length)
 }
 
 function getIndexOfPrevRow(input: HTMLInputElement | HTMLTextAreaElement, preText: string): number {
@@ -68,12 +86,63 @@ function getIndexOfNextRow(input: HTMLInputElement | HTMLTextAreaElement, preTex
   return preText.length + lastIndex
 }
 
+function getIndexOfLineStart(preText: string): number {
+  if (!preText) {
+    return 0
+  }
+  const indices = graphemeIndices(preText)
+  let start = 0
+  for (const index of indices.reverse()) {
+    if (preText[index] === '\n') {
+      start = index + 1
+      break
+    }
+  }
+  return start
+}
+
+function getIndexOfLineEnd(preText: string, postText: string): number {
+  if (!postText) {
+    return preText.length
+  }
+  let end = preText.length + postText.length
+  for (const index of graphemeIndices(postText)) {
+    if (postText[index] === '\n') {
+      end = preText.length + index
+      break
+    }
+  }
+  return end
+}
+
+let hasSelection = false
+
+export function updateSelection(event: { target: EventTarget | null }) {
+  const input = event.target as HTMLInputElement | HTMLTextAreaElement
+  hasSelection = input.selectionStart !== input.selectionEnd
+  if (input.selectionDirection === 'none') {
+    sendEventToKeyboard(JSON.stringify({ type: 'DESELECT' }))
+  }
+}
+
+function moveSelection(input: HTMLInputElement | HTMLTextAreaElement, newCaret: number, fixed: number) {
+  if (newCaret < fixed) {
+    updateInput(input, input.value, newCaret, fixed, 'backward')
+  }
+  else {
+    updateInput(input, input.value, fixed, newCaret, 'forward')
+  }
+}
+
 function simulate(key: string, code: string) {
   const input = getInputElement()
   if (!input) {
     return
   }
-  const caret = input.selectionStart!
+  // 'none' is treated as 'forward' natively.
+  const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
+  const fixed = input.selectionDirection === 'backward' ? input.selectionEnd! : input.selectionStart!
+  const movingSelection = input.selectionDirection !== 'none'
   const preText = input.value.slice(0, caret)
   const postText = input.value.slice(caret)
   if (key) {
@@ -82,56 +151,80 @@ function simulate(key: string, code: string) {
     return
   }
   switch (code) {
-    case 'ArrowDown':
-      updateInput(input, preText + postText, getIndexOfNextRow(input, preText, postText))
+    case 'ArrowDown': {
+      const newCaret = getIndexOfNextRow(input, preText, postText)
+      if (movingSelection && postText) {
+        moveSelection(input, newCaret, fixed)
+      }
+      else {
+        updateInput(input, input.value, newCaret, newCaret, 'none')
+      }
       break
+    }
     case 'ArrowLeft':
-      if (preText) {
-        const indices = graphemeIndices(preText)
-        const selectionStart = indices[indices.length - 1]
-        updateInput(input, preText + postText, selectionStart)
+      if (hasSelection && !movingSelection) {
+        updateInput(input, input.value, input.selectionStart!)
+      }
+      else if (preText) {
+        const newCaret = getIndexOfPrevChar(preText)
+        if (movingSelection) {
+          moveSelection(input, newCaret, fixed)
+        }
+        else {
+          updateInput(input, input.value, newCaret)
+        }
       }
       break
     case 'ArrowRight':
-      if (postText) {
-        const indices = graphemeIndices(postText)
-        const selectionStart = preText.length + (indices[1] ?? postText.length)
-        updateInput(input, preText + postText, selectionStart)
+      if (hasSelection && !movingSelection) {
+        updateInput(input, input.value, input.selectionEnd!)
+      }
+      else if (postText) {
+        const newCaret = getIndexOfNextChar(preText, postText)
+        if (movingSelection) {
+          moveSelection(input, newCaret, fixed)
+        }
+        else {
+          updateInput(input, input.value, newCaret)
+        }
       }
       break
-    case 'ArrowUp':
-      updateInput(input, preText + postText, getIndexOfPrevRow(input, preText))
+    case 'ArrowUp': {
+      const newCaret = getIndexOfPrevRow(input, preText)
+      if (input.selectionDirection !== 'none' && preText) {
+        moveSelection(input, newCaret, fixed)
+      }
+      else {
+        updateInput(input, input.value, newCaret, newCaret, 'none')
+      }
       break
+    }
     case 'Backspace':
       if (preText) {
-        const indices = graphemeIndices(preText)
-        const selectionStart = indices[indices.length - 1]
+        const selectionStart = getIndexOfPrevChar(preText)
         updateInput(input, preText.slice(0, selectionStart) + postText, selectionStart)
       }
       break
     case 'End':
       if (postText) {
-        let end = postText.length
-        for (const index of graphemeIndices(postText)) {
-          if (postText[index] === '\n') {
-            end = index
-            break
-          }
+        const newCaret = getIndexOfLineEnd(preText, postText)
+        if (movingSelection) {
+          moveSelection(input, newCaret, input.selectionStart!)
         }
-        updateInput(input, preText + postText, preText.length + end)
+        else {
+          updateInput(input, input.value, newCaret)
+        }
       }
       break
     case 'Home':
       if (preText) {
-        const indices = graphemeIndices(preText)
-        let start = 0
-        for (const index of indices.reverse()) {
-          if (preText[index] === '\n') {
-            start = index + 1
-            break
-          }
+        const newCaret = getIndexOfLineStart(preText)
+        if (movingSelection) {
+          moveSelection(input, newCaret, input.selectionEnd!)
         }
-        updateInput(input, preText + postText, start)
+        else {
+          updateInput(input, input.value, newCaret)
+        }
       }
       break
   }
@@ -168,6 +261,14 @@ export function createKeyboard() {
         case 'COMMIT':
           resetInput()
           return simulate(event.data, '')
+        case 'DESELECT': {
+          const input = getInputElement()
+          if (input) {
+            const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
+            updateInput(input, input.value, caret, caret, 'none')
+          }
+          break
+        }
         case 'GLOBE':
           return fcitx.Module.ccall('toggle', 'void', [], [])
         case 'KEY_DOWN':
@@ -178,6 +279,21 @@ export function createKeyboard() {
           break
         case 'SCROLL':
           return fcitx.Module.ccall('scroll', 'void', ['number', 'number'], [event.data.start, event.data.count])
+        case 'SELECT': {
+          const input = getInputElement()
+          if (input) {
+            input.selectionDirection = 'forward'
+          }
+          break
+        }
+        case 'SELECT_ALL': {
+          const input = getInputElement()
+          if (input?.value) {
+            updateInput(input, input.value, 0, input.value.length, 'forward')
+            sendEventToKeyboard(JSON.stringify({ type: 'SELECT' }))
+          }
+          break
+        }
         case 'SELECT_CANDIDATE':
           return fcitx.Module.ccall('select_candidate', 'void', ['number'], [event.data])
         case 'SET_INPUT_METHOD':
