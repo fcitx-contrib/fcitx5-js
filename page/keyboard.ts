@@ -138,16 +138,16 @@ function simulate(key: string, code: string) {
   if (!input) {
     return
   }
+  if (key) {
+    const pre = input.value.slice(0, input.selectionStart!) + key
+    updateInput(input, pre + input.value.slice(input.selectionEnd!), pre.length)
+    return
+  }
   // 'none' is treated as 'forward' natively.
   const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
   const fixed = input.selectionDirection === 'backward' ? input.selectionEnd! : input.selectionStart!
   const preText = input.value.slice(0, caret)
   const postText = input.value.slice(caret)
-  if (key) {
-    const pre = preText + key
-    updateInput(input, pre + postText, pre.length)
-    return
-  }
   switch (code) {
     case 'ArrowDown': {
       const newCaret = getIndexOfNextRow(input, preText, postText)
@@ -198,7 +198,10 @@ function simulate(key: string, code: string) {
       break
     }
     case 'Backspace':
-      if (preText) {
+      if (hasSelection) {
+        updateInput(input, input.value.slice(0, input.selectionStart!) + input.value.slice(input.selectionEnd!), input.selectionStart!)
+      }
+      else if (preText) {
         const selectionStart = getIndexOfPrevChar(preText)
         updateInput(input, preText.slice(0, selectionStart) + postText, selectionStart)
       }
