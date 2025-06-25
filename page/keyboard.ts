@@ -133,15 +133,18 @@ function moveSelection(input: HTMLInputElement | HTMLTextAreaElement, newCaret: 
   }
 }
 
+function replaceSelection(input: HTMLInputElement | HTMLTextAreaElement, replacement: string) {
+  const pre = input.value.slice(0, input.selectionStart!) + replacement
+  updateInput(input, pre + input.value.slice(input.selectionEnd!), pre.length)
+}
+
 function simulate(key: string, code: string) {
   const input = getInputElement()
   if (!input) {
     return
   }
   if (key) {
-    const pre = input.value.slice(0, input.selectionStart!) + key
-    updateInput(input, pre + input.value.slice(input.selectionEnd!), pre.length)
-    return
+    return replaceSelection(input, key)
   }
   // 'none' is treated as 'forward' natively.
   const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
@@ -205,6 +208,7 @@ function simulate(key: string, code: string) {
         const selectionStart = getIndexOfPrevChar(preText)
         updateInput(input, preText.slice(0, selectionStart) + postText, selectionStart)
       }
+      deselect()
       break
     case 'End':
       if (postText) {
@@ -235,6 +239,39 @@ export function sendEventToKeyboard(message: string) {
   onMessage(message)
 }
 
+function deselect() {
+  movingSelection = false
+  sendEventToKeyboard(JSON.stringify({ type: 'DESELECT' }))
+}
+
+let buffer = '' // A fallback for paste if user rejects permission.
+
+function copy(remove: boolean) {
+  const input = getInputElement()
+  if (!input) {
+    return
+  }
+  const { selectionStart, selectionEnd } = input
+  buffer = input.value.slice(selectionStart!, selectionEnd!)
+  navigator.clipboard.writeText(buffer)
+  if (remove) {
+    updateInput(input, input.value.slice(0, selectionStart!) + input.value.slice(selectionEnd!), selectionStart!)
+    deselect()
+  }
+}
+
+async function paste() {
+  let text = buffer
+  try {
+    text = await navigator.clipboard.readText()
+  }
+  catch {}
+  const input = getInputElement()
+  if (input && text) {
+    replaceSelection(input, text)
+  }
+}
+
 export function createKeyboard() {
   if (document.getElementById(keyboardId)) {
     return
@@ -262,6 +299,10 @@ export function createKeyboard() {
         case 'COMMIT':
           resetInput()
           return simulate(event.data, '')
+        case 'COPY':
+          return copy(false)
+        case 'CUT':
+          return copy(true)
         case 'DESELECT': {
           const input = getInputElement()
           if (input) {
@@ -279,6 +320,8 @@ export function createKeyboard() {
             simulate(event.data.key, event.data.code)
           }
           break
+        case 'PASTE':
+          return paste()
         case 'SCROLL':
           return fcitx.Module.ccall('scroll', 'void', ['number', 'number'], [event.data.start, event.data.count])
         case 'SELECT': {
@@ -316,8 +359,7 @@ export function showKeyboard() {
   keyboardShown = true
   const keyboard = document.getElementById(keyboardId)!
   keyboard.style.bottom = '0'
-  movingSelection = false
-  sendEventToKeyboard(JSON.stringify({ type: 'DESELECT' }))
+  deselect()
 }
 
 export function hideKeyboard() {
