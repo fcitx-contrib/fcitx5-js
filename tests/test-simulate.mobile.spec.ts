@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import { expectKeyboardShown, init, tapKeyboard } from './util'
+import { browserName, expectKeyboardShown, init, tapKeyboard } from './util'
 
 function openEditor(page: Page) {
   return page.locator('.fcitx-keyboard-toolbar-button:nth-child(3)').tap()
@@ -32,6 +32,18 @@ function getSelect(page: Page) {
 
 function getCutOrSelectAll(page: Page) {
   return getButton(page, 6)
+}
+
+function getCopy(page: Page) {
+  return getButton(page, 7)
+}
+
+function getPaste(page: Page) {
+  return getButton(page, 8)
+}
+
+function getBackspace(page: Page) {
+  return getButton(page, 9)
 }
 
 function getHome(page: Page) {
@@ -219,6 +231,61 @@ test('Move selection', async ({ page }) => {
   }
 })
 
+test('Clipboard', async ({ page }) => {
+  if (browserName(page) === 'chromium') {
+    page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
+  }
+  await init(page)
+  const textarea = page.locator('textarea')
+  await textarea.tap()
+  await expectKeyboardShown(page)
+  await openEditor(page)
+  await textarea.evaluate((el: HTMLTextAreaElement) => el.value = 'ab')
+  const left = getLeft(page)
+  const right = getRight(page)
+  const select = getSelect(page)
+  const selectAll = getCutOrSelectAll(page)
+  const cut = selectAll
+  const copy = getCopy(page)
+  const paste = getPaste(page)
+
+  for (const button of [
+    select,
+    left,
+    cut,
+  ]) {
+    await button.tap()
+  }
+  await expect(textarea).toHaveValue('a')
+  expect(await getSelection(textarea)).toEqual([1, 1])
+
+  await left.tap()
+  expect(await getSelection(textarea)).toEqual([0, 0])
+
+  await paste.tap()
+  await expect(textarea).toHaveValue('ba')
+
+  for (const button of [
+    select,
+    right,
+    copy,
+  ]) {
+    await button.tap()
+  }
+  await expect(textarea).toHaveValue('ba')
+  expect(await getSelection(textarea)).toEqual([1, 2])
+
+  for (const button of [
+    select,
+    selectAll,
+    paste,
+  ]) {
+    await button.tap()
+  }
+  await expect(textarea).toHaveValue('a')
+  expect(await getSelection(textarea)).toEqual([1, 1])
+})
+
 test('Backspace', async ({ page }) => {
   await init(page)
 
@@ -240,8 +307,17 @@ test('Backspace', async ({ page }) => {
   await textarea.evaluate((el: HTMLTextAreaElement) => {
     el.value = 'a只🦨'
     el.selectionStart = 0
-    el.selectionEnd = 2
+    el.selectionEnd = 0
   })
-  await tapKeyboard(page, backspace)
+
+  const right = getRight(page)
+  await openEditor(page)
+  await getSelect(page).tap()
+  await right.tap()
+  await right.tap()
+  await getBackspace(page).tap()
   await expect(textarea).toHaveValue('🦨')
+
+  await right.tap()
+  expect(await getSelection(textarea)).toEqual([2, 2])
 })
