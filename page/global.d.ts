@@ -2,7 +2,7 @@ import type { FCITX, EM_MODULE as MODULE } from './Fcitx5.d.ts'
 
 declare global {
   type EM_MODULE = MODULE
-  var fcitx: { [key: string]: any } & FCITX // eslint-disable-line vars-on-top,no-var
+  var fcitx: { [key: string]: any } & FCITX // eslint-disable-line vars-on-top
   type MessageData = {
     type: 'MKDIR'
     data: string

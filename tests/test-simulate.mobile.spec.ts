@@ -76,7 +76,7 @@ test('ArrowLeft and ArrowRight', async ({ page }) => {
   const left = getLeft(page)
   const right = getRight(page)
   await left.tap()
-  expect(await textarea.evaluate((el: HTMLTextAreaElement) => [el.selectionStart, el.selectionEnd])).toEqual([1, 1])
+  expect(await getSelection(textarea)).toEqual([1, 1])
 
   await right.tap()
   expect(await getSelection(textarea)).toEqual([3, 3])
@@ -181,7 +181,9 @@ test('Select all and deselect', async ({ page }) => {
 
   await getSelect(page).tap()
   expect(await getSelection(textarea)).toEqual([2, 2])
-  expect(await textarea.evaluate((el: HTMLTextAreaElement) => el.selectionDirection)).toEqual('none')
+
+  await getLeft(page).tap()
+  expect(await getSelection(textarea), 'Should be a simple caret move after deselect').toEqual([1, 1])
 })
 
 test('Move selection', async ({ page }) => {

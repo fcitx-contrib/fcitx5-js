@@ -10,6 +10,7 @@ const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
 
 export const hasTouch = /Android|iPhone|iPad|iPod/.test(navigator.userAgent)
 
+// Note: 'none' works on Android and not iOS.
 function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string, selectionStart: number, selectionEnd?: number, selectionDirection?: 'forward' | 'backward' | 'none') {
   input.value = value
   input.selectionStart = selectionStart
@@ -116,13 +117,11 @@ function getIndexOfLineEnd(preText: string, postText: string): number {
 }
 
 let hasSelection = false
+let movingSelection = false
 
 export function updateSelection(event: { target: EventTarget | null }) {
   const input = event.target as HTMLInputElement | HTMLTextAreaElement
   hasSelection = input.selectionStart !== input.selectionEnd
-  if (input.selectionDirection === 'none') {
-    sendEventToKeyboard(JSON.stringify({ type: 'DESELECT' }))
-  }
 }
 
 function moveSelection(input: HTMLInputElement | HTMLTextAreaElement, newCaret: number, fixed: number) {
@@ -142,7 +141,6 @@ function simulate(key: string, code: string) {
   // 'none' is treated as 'forward' natively.
   const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
   const fixed = input.selectionDirection === 'backward' ? input.selectionEnd! : input.selectionStart!
-  const movingSelection = input.selectionDirection !== 'none'
   const preText = input.value.slice(0, caret)
   const postText = input.value.slice(caret)
   if (key) {
@@ -191,7 +189,7 @@ function simulate(key: string, code: string) {
       break
     case 'ArrowUp': {
       const newCaret = getIndexOfPrevRow(input, preText)
-      if (input.selectionDirection !== 'none' && preText) {
+      if (movingSelection && preText) {
         moveSelection(input, newCaret, fixed)
       }
       else {
@@ -266,6 +264,7 @@ export function createKeyboard() {
           if (input) {
             const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
             updateInput(input, input.value, caret, caret, 'none')
+            movingSelection = false
           }
           break
         }
@@ -283,6 +282,7 @@ export function createKeyboard() {
           const input = getInputElement()
           if (input) {
             input.selectionDirection = 'forward'
+            movingSelection = true
           }
           break
         }
@@ -290,6 +290,7 @@ export function createKeyboard() {
           const input = getInputElement()
           if (input?.value) {
             updateInput(input, input.value, 0, input.value.length, 'forward')
+            movingSelection = true
             sendEventToKeyboard(JSON.stringify({ type: 'SELECT' }))
           }
           break
@@ -312,6 +313,8 @@ export function showKeyboard() {
   keyboardShown = true
   const keyboard = document.getElementById(keyboardId)!
   keyboard.style.bottom = '0'
+  movingSelection = false
+  sendEventToKeyboard(JSON.stringify({ type: 'DESELECT' }))
 }
 
 export function hideKeyboard() {
