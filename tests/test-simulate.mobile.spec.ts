@@ -59,6 +59,13 @@ test('Printable', async ({ page }) => {
   await tapKeyboard(page, 'b!')
   await tapKeyboard(page, 'c;')
   await expect(textarea, 'selectionStart is not reset to the end').toHaveValue('abcd')
+
+  await textarea.evaluate((el: HTMLTextAreaElement) => {
+    el.selectionStart = 1
+    el.selectionEnd = 3
+  })
+  await tapKeyboard(page, 'x:')
+  await expect(textarea, 'Selection should be replaced').toHaveValue('axd')
 })
 
 test('ArrowLeft and ArrowRight', async ({ page }) => {
@@ -229,4 +236,12 @@ test('Backspace', async ({ page }) => {
 
   await tapKeyboard(page, backspace)
   await expect(textarea).toHaveValue('')
+
+  await textarea.evaluate((el: HTMLTextAreaElement) => {
+    el.value = 'a只🦨'
+    el.selectionStart = 0
+    el.selectionEnd = 2
+  })
+  await tapKeyboard(page, backspace)
+  await expect(textarea).toHaveValue('🦨')
 })
