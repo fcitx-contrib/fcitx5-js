@@ -22,7 +22,8 @@ export function redrawCaret(event: { target: EventTarget | null }) {
   const input = event.target as HTMLInputElement | HTMLTextAreaElement
   const color = getComputedStyle(input).caretColor
   const box = input.getBoundingClientRect()
-  const { top, left } = getCaretCoordinates(input, input.selectionStart!)
+  const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
+  const { top, left } = getCaretCoordinates(input, caret)
   const caretHeight = getFontSize(input) * (1 + UNDERLINE_OFFSET_RATIO)
   removeCaret()
   const div = document.createElement('div')
