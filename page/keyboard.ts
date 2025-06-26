@@ -202,7 +202,7 @@ function simulate(key: string, code: string) {
     }
     case 'Backspace':
       if (hasSelection) {
-        updateInput(input, input.value.slice(0, input.selectionStart!) + input.value.slice(input.selectionEnd!), input.selectionStart!)
+        replaceSelection(input, '')
       }
       else if (preText) {
         const selectionStart = getIndexOfPrevChar(preText)
@@ -230,6 +230,30 @@ function simulate(key: string, code: string) {
         else {
           updateInput(input, input.value, newCaret)
         }
+      }
+      break
+  }
+}
+
+function backspaceSlide(action: 'LEFT' | 'RIGHT' | 'RELEASE') {
+  const input = getInputElement()
+  if (!input) {
+    return
+  }
+  const preText = input.value.slice(0, input.selectionStart!)
+  switch (action) {
+    case 'LEFT':
+      updateInput(input, input.value, getIndexOfPrevChar(preText), input.selectionEnd!, 'backward')
+      break
+    case 'RIGHT':
+      if (input.selectionStart! < input.selectionEnd!) {
+        const postText = input.value.slice(input.selectionStart!)
+        updateInput(input, input.value, getIndexOfNextChar(preText, postText), input.selectionEnd!, 'backward')
+      }
+      break
+    case 'RELEASE':
+      if (input.selectionStart! < input.selectionEnd!) {
+        replaceSelection(input, '')
       }
       break
   }
@@ -292,6 +316,8 @@ export function createKeyboard() {
       switch (event.type) {
         case 'ASK_CANDIDATE_ACTIONS':
           return fcitx.Module.ccall('ask_candidate_actions', 'void', ['number'], [event.data])
+        case 'BACKSPACE_SLIDE':
+          return backspaceSlide(event.data)
         case 'CANDIDATE_ACTION':
           return fcitx.Module.ccall('activate_candidate_action', 'void', ['number', 'number'], [event.data.index, event.data.id])
         case 'COLLAPSE':
