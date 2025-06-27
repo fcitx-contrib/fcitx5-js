@@ -1,6 +1,7 @@
 import getCaretCoordinates from 'textarea-caret'
 import { getFontSize, UNDERLINE_OFFSET_RATIO } from './caret'
 import { getInputElement, setSpellCheck } from './focus'
+import { onTextChange } from './undoRedo'
 import { graphemeIndices } from './unicode'
 
 let x = 0
@@ -137,9 +138,16 @@ ____ commit pre|edit ____
   if (preedit) {
     drawPreeditUnderline(input, newStart)
   }
+  else {
+    onTextChange(input.value)
+  }
 }
 
 export function setPreedit(text: string, index: number) {
+  if (!preedit && !text) {
+    // Don't execute changeInput for a common scene: commit (which already clears preedit) and clear preedit.
+    return
+  }
   changeInput('', text, index)
 }
 

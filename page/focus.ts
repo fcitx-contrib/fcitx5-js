@@ -2,6 +2,7 @@ import { redrawCaret, removeCaret } from './caret'
 import { resetPreedit } from './client'
 import { hasTouch, hideKeyboard, showKeyboard, updateSelection } from './keyboard'
 import Module from './module'
+import { resetStacks } from './undoRedo'
 
 type Input = HTMLInputElement | HTMLTextAreaElement
 
@@ -40,6 +41,7 @@ export function focus() {
     originalReadOnly = input.readOnly
     input.readOnly = true
     showKeyboard()
+    resetStacks(input.value)
     redrawCaret({ target: input })
   }
   originalSpellCheck = input.spellcheck
