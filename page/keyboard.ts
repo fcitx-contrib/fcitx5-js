@@ -1,7 +1,9 @@
+import type { SystemEvent } from 'fcitx5-keyboard-web/dist/api'
 import { onMessage, setBuiltInLayout, setClient } from 'fcitx5-keyboard-web'
 import getCaretCoordinates from 'textarea-caret'
 import { getInputElement, resetInput } from './focus'
 import { processKey } from './keycode'
+import { onTextChange, redo, undo } from './undoRedo'
 import { graphemeIndices } from './unicode'
 
 let keyboardShown = false
@@ -10,6 +12,7 @@ const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
 
 export const hasTouch = /Android|iPhone|iPad|iPod/.test(navigator.userAgent)
 
+// All simulated operations need to effectively call it so that undo/redo works correctly.
 // Note: 'none' works on Android and not iOS.
 function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string, selectionStart: number, selectionEnd?: number, selectionDirection?: 'forward' | 'backward' | 'none') {
   input.value = value
@@ -20,6 +23,7 @@ function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: strin
   }
   input.dispatchEvent(new Event('change'))
   input.dispatchEvent(new Event('selectionchange'))
+  onTextChange(input.value)
 }
 
 function getIndexOfPrevChar(preText: string): number {
@@ -263,9 +267,13 @@ export function sendEventToKeyboard(message: string) {
   onMessage(message)
 }
 
+export function sendSystemEventToKeyboard(event: SystemEvent) {
+  return sendEventToKeyboard(JSON.stringify(event))
+}
+
 function deselect() {
   movingSelection = false
-  sendEventToKeyboard(JSON.stringify({ type: 'DESELECT' }))
+  sendSystemEventToKeyboard({ type: 'DESELECT' })
 }
 
 let buffer = '' // A fallback for paste if user rejects permission.
@@ -348,6 +356,8 @@ export function createKeyboard() {
           break
         case 'PASTE':
           return paste()
+        case 'REDO':
+          return redo()
         case 'SCROLL':
           return fcitx.Module.ccall('scroll', 'void', ['number', 'number'], [event.data.start, event.data.count])
         case 'SELECT': {
@@ -363,7 +373,7 @@ export function createKeyboard() {
           if (input?.value) {
             updateInput(input, input.value, 0, input.value.length, 'forward')
             movingSelection = true
-            sendEventToKeyboard(JSON.stringify({ type: 'SELECT' }))
+            sendSystemEventToKeyboard({ type: 'SELECT' })
           }
           break
         }
@@ -373,6 +383,8 @@ export function createKeyboard() {
           return fcitx.setCurrentInputMethod(event.data)
         case 'STATUS_AREA_ACTION':
           return fcitx.Module.ccall('activate_status_area_action', 'void', ['number'], [event.data])
+        case 'UNDO':
+          return undo()
       }
     },
   })

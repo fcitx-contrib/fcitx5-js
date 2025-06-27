@@ -52,3 +52,7 @@ export async function tapKeyboard(page: Page, key: string | Locator,
   const keyBox = await getBox(locator)
   return keyboard.tap({ force: true, position: { x: keyBox.x + keyBox.width / 2 - box.x, y: keyBox.y + keyBox.height / 2 - box.y } })
 }
+
+export function getSelection(locator: Locator): Promise<[number, number]> {
+  return locator.evaluate((el: HTMLTextAreaElement) => [el.selectionStart, el.selectionEnd])
+}

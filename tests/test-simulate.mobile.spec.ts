@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import { browserName, expectKeyboardShown, init, tapKeyboard } from './util'
+import { browserName, expectKeyboardShown, getSelection, init, tapKeyboard } from './util'
 
 function openEditor(page: Page) {
   return page.locator('.fcitx-keyboard-toolbar-button:nth-child(3)').tap()
@@ -52,10 +52,6 @@ function getHome(page: Page) {
 
 function getEnd(page: Page) {
   return getButton(page, 11)
-}
-
-function getSelection(locator: Locator): Promise<[number, number]> {
-  return locator.evaluate((el: HTMLTextAreaElement) => [el.selectionStart, el.selectionEnd])
 }
 
 test('Printable', async ({ page }) => {
