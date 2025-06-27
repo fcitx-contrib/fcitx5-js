@@ -122,3 +122,26 @@ test('Reset stacks', async ({ page }) => {
   await undo(page)
   await expect(textarea).toHaveValue('a')
 })
+
+test('Preedit not counted in stack', async ({ page }) => {
+  await init(page)
+  const textarea = page.locator('textarea')
+  await textarea.tap()
+  await expectKeyboardShown(page)
+
+  await page.evaluate(() => {
+    window.fcitx.setPreedit('yu', 0)
+  })
+  await expect(textarea).toHaveValue('yu')
+
+  await page.evaluate(() => {
+    window.fcitx.commit('预')
+  })
+  await expect(textarea).toHaveValue('预')
+
+  await undo(page)
+  await expect(textarea).toHaveValue('')
+
+  await redo(page)
+  await expect(textarea).toHaveValue('预')
+})
