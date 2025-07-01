@@ -1,7 +1,6 @@
+import { isApple } from './context'
 import { getInputElement } from './focus'
 import Module from './module'
-
-const isApple = navigator.userAgent.includes('Mac OS X')
 
 function extract(event: KeyboardEvent): [string, string, number] | undefined {
   const { key, code, shiftKey, altKey, ctrlKey, metaKey } = event

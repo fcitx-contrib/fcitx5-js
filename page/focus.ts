@@ -1,6 +1,7 @@
 import { redrawCaret, removeCaret } from './caret'
 import { resetPreedit } from './client'
-import { hasTouch, hideKeyboard, showKeyboard, updateSelection } from './keyboard'
+import { hasTouch } from './context'
+import { hideKeyboard, showKeyboard, updateSelection } from './keyboard'
 import Module from './module'
 import { resetStacks } from './undoRedo'
 

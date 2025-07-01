@@ -1,4 +1,5 @@
 import getCaretCoordinates from 'textarea-caret'
+import { isFirefox } from './context'
 
 // Compared with macOS pinyin on font-size: 14px.
 export const UNDERLINE_OFFSET_RATIO = 1 / 6
@@ -19,6 +20,9 @@ export function removeCaret() {
 }
 
 export function redrawCaret(event: { target: EventTarget | null }) {
+  if (isFirefox) {
+    return // Firefox draws caret even when readonly true.
+  }
   const input = event.target as HTMLInputElement | HTMLTextAreaElement
   const color = getComputedStyle(input).caretColor
   const box = input.getBoundingClientRect()

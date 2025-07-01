@@ -10,8 +10,6 @@ let keyboardShown = false
 const keyboardId = 'fcitx-virtual-keyboard'
 const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
 
-export const hasTouch = /Android|iPhone|iPad|iPod/.test(navigator.userAgent)
-
 // All simulated operations need to effectively call it so that undo/redo works correctly.
 // Note: 'none' works on Android and not iOS.
 function updateInput(input: HTMLInputElement | HTMLTextAreaElement, value: string, selectionStart: number, selectionEnd?: number, selectionDirection?: 'forward' | 'backward' | 'none') {

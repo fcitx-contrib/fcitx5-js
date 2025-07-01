@@ -2,10 +2,11 @@ import type { NotificationCallback } from './Fcitx5'
 import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
+import { hasTouch, isFirefox } from './context'
 import { blur, clickPanel, focus } from './focus'
 import { mkdirP, rmR, traverseAsync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
-import { createKeyboard, hasTouch, sendEventToKeyboard } from './keyboard'
+import { createKeyboard, sendEventToKeyboard } from './keyboard'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
 import { getLocale } from './locale'
 import Module from './module'
@@ -40,7 +41,7 @@ globalThis.fcitx = {
           break
       }
     }
-    if (navigator.userAgent.includes('Firefox')) {
+    if (isFirefox) {
       // Firefox doesn't support assigning numeric scrollbar width. Event the thinnest scrollbar
       // pushes the 6th candidate to next row. Set it none to mitigate.
       (document.querySelector('.fcitx-hoverables') as HTMLElement).style.scrollbarWidth = 'none'
