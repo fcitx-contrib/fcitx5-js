@@ -56,3 +56,7 @@ export async function tapKeyboard(page: Page, key: string | Locator,
 export function getSelection(locator: Locator): Promise<[number, number]> {
   return locator.evaluate((el: HTMLTextAreaElement) => [el.selectionStart, el.selectionEnd])
 }
+
+export function tapReturn(page: Page) {
+  return page.locator('.fcitx-keyboard-return-bar .fcitx-keyboard-toolbar-button').tap()
+}
