@@ -1,6 +1,6 @@
 import UZIP from 'uzip'
+import { hasTouch } from './context'
 import { lsDir, mkdirP } from './fs'
-import { hasTouch } from './keyboard'
 import { getLocale } from './locale'
 import Module from './module'
 
