@@ -5,12 +5,11 @@ import { hideKeyboard, showKeyboard, updateSelection } from './keyboard'
 import Module from './module'
 import { resetStacks } from './undoRedo'
 
-type Input = HTMLInputElement | HTMLTextAreaElement
+export type Input = HTMLInputElement | HTMLTextAreaElement
 
 let input: Input | null = null
 let userClick = false
 let originalSpellCheck = true
-let originalReadOnly = false
 
 // false means disable, true means respect the original value.
 export function setSpellCheck(spellCheck: boolean) {
@@ -28,23 +27,34 @@ export function resetInput() {
   Module.ccall('reset_input', 'void', [], [])
 }
 
+export function isInputElement(element: Element | null): element is Input {
+  return !!element && (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA')
+}
+
 export function focus() {
-  if (!['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '')) {
+  if (!isInputElement(document.activeElement)) {
     return
   }
   input = <Input>document.activeElement
-  input.addEventListener('mousedown', resetInput)
   if (hasTouch) {
+    if (!input.readOnly) {
+      const element = input
+      input.readOnly = true
+      setTimeout(() => {
+        element.blur()
+        setTimeout(() => element.focus(), 0)
+      }, 0)
+      return
+    }
     input.addEventListener('touchstart', resetInput)
     input.addEventListener('selectionchange', updateSelection)
     input.addEventListener('selectionchange', redrawCaret)
     input.addEventListener('change', redrawCaret) // Needed when deleting the only character.
-    originalReadOnly = input.readOnly
-    input.readOnly = true
     showKeyboard()
     resetStacks(input.value)
     redrawCaret({ target: input })
   }
+  input.addEventListener('mousedown', resetInput)
   originalSpellCheck = input.spellcheck
   const isPassword = input.tagName === 'INPUT' && input.type === 'password'
   Module.ccall('focus_in', 'void', ['bool'], [isPassword])
@@ -67,7 +77,6 @@ export function blur() {
     input.removeEventListener('selectionchange', updateSelection)
     input.removeEventListener('selectionchange', redrawCaret)
     input.removeEventListener('change', redrawCaret)
-    input.readOnly = originalReadOnly
     hideKeyboard()
     removeCaret()
   }
