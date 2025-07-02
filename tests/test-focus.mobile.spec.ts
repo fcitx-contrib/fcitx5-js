@@ -79,4 +79,17 @@ test('Kick system keyboard', async ({ page }) => {
     'blurTEXTAREA', // kick system keyboard
     'focusTEXTAREA', // refocus
   ])
+
+  await page.evaluate(() => window.fcitx.disable())
+  await expect(textarea).not.toHaveAttribute('readonly')
+  await expect(input).not.toHaveAttribute('readonly')
+
+  await page.evaluate(() => (window as any).events.length = 0)
+
+  await input.tap()
+  await expect(input).toBeFocused()
+  expect(await page.evaluate(() => (window as any).events)).toEqual([
+    'blurTEXTAREA', // tap
+    'focusINPUT', // tap
+  ])
 })
