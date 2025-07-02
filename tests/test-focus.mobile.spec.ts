@@ -49,3 +49,34 @@ test('Touching input switches focus', async ({ page }) => {
   await expect(input).toBeFocused()
   await expectKeyboardShown(page)
 })
+
+test('Kick system keyboard', async ({ page }) => {
+  await init(page)
+
+  const textarea = page.locator('textarea')
+  const input = page.locator('input')
+
+  await expect(textarea).toHaveAttribute('readonly')
+  await expect(input).toHaveAttribute('readonly')
+
+  await textarea.evaluate(el => el.remove())
+  await page.evaluate(() => document.body.insertAdjacentHTML('afterend', '<textarea></textarea>'))
+  await expect(textarea).not.toHaveAttribute('readonly')
+
+  await page.evaluate(() => {
+    const events: string[] = []
+    document.addEventListener('focus', el => events.push(`focus${(<Element>el.target).tagName}`), true)
+    document.addEventListener('blur', el => events.push(`blur${(<Element>el.target).tagName}`), true)
+    // @ts-expect-error this is just a test
+    window.events = events
+  })
+  await textarea.tap()
+  await expectKeyboardShown(page)
+  await expect(textarea).toHaveAttribute('readonly')
+
+  expect(await page.evaluate(() => (window as any).events)).toEqual([
+    'focusTEXTAREA', // tap
+    'blurTEXTAREA', // kick system keyboard
+    'focusTEXTAREA', // refocus
+  ])
+})
