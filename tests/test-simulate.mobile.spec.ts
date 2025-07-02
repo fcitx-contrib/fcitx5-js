@@ -280,6 +280,9 @@ test('Clipboard', async ({ page }) => {
   }
   await expect(textarea).toHaveValue('a')
   expect(await getSelection(textarea)).toEqual([1, 1])
+
+  await left.tap()
+  expect(await getSelection(textarea), 'Should deselect after paste').toEqual([0, 0])
 })
 
 test('Backspace', async ({ page }) => {

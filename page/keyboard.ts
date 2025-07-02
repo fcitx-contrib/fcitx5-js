@@ -274,7 +274,7 @@ function deselect() {
   sendSystemEventToKeyboard({ type: 'DESELECT' })
 }
 
-let buffer = '' // A fallback for paste if user rejects permission.
+let buffer = '' // A fallback for paste if user rejects permission or context is insecure.
 
 function copy(remove: boolean) {
   const input = getInputElement()
@@ -283,7 +283,7 @@ function copy(remove: boolean) {
   }
   const { selectionStart, selectionEnd } = input
   buffer = input.value.slice(selectionStart!, selectionEnd!)
-  navigator.clipboard.writeText(buffer)
+  navigator.clipboard?.writeText(buffer) // clipboard is undefined in insecure context.
   if (remove) {
     updateInput(input, input.value.slice(0, selectionStart!) + input.value.slice(selectionEnd!), selectionStart!)
     deselect()
@@ -300,6 +300,7 @@ async function paste() {
   if (input && text) {
     replaceSelection(input, text)
   }
+  deselect()
 }
 
 export function createKeyboard() {
