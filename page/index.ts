@@ -1,9 +1,10 @@
 import type { NotificationCallback } from './Fcitx5'
+import type { Input } from './focus'
 import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
 import { hasTouch, isFirefox } from './context'
-import { blur, clickPanel, focus } from './focus'
+import { blur, clickPanel, focus, isInputElement } from './focus'
 import { mkdirP, rmR, traverseAsync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
@@ -80,7 +81,22 @@ globalThis.fcitx = {
     document.addEventListener('keydown', keyEvent)
     document.addEventListener('keyup', keyEvent)
     document.querySelector('.fcitx-decoration')?.addEventListener('mousedown', clickPanel)
-    focus() // there may be textarea focused before wasm initialized
+    if (hasTouch) {
+      // This is destructive. I tried listening on touchstart of input elements, but system keyboard still shows
+      // up because on iOS if you touch body that nears an input element, it's still focused before set readonly.
+      document.querySelectorAll('input, textarea').forEach((el) => {
+        (<Input>el).readOnly = true
+      })
+      const activeElement = document.activeElement as HTMLElement | null
+      if (isInputElement(activeElement)) {
+        // Collapse system keyboard and expand fcitx keyboard.
+        activeElement.blur()
+        setTimeout(() => activeElement.focus(), 0)
+      }
+    }
+    else {
+      focus() // there may be textarea focused before wasm initialized
+    }
   },
   disable() {
     if (globalThis.fcitx.isWorker) {
@@ -91,6 +107,12 @@ globalThis.fcitx = {
     document.removeEventListener('keydown', keyEvent)
     document.removeEventListener('keyup', keyEvent)
     document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanel)
+    if (hasTouch) {
+      // Not ideal, but 🤷‍♂️
+      document.querySelectorAll('input, textarea').forEach((el) => {
+        (<Input>el).readOnly = false
+      })
+    }
   },
   setInputMethodsCallback(callback: () => void) {
     inputMethodsCallback = callback
