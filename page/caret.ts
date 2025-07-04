@@ -23,21 +23,31 @@ export function redrawCaret(event: { target: EventTarget | null }) {
   if (isFirefox) {
     return // Firefox draws caret even when readonly true.
   }
+  removeCaret()
   const input = event.target as HTMLInputElement | HTMLTextAreaElement
-  const color = getComputedStyle(input).caretColor
   const box = input.getBoundingClientRect()
   const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
   const { top, left } = getCaretCoordinates(input, caret)
+  const offsetX = left - input.scrollLeft
+  const offsetY = top - input.scrollTop
+  if (offsetX < 0 || offsetX > box.width) {
+    return
+  }
   const caretHeight = getFontSize(input) * (1 + UNDERLINE_OFFSET_RATIO)
-  removeCaret()
+  const t = Math.max(offsetY, 0)
+  const b = Math.min(offsetY + caretHeight, box.height)
+  if (b - t < 1) {
+    return
+  }
+  const { caretColor } = getComputedStyle(input)
   const div = document.createElement('div')
   div.classList.add('fcitx-mobile-caret')
   div.style.position = 'absolute'
-  div.style.top = `${box.top + top}px`
-  div.style.left = `${box.left + left}px`
-  div.style.height = `${caretHeight}px`
+  div.style.top = `${box.top + t}px`
+  div.style.left = `${box.left + offsetX}px`
+  div.style.height = `${b - t}px`
   div.style.width = '1px'
-  div.style.backgroundColor = color
+  div.style.backgroundColor = caretColor
   document.body.appendChild(div)
   show = true
   timer = window.setInterval(() => {
