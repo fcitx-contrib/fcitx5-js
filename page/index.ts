@@ -69,7 +69,8 @@ globalThis.fcitx = {
   getInstalledPlugins,
   unzip,
   enable() {
-    if (!globalThis.fcitx.isWorker) {
+    // Don't create keyboard for desktop, otherwise it may jump out when widening window.
+    if (!globalThis.fcitx.isWorker && hasTouch) {
       createKeyboard() // Must be called before init as webkeyboard will manipulate DOM.
     }
     Module.ccall('init', 'void', ['string', 'bool', 'bool'], [getLocale(), globalThis.fcitx.isWorker, hasTouch])
