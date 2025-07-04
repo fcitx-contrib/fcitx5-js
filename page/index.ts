@@ -4,7 +4,7 @@ import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
 import { hasTouch, isFirefox } from './context'
-import { blur, clickPanel, focus, isInputElement } from './focus'
+import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline } from './focus'
 import { mkdirP, rmR, traverseAsync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
@@ -81,6 +81,7 @@ globalThis.fcitx = {
     document.addEventListener('keydown', keyEvent)
     document.addEventListener('keyup', keyEvent)
     document.querySelector('.fcitx-decoration')?.addEventListener('mousedown', clickPanel)
+    document.addEventListener('scroll', redrawCaretAndPreeditUnderline, true)
     if (hasTouch) {
       // This is destructive. I tried listening on touchstart of input elements, but system keyboard still shows
       // up because on iOS if you touch body that nears an input element, it's still focused before set readonly.
@@ -107,6 +108,7 @@ globalThis.fcitx = {
     document.removeEventListener('keydown', keyEvent)
     document.removeEventListener('keyup', keyEvent)
     document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanel)
+    document.removeEventListener('scroll', redrawCaretAndPreeditUnderline, true)
     if (hasTouch) {
       // Not ideal, but 🤷‍♂️
       document.querySelectorAll('input, textarea').forEach((el) => {

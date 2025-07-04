@@ -51,14 +51,22 @@ function clearPreeditUnderline() {
   document.querySelectorAll('.fcitx-preedit-underline').forEach(div => div.remove())
 }
 
-function drawUnderline(top: number, left: number, width: number, color: string) {
+function drawUnderline(box: DOMRect, top: number, left: number, width: number, color: string) {
+  if (top < 0 || top > box.height) {
+    return
+  }
+  const l = Math.max(left, 0)
+  const r = Math.min(left + width, box.width)
+  if (r - l < 1) {
+    return
+  }
   const div = document.createElement('div')
   div.className = 'fcitx-preedit-underline'
   div.style.position = 'absolute'
-  div.style.top = `${top}px`
-  div.style.left = `${left}px`
+  div.style.top = `${box.top + top}px`
+  div.style.left = `${box.left + l}px`
   div.style.height = '1px'
-  div.style.width = `${width}px`
+  div.style.width = `${r - l}px`
   div.style.backgroundColor = color
   document.body.appendChild(div)
 }
@@ -89,14 +97,14 @@ function drawPreeditUnderline(input: HTMLElement, start: number) {
       // getCaretCoordinates can't tell the position of the end of previous line,
       // because it's equivalent to the start of next line, which is the actual place
       // that new character is written. So we need to calculate width of the last character.
-      drawUnderline(box.top + rowTop + fontSize * (1 + UNDERLINE_OFFSET_RATIO), box.left + rowLeft, lastLeft - rowLeft + getTextWidth(input, preedit[i - 1]), color)
+      drawUnderline(box, rowTop - input.scrollTop + fontSize * (1 + UNDERLINE_OFFSET_RATIO), rowLeft - input.scrollLeft, lastLeft - rowLeft + getTextWidth(input, preedit[i - 1]), color)
       rowTop = top
-      rowLeft = lastLeft
+      rowLeft = left
     }
     lastLeft = left
   }
   if (lastLeft !== endLeft) {
-    drawUnderline(box.top + endTop + fontSize * (1 + UNDERLINE_OFFSET_RATIO), box.left + lastLeft, endLeft - lastLeft, color)
+    drawUnderline(box, endTop - input.scrollTop + fontSize * (1 + UNDERLINE_OFFSET_RATIO), lastLeft - input.scrollLeft, endLeft - lastLeft, color)
   }
 }
 
@@ -159,4 +167,16 @@ export function resetPreedit() {
   preedit = ''
   preeditIndex = 0
   clearPreeditUnderline()
+}
+
+export function redrawPreeditUnderline() {
+  if (!preedit) {
+    return
+  }
+  const input = getInputElement()
+  if (!input) {
+    return
+  }
+  clearPreeditUnderline()
+  drawPreeditUnderline(input, input.selectionStart! - preeditIndex)
 }
