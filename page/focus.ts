@@ -1,5 +1,5 @@
 import { redrawCaret, removeCaret } from './caret'
-import { resetPreedit } from './client'
+import { redrawPreeditUnderline, resetPreedit } from './client'
 import { hasTouch } from './context'
 import { hideKeyboard, showKeyboard, updateSelection } from './keyboard'
 import Module from './module'
@@ -31,6 +31,15 @@ export function isInputElement(element: Element | null): element is Input {
   return !!element && (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA')
 }
 
+export function redrawCaretAndPreeditUnderline() {
+  redrawPreeditUnderline()
+  if (hasTouch) {
+    redrawCaret({ target: input })
+  }
+}
+
+const resizeObserver = new ResizeObserver(redrawCaretAndPreeditUnderline)
+
 export function focus() {
   if (!isInputElement(document.activeElement)) {
     return
@@ -52,8 +61,8 @@ export function focus() {
     input.addEventListener('change', redrawCaret) // Needed when deleting the only character.
     showKeyboard()
     resetStacks(input.value)
-    redrawCaret({ target: input })
   }
+  resizeObserver.observe(input)
   input.addEventListener('mousedown', resetInput)
   originalSpellCheck = input.spellcheck
   const isPassword = input.tagName === 'INPUT' && input.type === 'password'
@@ -80,6 +89,7 @@ export function blur() {
     hideKeyboard()
     removeCaret()
   }
+  resizeObserver.unobserve(input)
   input.spellcheck = originalSpellCheck
   input = null
   Module.ccall('focus_out', 'void', [], [])
