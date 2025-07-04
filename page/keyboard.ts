@@ -329,6 +329,7 @@ export function createKeyboard() {
   keyboard.style.width = '100vw'
   keyboard.style.height = 'min(calc(200vw / 3), 50vh)'
   keyboard.style.bottom = hiddenBottom
+  keyboard.style.left = '0'
   keyboard.style.position = 'fixed'
   keyboard.style.transition = 'bottom 0.5s'
   document.body.appendChild(keyboard)

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { expectKeyboardShown, init, tapKeyboard, tapReturn } from './util'
+import { expectKeyboardShown, getBox, init, tapKeyboard, tapReturn } from './util'
 
 test('keyboard-us', async ({ page }) => {
   await init(page)
@@ -29,6 +29,16 @@ test('keyboard-th', async ({ page }) => {
 
   await tapKeyboard(page, 'l')
   await expect(textarea).toHaveValue('ส')
+})
+
+test('Body has margin', async ({ page }) => {
+  await init(page)
+  await page.evaluate(() => document.body.style.margin = '8px')
+  await page.locator('textarea').tap()
+  await expectKeyboardShown(page)
+
+  const box = await getBox(page.locator('#fcitx-virtual-keyboard'))
+  expect(box.x).toBe(0)
 })
 
 test('Space label preserved when collapse on editor', async ({ page }) => {
