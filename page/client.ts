@@ -180,3 +180,7 @@ export function redrawPreeditUnderline() {
   clearPreeditUnderline()
   drawPreeditUnderline(input, input.selectionStart! - preeditIndex)
 }
+
+export function hasPreedit() {
+  return !!preedit
+}

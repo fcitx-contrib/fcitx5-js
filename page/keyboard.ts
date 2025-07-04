@@ -1,6 +1,7 @@
 import type { SystemEvent } from 'fcitx5-keyboard-web/dist/api'
 import { onMessage, setBuiltInLayout, setClient } from 'fcitx5-keyboard-web'
 import getCaretCoordinates from 'textarea-caret'
+import { hasPreedit } from './client'
 import { getInputElement, resetInput } from './focus'
 import { processKey } from './keycode'
 import { onTextChange, redo, undo } from './undoRedo'
@@ -9,6 +10,7 @@ import { graphemeIndices } from './unicode'
 let keyboardShown = false
 const keyboardId = 'fcitx-virtual-keyboard'
 const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
+let hasVirtualPreeditOrAux = false
 
 // All simulated operations need to effectively call it so that undo/redo works correctly.
 // Note: 'none' works on Android and not iOS.
@@ -242,6 +244,12 @@ function backspaceSlide(action: 'LEFT' | 'RIGHT' | 'RELEASE') {
   if (!input) {
     return
   }
+  if (hasPreedit() || hasVirtualPreeditOrAux) {
+    if (action === 'RELEASE') {
+      resetInput()
+    }
+    return
+  }
   const preText = input.value.slice(0, input.selectionStart!)
   switch (action) {
     case 'LEFT':
@@ -262,11 +270,15 @@ function backspaceSlide(action: 'LEFT' | 'RIGHT' | 'RELEASE') {
 }
 
 export function sendEventToKeyboard(message: string) {
+  const event = JSON.parse(message) as SystemEvent
+  if (event.type === 'PREEDIT') {
+    hasVirtualPreeditOrAux = !!event.data.preedit || !!event.data.auxUp
+  }
   onMessage(message)
 }
 
 export function sendSystemEventToKeyboard(event: SystemEvent) {
-  return sendEventToKeyboard(JSON.stringify(event))
+  return onMessage(JSON.stringify(event))
 }
 
 function deselect() {
