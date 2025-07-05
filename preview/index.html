@@ -12,9 +12,8 @@
     </div>
     <script type="module">
       import { fcitxReady } from "./Fcitx5.js"
-      window.fcitxReady = fcitxReady
-      await fcitxReady
-      window.fcitx.enable()
+      window.fcitxReady = fcitxReady.then(() => window.fcitx.enable())
+      await window.fcitxReady
     </script>
   </body>
 </html>
