@@ -24,7 +24,10 @@ export function redrawCaret(event: { target: EventTarget | null }) {
     return // Firefox draws caret even when readonly true.
   }
   removeCaret()
-  const input = event.target as HTMLInputElement | HTMLTextAreaElement
+  const input = event.target as HTMLInputElement | HTMLTextAreaElement | null
+  if (!input) {
+    return
+  }
   const box = input.getBoundingClientRect()
   const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
   const { top, left } = getCaretCoordinates(input, caret)
@@ -42,7 +45,7 @@ export function redrawCaret(event: { target: EventTarget | null }) {
   const { caretColor } = getComputedStyle(input)
   const div = document.createElement('div')
   div.classList.add('fcitx-mobile-caret')
-  div.style.position = 'absolute'
+  div.style.position = 'fixed'
   div.style.top = `${box.top + t}px`
   div.style.left = `${box.left + offsetX}px`
   div.style.height = `${b - t}px`

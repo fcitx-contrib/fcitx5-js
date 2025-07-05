@@ -62,7 +62,7 @@ function drawUnderline(box: DOMRect, top: number, left: number, width: number, c
   }
   const div = document.createElement('div')
   div.className = 'fcitx-preedit-underline'
-  div.style.position = 'absolute'
+  div.style.position = 'fixed'
   div.style.top = `${box.top + top}px`
   div.style.left = `${box.left + l}px`
   div.style.height = '1px'
