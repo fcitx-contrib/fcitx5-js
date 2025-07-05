@@ -65,6 +65,30 @@ test('Caret follows page scroll', async ({ page }) => {
 
   const container = page.locator('.container')
   await container.evaluate((el) => {
+    // On Android there is layout issue with keyboard if width is bigger than 100vw.
+    el.style.height = '110vh'
+  })
+  const textarea = page.locator('textarea')
+  await textarea.tap()
+  const caret = page.locator('.fcitx-mobile-caret')
+  const box = await getBox(caret)
+
+  await page.evaluate(() => window.scrollBy(10, 10))
+  let newBox
+  while (true) {
+    newBox = await getBox(caret)
+    if (newBox.y < box.y) {
+      break
+    }
+  }
+  expect(newBox.y).toBeCloseTo(box.y - 10, 0.1)
+})
+
+test('Caret follows container scroll', async ({ page }) => {
+  await init(page)
+
+  const container = page.locator('.container')
+  await container.evaluate((el) => {
     el.style.width = '100px'
     el.style.height = '100px'
     el.style.overflow = 'auto'

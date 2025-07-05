@@ -106,6 +106,33 @@ test('Underline', async ({ page }) => {
 test('Underline follows page scroll', async ({ page }) => {
   await init(page)
 
+  const textarea = page.locator('textarea')
+  await textarea.focus()
+  const container = page.locator('.container')
+  await container.evaluate((el) => {
+    el.style.width = '110vw'
+    el.style.height = '110vh'
+    window.fcitx.setPreedit('a', 0)
+  })
+
+  const underline = page.locator('.fcitx-preedit-underline')
+  const box = await getBox(underline)
+  await page.evaluate(() => window.scrollBy(10, 10))
+  let newBox
+  while (true) { // Wait scroll take effect.
+    newBox = await getBox(underline)
+    if (newBox.x < box.x) {
+      break
+    }
+  }
+  // With above treatment there could still be false negative, but it's acceptable.
+  expect(newBox.x).toBeCloseTo(box.x - 10, 0.1)
+  expect(newBox.y).toBeCloseTo(box.y - 10, 0.1)
+})
+
+test('Underline follows container scroll', async ({ page }) => {
+  await init(page)
+
   const container = page.locator('.container')
   await container.evaluate((el) => {
     el.style.width = '100px'
