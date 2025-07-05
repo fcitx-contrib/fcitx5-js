@@ -38,7 +38,12 @@ export function redrawCaretAndPreeditUnderline() {
   }
 }
 
-const resizeObserver = new ResizeObserver(redrawCaretAndPreeditUnderline)
+const resizeObserver = (() => {
+  if (globalThis.ResizeObserver) {
+    return new ResizeObserver(redrawCaretAndPreeditUnderline)
+  }
+  return null // webworker
+})()
 
 export function focus() {
   if (!isInputElement(document.activeElement)) {
@@ -62,7 +67,7 @@ export function focus() {
     showKeyboard()
     resetStacks(input.value)
   }
-  resizeObserver.observe(input)
+  resizeObserver?.observe(input)
   input.addEventListener('mousedown', resetInput)
   originalSpellCheck = input.spellcheck
   const isPassword = input.tagName === 'INPUT' && input.type === 'password'
@@ -89,7 +94,7 @@ export function blur() {
     hideKeyboard()
     removeCaret()
   }
-  resizeObserver.unobserve(input)
+  resizeObserver?.unobserve(input)
   input.spellcheck = originalSpellCheck
   input = null
   Module.ccall('focus_out', 'void', [], [])
