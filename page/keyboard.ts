@@ -365,7 +365,7 @@ export function createKeyboard() {
           return fcitx.Module.ccall('toggle', 'void', [], [])
         case 'KEY_DOWN':
         case 'KEY_UP':
-          if (!processKey(event.data.key, event.data.code, 0, event.type === 'KEY_UP')) {
+          if (!processKey(event.data.key, event.data.code, 1 << 29 /* KeyState::Virtual */, event.type === 'KEY_UP')) {
             simulate(event.data.key, event.data.code)
           }
           break

@@ -9,7 +9,8 @@ set(CMAKE_CXX_STANDARD 20)
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
 set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-sSIDE_MODULE")
 set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "-sSIDE_MODULE")
-add_compile_options(-fPIC -fexceptions)
+# -fexperimental-library is for std::osyncstream
+add_compile_options(-fPIC -fexceptions -fexperimental-library)
 
 option(RIME_ONLY "Disable components unused by rime" OFF)
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
