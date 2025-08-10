@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: lint
     env:
-      EMSCRIPTEN_VERSION: '4.0.10'
+      EMSCRIPTEN_VERSION: '4.0.12'
     strategy:
       fail-fast: false
       matrix:
@@ -132,7 +132,7 @@ jobs:
     needs: build
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: artifact-ubuntu-24.04
           merge-multiple: true
