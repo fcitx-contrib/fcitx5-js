@@ -16,6 +16,12 @@ FCITX_DEFINE_STATIC_ADDON_REGISTRY(getStaticAddon)
 
 namespace fcitx {
 
+enum class Runtime {
+    web = 0,
+    webworker = 1,
+    serviceworker = 2,
+};
+
 std::unique_ptr<Instance> instance;
 WasmFrontend *frontend;
 WebKeyboard *ui;
@@ -150,7 +156,8 @@ EMSCRIPTEN_KEEPALIVE void write_clipboard(const char *text) {
     clipboard->call<IClipboard::setClipboardV2>("", text, false);
 }
 
-EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker, bool touch) {
+EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
+                               bool touch) {
     if (instance) {
         return;
     }
@@ -167,17 +174,29 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker, bool touch) {
 
     EventLoop::setEventLoopFactory(
         [] { return std::make_unique<JSEventLoop>(); });
-    if (worker) {
+    switch (runtime) {
+    case Runtime::web: {
+        instance = std::make_unique<Instance>(0, nullptr);
+        if (touch) {
+            instance->setInputMethodMode(InputMethodMode::OnScreenKeyboard);
+        }
+        break;
+    }
+    case Runtime::webworker: {
         char arg0[] = "fcitx5-js";
         char arg1[] = "--disable=all";
         char arg2[] = "--enable=rime,notifications";
         char *argv[] = {arg0, arg1, arg2};
         instance = std::make_unique<Instance>(FCITX_ARRAY_SIZE(argv), argv);
-    } else {
-        instance = std::make_unique<Instance>(0, nullptr);
-        if (touch) {
-            instance->setInputMethodMode(InputMethodMode::OnScreenKeyboard);
-        }
+        break;
+    }
+    case Runtime::serviceworker: {
+        char arg0[] = "fcitx5-js";
+        char arg1[] = "--disable=webkeyboard,webpanel";
+        char *argv[] = {arg0, arg1};
+        instance = std::make_unique<Instance>(FCITX_ARRAY_SIZE(argv), argv);
+        break;
+    }
     }
     auto &addonMgr = instance->addonManager();
     addonMgr.registerDefaultLoader(&getStaticAddon());
@@ -189,7 +208,7 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, bool worker, bool touch) {
 
 EMSCRIPTEN_KEEPALIVE void reload(const char *locale, bool touch) {
     if (!instance) { // Pre-install plugins.
-        return init(locale, false, touch);
+        return init(locale, Runtime::web, touch);
     }
     instance->reloadConfig();
     instance->refresh();

@@ -34,14 +34,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: lint
     env:
-      EMSCRIPTEN_VERSION: '4.0.13'
+      EMSCRIPTEN_VERSION: '4.0.14'
     strategy:
       fail-fast: false
       matrix:
         include:
           - { os: ubuntu-24.04 }
           - { os: ubuntu-24.04-arm }
-          - { os: macos-15 }
+          - { os: macos-26 }
     steps:
       - uses: actions/checkout@v5
         with:
@@ -52,7 +52,7 @@ jobs:
           repository: emscripten-core/emsdk
           path: emsdk
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24.x
 
@@ -60,15 +60,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt install -y \
-            ninja-build \
             gettext
-
-      - name: Install dependencies (macOS)
-        if: ${{ matrix.os == 'macos-15' }}
-        env:
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
-        run: |
-          brew install ninja
 
       - name: Install node dependencies
         run: |

@@ -3,6 +3,7 @@ import type { Input } from './focus'
 import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
+import { SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
 import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline } from './focus'
 import { mkdirP, rmR, traverseAsync } from './fs'
@@ -70,12 +71,12 @@ globalThis.fcitx = {
   unzip,
   enable() {
     // Don't create keyboard for desktop, otherwise it may jump out when widening window.
-    if (!globalThis.fcitx.isWorker && hasTouch) {
+    if (globalThis.fcitx.runtime === WEB && hasTouch) {
       createKeyboard() // Must be called before init as webkeyboard will manipulate DOM.
     }
-    Module.ccall('init', 'void', ['string', 'bool', 'bool'], [getLocale(), globalThis.fcitx.isWorker, hasTouch])
-    if (globalThis.fcitx.isWorker) {
-      return
+    Module.ccall('init', 'void', ['string', 'number', 'bool'], [getLocale(), globalThis.fcitx.runtime, hasTouch])
+    if (globalThis.fcitx.runtime !== WEB) {
+      return { keyEvent }
     }
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
@@ -101,7 +102,7 @@ globalThis.fcitx = {
     }
   },
   disable() {
-    if (globalThis.fcitx.isWorker) {
+    if (globalThis.fcitx.runtime !== WEB) {
       return
     }
     document.removeEventListener('focus', focus, true)
@@ -122,7 +123,12 @@ globalThis.fcitx = {
   },
   updateInputMethods() {
     inputMethodsCallback()
-    sendEventToKeyboard(JSON.stringify({ type: 'INPUT_METHODS', data: { currentInputMethod: globalThis.fcitx.currentInputMethod(), inputMethods: globalThis.fcitx.getInputMethods() } }))
+    if (globalThis.fcitx.runtime === WEB) {
+      sendEventToKeyboard(JSON.stringify({ type: 'INPUT_METHODS', data: {
+        currentInputMethod: globalThis.fcitx.currentInputMethod(),
+        inputMethods: globalThis.fcitx.getInputMethods(),
+      } }))
+    }
   },
   setStatusAreaCallback(callback: () => void) {
     statusAreaCallback = callback
@@ -144,7 +150,7 @@ globalThis.fcitx = {
   // On f5o main thread set true to enable worker. On worker thread this is always false.
   useWorker: false,
   // @ts-expect-error uncertain environment
-  isWorker: typeof globalThis.WorkerGlobalScope !== 'undefined',
+  runtime: typeof ServiceWorkerGlobalScope === 'undefined' ? (typeof globalThis.WorkerGlobalScope === 'undefined' ? WEB : WEB_WORKER) : SERVICE_WORKER,
   followCaret: false,
 }
 const apis = [

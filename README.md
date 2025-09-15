@@ -7,6 +7,7 @@ The project provides an npm package `fcitx5-js.tgz`, which powers derivative app
 Derivative | Note
 -|-
 [Fcitx5 Online](https://github.com/fcitx-contrib/fcitx5-online) | [Preview](https://fcitx-contrib.github.io/online/)
+[Fcitx5 Chrome](https://github.com/fcitx-contrib/fcitx5-chrome) |
 
 ## Build
 
@@ -20,6 +21,8 @@ to install node.
 ```sh
 npm i -g pnpm
 pnpm i
+pnpm --prefix=fcitx5-keyboard-web i
+pnpm --prefix=fcitx5-keyboard-web run build
 pnpm --prefix=fcitx5-webview i
 ./scripts/install-deps.sh
 ```
@@ -39,7 +42,7 @@ You can also use `Ctrl+Shift+B` (or `Cmd+Shift+B` on macOS) in VSCode to execute
 npx serve -l 9000 -S preview
 ```
 See `interface FCITX` in [Fcitx5.d.ts](./page/Fcitx5.d.ts) for a list of JS APIs.
-They are methods of `window.fcitx` object.
+They are methods of `globalThis.fcitx` object.
 
 ### Pack
 ```sh
