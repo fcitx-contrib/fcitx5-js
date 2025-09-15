@@ -61,8 +61,25 @@ export type SyncCallback = (path: string) => void
 export type AsyncCallback = (path: string) => Promise<void> | void
 export type NotificationCallback = (name: string, icon: string, body: string, timeout: number) => void
 
+export interface KeyData {
+  type: string
+  key: string
+  code: string
+  shiftKey?: boolean
+  altKey?: boolean
+  ctrlKey?: boolean
+  metaKey?: boolean
+  getModifierState: (modifier: string) => boolean
+  preventDefault: () => void
+}
+
 export interface FCITX {
-  enable: () => void
+  // Return value is for ChromeOS.
+  enable: () => { keyEvent: (keyData: KeyData) => boolean } | undefined
+  // ChromeOS only.
+  commit: (text: string) => void
+  // ChromeOS only.
+  setPreedit: (text: string, index: number) => void
   disable: () => void
   currentInputMethod: () => string
   setCurrentInputMethod: (im: string) => void
