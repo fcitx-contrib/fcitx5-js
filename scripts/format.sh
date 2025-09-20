@@ -1,2 +1,2 @@
-find src wasmfrontend wasmnotifications webkeyboard webpanel -name '*.h' -o -name '*.cpp' | xargs clang-format -i
+find src wasmfrontend wasmnotifications webkeyboard webpanel chromepanel -name '*.h' -o -name '*.cpp' | xargs clang-format -i
 pnpm run lint:fix

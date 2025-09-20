@@ -174,16 +174,19 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
 
     EventLoop::setEventLoopFactory(
         [] { return std::make_unique<JSEventLoop>(); });
+
+    char arg0[] = "fcitx5-js";
     switch (runtime) {
     case Runtime::web: {
-        instance = std::make_unique<Instance>(0, nullptr);
+        char arg1[] = "--disable=chromepanel";
+        char *argv[] = {arg0, arg1};
+        instance = std::make_unique<Instance>(FCITX_ARRAY_SIZE(argv), argv);
         if (touch) {
             instance->setInputMethodMode(InputMethodMode::OnScreenKeyboard);
         }
         break;
     }
     case Runtime::webworker: {
-        char arg0[] = "fcitx5-js";
         char arg1[] = "--disable=all";
         char arg2[] = "--enable=rime,notifications";
         char *argv[] = {arg0, arg1, arg2};
@@ -191,7 +194,6 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
         break;
     }
     case Runtime::serviceworker: {
-        char arg0[] = "fcitx5-js";
         char arg1[] = "--disable=webkeyboard,webpanel";
         char *argv[] = {arg0, arg1};
         instance = std::make_unique<Instance>(FCITX_ARRAY_SIZE(argv), argv);

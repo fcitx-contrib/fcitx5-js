@@ -1,7 +1,5 @@
 export DESTDIR=build/destdir
-cmake --install build/fcitx5
-cmake --install build/wasmfrontend
-cmake --install build/wasmnotifications
-cmake --install build/webkeyboard
-cmake --install build/webpanel
+for dir in chromepanel fcitx5 wasmfrontend wasmnotifications webkeyboard webpanel; do
+  cmake --install build/$dir
+done
 touch build/dummy.cpp

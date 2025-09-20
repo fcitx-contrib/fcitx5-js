@@ -82,6 +82,7 @@ add_subdirectory(wasmnotifications)
 add_subdirectory(webkeyboard)
 add_subdirectory(fcitx5-webview)
 add_subdirectory(webpanel)
+add_subdirectory(chromepanel)
 
 # Force cmake to re-link Fcitx5.js when non-cpp files are changed.
 set(DUMMY_CPP "${PROJECT_BINARY_DIR}/dummy.cpp")
@@ -90,7 +91,7 @@ file(GLOB JS_SOURCES CONFIGURE_DEPENDS "page/*")
 add_custom_command(
     OUTPUT ${DUMMY_CPP}
     COMMAND pnpm run build && ./scripts/install.sh
-    DEPENDS ${JS_SOURCES} clipboard imselector spell quickphrase unicode webpanel webkeyboard wasmfrontend notifications
+    DEPENDS ${JS_SOURCES} clipboard imselector spell quickphrase unicode webpanel webkeyboard chromepanel wasmfrontend notifications
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Generating the pre.js, index.js and installing shared libraries"
 )

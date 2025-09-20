@@ -1,0 +1,7 @@
+[Addon]
+Name=ChromePanel
+Type=StaticLibrary
+Library=libchromepanel
+Category=UI
+Version=@PROJECT_VERSION@
+Configurable=False
