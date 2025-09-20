@@ -29,7 +29,7 @@ set(EXE_LINK_OPTIONS
 set(INSTALL_LIB_DIR "${PROJECT_BINARY_DIR}/destdir/usr/lib")
 set(INSTALL_SHARE_DIR "${PROJECT_BINARY_DIR}/destdir/usr/share")
 
-set(STATIC_ADDONS webpanel webkeyboard wasmfrontend)
+set(STATIC_ADDONS webpanel webkeyboard chromepanel wasmfrontend)
 
 if (RIME_ONLY)
     foreach(ADDON ${STATIC_ADDONS})
