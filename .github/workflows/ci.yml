@@ -15,7 +15,7 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24.x
 
@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: lint
     env:
-      EMSCRIPTEN_VERSION: '4.0.14'
+      EMSCRIPTEN_VERSION: '4.0.15'
     strategy:
       fail-fast: false
       matrix:
