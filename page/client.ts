@@ -19,7 +19,7 @@ export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft
     return
   }
   const rect = input.getBoundingClientRect()
-  const { top, left, height } = getCaretCoordinates(input, input.selectionStart! - (window.fcitx.followCaret ? 0 : preeditIndex))
+  const { top, left, height } = getCaretCoordinates(input, input.selectionStart! - (globalThis.fcitx.followCaret ? 0 : preeditIndex))
   const h = height /* NaN if no line-height is set */ || getFontSize(input) + CANDIDATE_WINDOW_OFFSET
   const panel = <HTMLElement>document.querySelector('#fcitx-theme')
   const frame = panel.getBoundingClientRect()

@@ -12,8 +12,8 @@ const textDecoder = new TextDecoder()
 
 function addDefaultIMs(byteArray: Uint8Array) {
   const inputMethods = (JSON.parse(textDecoder.decode(byteArray)).input_methods ?? []) as string[]
-  const currentInputMethods = window.fcitx.getInputMethods().map(im => im.name)
-  window.fcitx.setInputMethods([...currentInputMethods, ...inputMethods.filter(im => !currentInputMethods.includes(im))])
+  const currentInputMethods = globalThis.fcitx.getInputMethods().map(im => im.name)
+  globalThis.fcitx.setInputMethods([...currentInputMethods, ...inputMethods.filter(im => !currentInputMethods.includes(im))])
 }
 
 function distributeFiles(manifest: UZIP.UZIPFiles, dir: string) {

@@ -275,7 +275,7 @@ export function sendEventToKeyboard(message: string) {
     hasVirtualPreeditOrAux = !!event.data.preedit || !!event.data.auxUp
   }
   else if (event.type === 'STATUS_AREA') {
-    window.fcitx.updateStatusArea()
+    globalThis.fcitx.updateStatusArea()
   }
   onMessage(message)
 }
