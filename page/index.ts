@@ -13,6 +13,7 @@ import { jsKeyToFcitxString, keyEvent } from './keycode'
 import { getLocale } from './locale'
 import Module from './module'
 import { getInstalledPlugins, installPlugin, unzip } from './plugin'
+import { utf8Index2JS } from './unicode'
 import { deployRimeInWorker } from './workerAPI'
 
 let res: (value: any) => void
@@ -69,6 +70,7 @@ globalThis.fcitx = {
   installPlugin,
   getInstalledPlugins,
   unzip,
+  utf8Index2JS,
   enable() {
     // Don't create keyboard for desktop, otherwise it may jump out when widening window.
     if (globalThis.fcitx.runtime === WEB && hasTouch) {

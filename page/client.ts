@@ -2,7 +2,7 @@ import getCaretCoordinates from 'textarea-caret'
 import { getFontSize, UNDERLINE_OFFSET_RATIO } from './caret'
 import { getInputElement, setSpellCheck } from './focus'
 import { onTextChange } from './undoRedo'
-import { graphemeIndices } from './unicode'
+import { utf8Index2JS } from './unicode'
 
 let x = 0
 let y = 0
@@ -12,8 +12,6 @@ let preeditIndex = 0
 
 // compared with macOS pinyin
 const CANDIDATE_WINDOW_OFFSET = 6
-
-const textEncoder = new TextEncoder()
 
 export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft: number, dragging: boolean) {
   const input = getInputElement()
@@ -121,17 +119,7 @@ ____ commit pre|edit ____
     return
   }
 
-  // Convert UTF-8 index to JS string index
-  let i = preeditText.length
-  const indices = graphemeIndices(preeditText)
-  for (const idx of indices) {
-    const { length } = textEncoder.encode(preeditText.slice(0, idx))
-    if (length === index) {
-      i = idx
-      break
-    }
-  }
-
+  const i = utf8Index2JS(preeditText, index)
   const start = input.selectionStart! - preeditIndex
   const end = preedit ? start + preedit.length : input.selectionEnd!
   const newStart = start + commitText.length

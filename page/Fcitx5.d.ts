@@ -102,6 +102,7 @@ export interface FCITX {
   mkdirP: (path: string) => void
   rmR: (path: string) => void
   traverseAsync: (preDirCallback: AsyncCallback | undefined, fileCallback: AsyncCallback, postDirCallback: AsyncCallback | undefined) => (path: string) => Promise<void>
+  utf8Index2JS: (text: string, index: number) => number
   setNotificationCallback: (callback: NotificationCallback) => void
   notify: NotificationCallback
   Module: EM_MODULE

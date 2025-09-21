@@ -48,7 +48,15 @@ void ChromePanel::update(UserInterfaceComponent component,
             }
         }
         auto str =
-            json{{"candidates", candidates}, {"highlighted", highlighted}}
+            json{{"candidates", candidates},
+                 {"highlighted", highlighted},
+                 {"preedit",
+                  instance_->outputFilter(inputContext, inputPanel.preedit())
+                      .toString()},
+                 {"caret", inputPanel.preedit().cursor()},
+                 {"auxUp",
+                  instance_->outputFilter(inputContext, inputPanel.auxUp())
+                      .toString()}}
                 .dump();
         EM_ASM(fcitx.chrome.setCandidates(UTF8ToString($0)), str.c_str());
         break;

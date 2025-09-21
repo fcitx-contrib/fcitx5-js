@@ -19,13 +19,14 @@ namespace fcitx {
 enum class Runtime {
     web = 0,
     webworker = 1,
-    serviceworker = 2,
+    serviceworker = 2, // ChromeOS
 };
 
 std::unique_ptr<Instance> instance;
 WasmFrontend *frontend;
 WebKeyboard *ui;
 AddonInstance *clipboard;
+Runtime runtime;
 
 void notify_main_async(const std::string &str);
 
@@ -61,13 +62,16 @@ EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
 
 EMSCRIPTEN_KEEPALIVE void toggle() { instance->toggle(); }
 
+// For virtual keyboard (scroll mode whenever possible) and ChromeOS (normal
+// mode) only.
 EMSCRIPTEN_KEEPALIVE void select_candidate(int index) {
     auto ic = instance->mostRecentInputContext();
     const auto &list = ic->inputPanel().candidateList();
     if (!list)
         return;
     const auto &bulk = list->toBulk();
-    if (bulk) {
+    if (runtime != Runtime::serviceworker &&
+        bulk) { // ChromeOS doesn't support scroll mode.
         try {
             bulk->candidateFromAll(index).select(ic);
         } catch (const std::invalid_argument &e) {
@@ -161,6 +165,7 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
     if (instance) {
         return;
     }
+    fcitx::runtime = runtime;
     umask(007); // Fix config file's mode
     StandardPaths::global().syncUmask();
 #ifdef NDEBUG
