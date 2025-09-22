@@ -13,6 +13,7 @@ static nlohmann::json actionToJson(Action *action, InputContext *ic) {
     nlohmann::json j;
     j["id"] = action->id();
     j["desc"] = action->shortText(ic);
+    j["icon"] = action->icon(ic);
     if (action->isSeparator()) {
         j["separator"] = true;
     }
@@ -28,20 +29,24 @@ static nlohmann::json actionToJson(Action *action, InputContext *ic) {
     return j;
 }
 
+nlohmann::json getMenuActions(InputContext *ic) {
+    nlohmann::json actions = nlohmann::json::array();
+    auto &statusArea = ic->statusArea();
+    for (auto *action : statusArea.allActions()) {
+        if (!action->id()) {
+            // Not registered with UI manager.
+            continue;
+        }
+        actions.emplace_back(actionToJson(action, ic));
+    }
+    return actions;
+}
+
 extern "C" {
 EMSCRIPTEN_KEEPALIVE const char *get_menu_actions() {
     static std::string ret;
     if (auto *ic = instance->mostRecentInputContext()) {
-        nlohmann::json j = nlohmann::json::array();
-        auto &statusArea = ic->statusArea();
-        for (auto *action : statusArea.allActions()) {
-            if (!action->id()) {
-                // Not registered with UI manager.
-                continue;
-            }
-            j.emplace_back(actionToJson(action, ic));
-        }
-        ret = j.dump();
+        ret = getMenuActions(ic).dump();
         return ret.c_str();
     }
     return "[]";

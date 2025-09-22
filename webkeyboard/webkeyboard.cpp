@@ -12,6 +12,8 @@ void notify_main_async(const std::string &str) {
     EM_ASM(fcitx.sendEventToKeyboard(UTF8ToString($0)), str.c_str());
 }
 
+nlohmann::json getMenuActions(InputContext *ic);
+
 WebKeyboard::WebKeyboard(Instance *instance) : instance_(instance) {}
 
 void WebKeyboard::update(UserInterfaceComponent component,
@@ -111,37 +113,9 @@ void WebKeyboard::scroll(int start, int count) {
                        endReached);
 }
 
-static nlohmann::json actionToJson(Action *action, InputContext *ic) {
-    nlohmann::json j;
-    j["id"] = action->id();
-    j["desc"] = action->shortText(ic);
-    j["icon"] = action->icon(ic);
-    if (action->isSeparator()) {
-        j["separator"] = true;
-    }
-    if (action->isCheckable()) {
-        bool checked = action->isChecked(ic);
-        j["checked"] = checked;
-    }
-    if (auto *menu = action->menu()) {
-        for (auto *subaction : menu->actions()) {
-            j["children"].emplace_back(actionToJson(subaction, ic));
-        }
-    }
-    return j;
-}
-
 void WebKeyboard::updateStatusArea(InputContext *ic) {
-    nlohmann::json actions = nlohmann::json::array();
-    auto &statusArea = ic->statusArea();
-    for (auto *action : statusArea.allActions()) {
-        if (!action->id()) {
-            // Not registered with UI manager.
-            continue;
-        }
-        actions.emplace_back(actionToJson(action, ic));
-    }
-    notify_main_async(json{{"type", "STATUS_AREA"}, {"data", actions}}.dump());
+    notify_main_async(
+        json{{"type", "STATUS_AREA"}, {"data", getMenuActions(ic)}}.dump());
 }
 } // namespace fcitx
 

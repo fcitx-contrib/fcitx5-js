@@ -1,6 +1,7 @@
 import type { SystemEvent } from 'fcitx5-keyboard-web/dist/api'
 import { onMessage, setBuiltInLayout, setClient } from 'fcitx5-keyboard-web'
 import getCaretCoordinates from 'textarea-caret'
+import { activateMenuAction } from './action'
 import { hasPreedit } from './client'
 import { getInputElement, resetInput } from './focus'
 import { processKey } from './keycode'
@@ -397,7 +398,7 @@ export function createKeyboard() {
         case 'SET_INPUT_METHOD':
           return fcitx.setCurrentInputMethod(event.data)
         case 'STATUS_AREA_ACTION':
-          return fcitx.Module.ccall('activate_status_area_action', 'void', ['number'], [event.data])
+          return activateMenuAction(event.data)
         case 'UNDO':
           return undo()
       }

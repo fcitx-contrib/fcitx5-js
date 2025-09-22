@@ -145,13 +145,6 @@ EMSCRIPTEN_KEEPALIVE void activate_candidate_action(int index, int id) {
     }
 }
 
-EMSCRIPTEN_KEEPALIVE void activate_status_area_action(int id) {
-    if (auto *ic = instance->mostRecentInputContext()) {
-        auto *action = instance->userInterfaceManager().lookupActionById(id);
-        action->activate(ic);
-    }
-}
-
 EMSCRIPTEN_KEEPALIVE void scroll(int start, int count) {
     ui->scroll(start, count);
 }

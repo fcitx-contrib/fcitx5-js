@@ -61,6 +61,9 @@ void ChromePanel::update(UserInterfaceComponent component,
         EM_ASM(fcitx.chrome.setCandidates(UTF8ToString($0)), str.c_str());
         break;
     }
+    case UserInterfaceComponent::StatusArea:
+        EM_ASM(fcitx.updateStatusArea());
+        break;
     }
 }
 } // namespace fcitx
