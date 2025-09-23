@@ -44,6 +44,12 @@ static void answerCandidateAction(ActionableCandidateList *actionableList,
     }
 }
 
+// This has to be defined in f5j instead of librime.so because the latter is
+// compiled to eval(), which is banned by service worker's CSP.
+EMSCRIPTEN_KEEPALIVE int deployRimeInWorker() {
+    return EM_ASM_INT(return fcitx.deployRimeInWorker());
+}
+
 extern "C" {
 
 EMSCRIPTEN_KEEPALIVE void focus_in(bool isPassword) {
