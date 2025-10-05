@@ -94,7 +94,7 @@ add_custom_command(
     DEPENDS ${JS_SOURCES} clipboard imselector spell quickphrase unicode
         clipboard.conf.in-fmt keyboard.conf.in-fmt imselector.conf.in-fmt spell.conf.in-fmt quickphrase.conf.in-fmt unicode.conf.in-fmt
         fcitx5-translation
-        webpanel.conf.in-fmt webkeyboard.conf.in-fmt chromepanel.conf.in-fmt wasmfrontend.conf.in-fmt notifications.conf.in-fmt
+        webpanel.conf.in-fmt webkeyboard.conf.in-fmt chromepanel.conf.in-fmt wasmfrontend.conf.in-fmt wasmnotifications.conf.in-fmt
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Generating the pre.js, index.js and installing shared libraries"
 )

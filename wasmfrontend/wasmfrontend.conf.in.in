@@ -4,4 +4,4 @@ Type=StaticLibrary
 Library=libwasmfrontend
 Category=Frontend
 Version=@PROJECT_VERSION@
-Configurable=True
+Configurable=False
