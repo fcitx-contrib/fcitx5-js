@@ -6,7 +6,7 @@ import { getAddons, getConfig, setConfig } from './config'
 import { SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
 import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline } from './focus'
-import { mkdirP, rmR, traverseAsync } from './fs'
+import { rmR, traverseAsync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
@@ -144,7 +144,6 @@ globalThis.fcitx = {
   notify(name: string, icon: string, body: string, timeout: number) {
     notificationCallback(name, icon, body, timeout)
   },
-  mkdirP,
   rmR,
   traverseAsync,
   deployRimeInWorker,

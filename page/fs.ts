@@ -6,20 +6,6 @@ export function lsDir(path: string) {
   return names.filter(name => name !== '.' && name !== '..')
 }
 
-export function mkdirP(path: string) {
-  const parts = path.split('/')
-  let current = ''
-  for (const part of parts) {
-    current += `${part}/`
-    try {
-      Module.FS.mkdir(current)
-    }
-    catch {
-      // Directory already exists.
-    }
-  }
-}
-
 function traverseSync(preDirCallback: SyncCallback | undefined, fileCallback: SyncCallback, postDirCallback: SyncCallback | undefined) {
   async function closure(path: string) {
     const { mode } = Module.FS.lstat(path)

@@ -38,6 +38,7 @@ interface FS {
   isDir: (mode: number) => boolean
   lstat: (path: string) => { mode: number }
   mkdir: (path: string) => void
+  mkdirTree: (path: string) => void
   readFile: {
     (path: string): Uint8Array
     (path: string, options: { encoding: 'utf8' }): string
@@ -99,7 +100,6 @@ export interface FCITX {
   installPlugin: (buffer: ArrayBuffer) => string
   getInstalledPlugins: () => string[]
   unzip: (buffer: ArrayBuffer, dir: string) => void
-  mkdirP: (path: string) => void
   rmR: (path: string) => void
   traverseAsync: (preDirCallback: AsyncCallback | undefined, fileCallback: AsyncCallback, postDirCallback: AsyncCallback | undefined) => (path: string) => Promise<void>
   utf8Index2JS: (text: string, index: number) => number

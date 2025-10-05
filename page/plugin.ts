@@ -1,6 +1,6 @@
 import UZIP from 'uzip'
 import { hasTouch } from './context'
-import { lsDir, mkdirP } from './fs'
+import { lsDir } from './fs'
 import { getLocale } from './locale'
 import Module from './module'
 
@@ -20,7 +20,7 @@ function distributeFiles(manifest: UZIP.UZIPFiles, dir: string) {
   Object.entries(manifest).forEach(([path, data]) => {
     const absolutePath = `${dir}/${path}`
     if (path.endsWith('/')) {
-      mkdirP(absolutePath)
+      Module.FS.mkdirTree(absolutePath)
     }
     else {
       Module.FS.writeFile(absolutePath, data)

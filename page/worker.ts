@@ -23,10 +23,10 @@ globalThis.onmessage = async ({ data }: MessageEvent<MessageData>) => {
   await readyPromise
   switch (data.type) {
     case 'MKDIR':
-      globalThis.fcitx.mkdirP(data.data)
+      globalThis.fcitx.Module.FS.mkdirTree(data.data)
       break
     case 'WRITE_FILE':
-      globalThis.fcitx.mkdirP(data.data.path.slice(0, data.data.path.lastIndexOf('/')))
+      globalThis.fcitx.Module.FS.mkdirTree(data.data.path.slice(0, data.data.path.lastIndexOf('/')))
       globalThis.fcitx.Module.FS.writeFile(data.data.path, new Uint8Array(data.data.buffer))
       break
     case 'DEPLOY':

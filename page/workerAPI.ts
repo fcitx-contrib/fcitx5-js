@@ -14,7 +14,7 @@ function ensureWorker() {
   worker.onmessage = ({ data }: MessageEvent<MessageData>) => {
     switch (data.type) {
       case 'MKDIR':
-        globalThis.fcitx.mkdirP(data.data)
+        globalThis.fcitx.Module.FS.mkdirTree(data.data)
         break
       case 'WRITE_FILE':
         globalThis.fcitx.Module.FS.writeFile(data.data.path, new Uint8Array(data.data.buffer))
