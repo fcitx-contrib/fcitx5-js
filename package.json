@@ -21,7 +21,7 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.1",
-    "@playwright/test": "^1.53.1",
+    "@playwright/test": "1.55.1",
     "@types/node": "^24.0.4",
     "@types/uzip": "^0.20201231.2",
     "error-stack-parser": "^2.1.4",
