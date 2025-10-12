@@ -1,11 +1,16 @@
+#include "isocodes.h"
 #include <emscripten.h>
+#include <fcitx-utils/i18n.h>
 #include <fcitx/inputmethodentry.h>
 #include <fcitx/inputmethodmanager.h>
 #include <fcitx/instance.h>
 #include <nlohmann/json.hpp>
 
+#define ISO_639_3_DOMAIN "iso_639-3"
+
 namespace fcitx {
 extern std::unique_ptr<Instance> instance;
+extern IsoCodes isoCodes;
 
 static nlohmann::json json_describe_im(const fcitx::InputMethodEntry *entry) {
     nlohmann::json j;
@@ -66,6 +71,16 @@ EMSCRIPTEN_KEEPALIVE const char *get_all_input_methods() {
     });
     ret = j.dump();
     return ret.c_str();
+}
+
+EMSCRIPTEN_KEEPALIVE const char *get_language_name(const char *code) {
+    static std::string name;
+    auto entry = isoCodes.entry(code);
+    if (!entry) {
+        return "";
+    }
+    name = D_(ISO_639_3_DOMAIN, entry->name);
+    return name.c_str();
 }
 }
 } // namespace fcitx

@@ -10,6 +10,7 @@ add_executable(Fcitx5
 
 target_include_directories(Fcitx5 PRIVATE
     "${PROJECT_BINARY_DIR}/fcitx5"
+    "${PROJECT_SOURCE_DIR}/fcitx5/src/im/keyboard"
 )
 
 set(EXE_LINK_OPTIONS

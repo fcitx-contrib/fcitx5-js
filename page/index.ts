@@ -7,7 +7,7 @@ import { SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
 import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline } from './focus'
 import { rmR, traverseAsync } from './fs'
-import { currentInputMethod, getAllInputMethods, getInputMethods, setCurrentInputMethod, setInputMethods } from './input-method'
+import { currentInputMethod, getAllInputMethods, getInputMethods, getLanguageName, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
 import { getLocale } from './locale'
@@ -56,6 +56,7 @@ globalThis.fcitx = {
   setPreedit,
   commit,
   sendEventToKeyboard,
+  getLanguageName,
   setCurrentInputMethod,
   currentInputMethod,
   getInputMethods,

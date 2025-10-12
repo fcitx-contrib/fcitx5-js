@@ -82,6 +82,7 @@ export interface FCITX {
   // ChromeOS only.
   setPreedit: (text: string, index: number) => void
   disable: () => void
+  getLanguageName: (code: string) => string
   currentInputMethod: () => string
   setCurrentInputMethod: (im: string) => void
   getInputMethods: () => { name: string, displayName: string }[]
