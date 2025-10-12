@@ -21,6 +21,10 @@ FCITX_CONFIG_ENUM_NAME_WITH_I18N(writing_mode_t, N_("Horizontal top-bottom"),
                                  N_("Vertical left-right"))
 } // namespace candidate_window
 
+enum class DefaultTheme { System, MacOS26, MacOS15 };
+FCITX_CONFIG_ENUM_NAME_WITH_I18N(DefaultTheme, N_("System"), N_("macOS 26"),
+                                 N_("macOS 15"))
+
 enum class PagingButtonsStyle { None, Arrow, Triangle };
 FCITX_CONFIG_ENUM_NAME_WITH_I18N(PagingButtonsStyle, N_("None"), N_("Arrow"),
                                  N_("Triangle"))
@@ -78,8 +82,11 @@ struct PluginAnnotation {
 FCITX_CONFIGURATION(
     BasicConfig,
     Option<bool> followCaret{this, "FollowCaret", _("Follow caret"), false};
-    Option<candidate_window::theme_t> theme{this, "Theme", _("Theme"),
-                                            candidate_window::theme_t::system};
+    OptionWithAnnotation<candidate_window::theme_t,
+                         candidate_window::theme_tI18NAnnotation>
+        theme{this, "Theme", _("Theme"), candidate_window::theme_t::system};
+    OptionWithAnnotation<DefaultTheme, DefaultThemeI18NAnnotation> defaultTheme{
+        this, "DefaultTheme", _("Default theme"), DefaultTheme::System};
     OptionWithAnnotation<std::string, UserThemeAnnotation> userTheme{
         this, "UserTheme", _("User theme"), ""};
     ExternalOption exportCurrentTheme{this, "ExportCurrentTheme",
@@ -233,17 +240,21 @@ FCITX_CONFIGURATION(
 
 FCITX_CONFIGURATION(
     TypographyConfig,
-    Option<candidate_window::layout_t> layout{
-        this, "Layout", _("Layout"), candidate_window::layout_t::horizontal};
-    Option<candidate_window::writing_mode_t> writingMode{
-        this, "WritingMode", _("Writing mode"),
-        candidate_window::writing_mode_t::horizontal_tb};
+    OptionWithAnnotation<candidate_window::layout_t,
+                         candidate_window::layout_tI18NAnnotation>
+        layout{this, "Layout", _("Layout"),
+               candidate_window::layout_t::horizontal};
+    OptionWithAnnotation<candidate_window::writing_mode_t,
+                         candidate_window::writing_mode_tI18NAnnotation>
+        writingMode{this, "WritingMode", _("Writing mode"),
+                    candidate_window::writing_mode_t::horizontal_tb};
     Option<bool> typographyAwarenessForIM{this, "TypographyAwarenessForIM",
                                           _("Typography awareness for IM"),
                                           true};
-    Option<PagingButtonsStyle> pagingButtonsStyle{this, "PagingButtonsStyle",
-                                                  _("Paging buttons style"),
-                                                  PagingButtonsStyle::Arrow};);
+    OptionWithAnnotation<PagingButtonsStyle, PagingButtonsStyleI18NAnnotation>
+        pagingButtonsStyle{this, "PagingButtonsStyle",
+                           _("Paging buttons style"),
+                           PagingButtonsStyle::Arrow};);
 
 FCITX_CONFIGURATION(BackgroundConfig,
                     OptionWithAnnotation<std::string, ImageAnnotation> imageUrl{
@@ -282,20 +293,22 @@ FCITX_CONFIGURATION(
                                  ""};);
 
 FCITX_CONFIGURATION(CaretConfig,
-                    Option<CaretStyle> style{this, "Style", _("Style"),
-                                             CaretStyle::Blink};
+                    OptionWithAnnotation<CaretStyle, CaretStyleI18NAnnotation>
+                        style{this, "Style", _("Style"), CaretStyle::Blink};
                     Option<std::string> text{this, "Text", _("Text"), "‸"};);
 
 FCITX_CONFIGURATION(
     HighlightConfig,
-    Option<HighlightMarkStyle> markStyle{this, "MarkStyle", _("Mark style"),
-                                         HighlightMarkStyle::None};
+    OptionWithAnnotation<HighlightMarkStyle, HighlightMarkStyleI18NAnnotation>
+        markStyle{this, "MarkStyle", _("Mark style"), HighlightMarkStyle::None};
     Option<std::string> markText{this, "MarkText", _("Mark text"), "🐧"};
-    Option<HoverBehavior> hoverBehavior{
-        this, "HoverBehavior", _("Hover behavior"), HoverBehavior::None};);
+    OptionWithAnnotation<HoverBehavior, HoverBehaviorI18NAnnotation>
+        hoverBehavior{this, "HoverBehavior", _("Hover behavior"),
+                      HoverBehavior::None};);
 
 FCITX_CONFIGURATION(
-    Size,
+    Size, Option<bool> overrideDefault{this, "OverrideDefault",
+                                       _("Override default"), false};
     Option<int, IntConstrain> borderWidth{this, "BorderWidth",
                                           _("Border width (px)"), 1,
                                           IntConstrain(0, BORDER_WIDTH_MAX)};
