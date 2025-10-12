@@ -2,6 +2,7 @@
 #include "../wasmfrontend/wasmfrontend.h"
 #include "../webkeyboard/webkeyboard.h"
 #include "event_js.h"
+#include "isocodes.h"
 #include "keycode.h"
 #include <emscripten.h>
 #include <fcitx-utils/event.h>
@@ -26,6 +27,7 @@ std::unique_ptr<Instance> instance;
 WasmFrontend *frontend;
 WebKeyboard *ui;
 AddonInstance *clipboard;
+IsoCodes isoCodes;
 Runtime runtime;
 
 void notify_main_async(const std::string &str);
@@ -174,6 +176,7 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
 #endif
 
     setlocale(LC_ALL, locale); // emscripten musl specific.
+    isoCodes.read(ISOCODES_ISO639_JSON);
     setenv("XKB_CONFIG_ROOT", "/usr/share/xkeyboard-config-2", 1);
 
     EventLoop::setEventLoopFactory(

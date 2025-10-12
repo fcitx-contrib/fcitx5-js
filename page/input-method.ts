@@ -19,3 +19,7 @@ export function setInputMethods(ims: string[]) {
 export function getAllInputMethods() {
   return JSON.parse(Module.ccall('get_all_input_methods', 'string', [], []))
 }
+
+export function getLanguageName(code: string) {
+  return Module.ccall('get_language_name', 'string', ['string'], [code])
+}
