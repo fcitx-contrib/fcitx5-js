@@ -15,7 +15,7 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.x
 
@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: lint
     env:
-      EMSCRIPTEN_VERSION: '4.0.16'
+      EMSCRIPTEN_VERSION: '4.0.17'
     strategy:
       fail-fast: false
       matrix:
@@ -52,7 +52,7 @@ jobs:
           repository: emscripten-core/emsdk
           path: emsdk
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.x
 
