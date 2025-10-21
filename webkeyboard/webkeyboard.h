@@ -53,7 +53,7 @@ class WebKeyboard final : public VirtualKeyboardUserInterface {
 
     void setCandidatesAsync(const std::vector<Candidate> &candidates,
                             int highlighted, int scrollState, bool scrollStart,
-                            bool scrollEnd);
+                            bool scrollEnd, bool hasClientPreedit);
     void expand();
 };
 
