@@ -12,6 +12,7 @@ let keyboardShown = false
 const keyboardId = 'fcitx-virtual-keyboard'
 const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
 let hasVirtualPreeditOrAux = false
+let hasCandidates = false
 
 // All simulated operations need to effectively call it so that undo/redo works correctly.
 // Note: 'none' works on Android and not iOS.
@@ -245,7 +246,7 @@ function backspaceSlide(action: 'LEFT' | 'RIGHT' | 'RELEASE') {
   if (!input) {
     return
   }
-  if (hasPreedit() || hasVirtualPreeditOrAux) {
+  if (hasPreedit() || hasVirtualPreeditOrAux || hasCandidates) {
     if (action === 'RELEASE') {
       resetInput()
     }
@@ -272,11 +273,20 @@ function backspaceSlide(action: 'LEFT' | 'RIGHT' | 'RELEASE') {
 
 export function sendEventToKeyboard(message: string) {
   const event = JSON.parse(message) as SystemEvent
-  if (event.type === 'PREEDIT') {
-    hasVirtualPreeditOrAux = !!event.data.preedit || !!event.data.auxUp
-  }
-  else if (event.type === 'STATUS_AREA') {
-    globalThis.fcitx.updateStatusArea()
+  switch (event.type) {
+    case 'PREEDIT':
+      hasVirtualPreeditOrAux = !!event.data.preedit || !!event.data.auxUp
+      break
+    case 'CANDIDATES':
+      hasCandidates = event.data.candidates.length > 0
+      break
+    case 'CLEAR':
+      hasVirtualPreeditOrAux = false
+      hasCandidates = false
+      break
+    case 'STATUS_AREA':
+      globalThis.fcitx.updateStatusArea()
+      break
   }
   onMessage(message)
 }

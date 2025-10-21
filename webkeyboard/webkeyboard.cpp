@@ -57,7 +57,8 @@ void WebKeyboard::update(UserInterfaceComponent component,
         if (auxUp.empty() && preedit.empty() && candidates.empty()) {
             notify_main_async(R"JSON({"type":"CLEAR"})JSON");
         } else {
-            setCandidatesAsync(candidates, highlighted, 0, false, false);
+            setCandidatesAsync(candidates, highlighted, 0, false, false,
+                               !inputPanel.clientPreedit().empty());
         }
         break;
     }
@@ -69,14 +70,16 @@ void WebKeyboard::update(UserInterfaceComponent component,
 
 void WebKeyboard::setCandidatesAsync(const std::vector<Candidate> &candidates,
                                      int highlighted, int scrollState,
-                                     bool scrollStart, bool scrollEnd) {
+                                     bool scrollStart, bool scrollEnd,
+                                     bool hasClientPreedit) {
     auto j = json{{"type", "CANDIDATES"},
                   {"data",
                    {{"candidates", candidates},
                     {"highlighted", highlighted},
                     {"scrollState", scrollState},
                     {"scrollStart", scrollStart},
-                    {"scrollEnd", scrollEnd}}}};
+                    {"scrollEnd", scrollEnd},
+                    {"hasClientPreedit", hasClientPreedit}}}};
     notify_main_async(j.dump());
 }
 
@@ -110,7 +113,7 @@ void WebKeyboard::scroll(int start, int count) {
         }
     }
     setCandidatesAsync(candidates, start == 0 ? 0 : -1, 2, start == 0,
-                       endReached);
+                       endReached, !ic->inputPanel().clientPreedit().empty());
 }
 
 void WebKeyboard::updateStatusArea(InputContext *ic) {
