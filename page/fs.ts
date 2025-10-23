@@ -1,12 +1,15 @@
 import type { AsyncCallback, SyncCallback } from './Fcitx5'
 import Module from './module'
 
+export const USR_MOUNT_POINT = '/backup/usr'
+export const HOME_MOUNT_POINT = '/home/web_user'
+
 export function lsDir(path: string) {
   const names = Module.FS.readdir(path)
   return names.filter(name => name !== '.' && name !== '..')
 }
 
-function traverseSync(preDirCallback: SyncCallback | undefined, fileCallback: SyncCallback, postDirCallback: SyncCallback | undefined) {
+export function traverseSync(preDirCallback: SyncCallback | undefined, fileCallback: SyncCallback, postDirCallback: SyncCallback | undefined) {
   async function closure(path: string) {
     const { mode } = Module.FS.lstat(path)
     if (Module.FS.isDir(mode)) {
@@ -48,4 +51,20 @@ export function traverseAsync(preDirCallback: AsyncCallback | undefined, fileCal
     return fileCallback(path)
   }
   return closure
+}
+
+export function mount() {
+  // Don't mount /usr directly as it stores unnecessary files and is too slow.
+  Module.FS.mkdirTree(USR_MOUNT_POINT)
+  Module.FS.mount(Module.IDBFS, { autoPersist: true }, USR_MOUNT_POINT)
+  Module.FS.mount(Module.IDBFS, { autoPersist: true }, HOME_MOUNT_POINT)
+}
+
+export function reset() {
+  const { promise, resolve } = Promise.withResolvers<void>()
+  rmR(USR_MOUNT_POINT)
+  rmR(HOME_MOUNT_POINT)
+  // Manually trigger syncfs to ensure data is cleared.
+  Module.FS.syncfs(false, () => resolve())
+  return promise
 }

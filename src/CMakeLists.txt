@@ -19,11 +19,12 @@ set(EXE_LINK_OPTIONS
     "-sSTACK_SIZE=1MB" # fcitx5-chewing's log overflows the default 64KB stack
     "-sALLOW_MEMORY_GROWTH=1"
     "-sMAXIMUM_MEMORY=4GB"
-    "-sEXPORTED_RUNTIME_METHODS=['ccall','FS']"
+    "-sEXPORTED_RUNTIME_METHODS=['ccall','FS','IDBFS']"
     "-sENVIRONMENT=web,worker" # disable require("ws") in Fcitx5.js which is rejected by project user's bundler
     "--extern-pre-js ${PROJECT_BINARY_DIR}/pre.js"
     "--extern-post-js ${PROJECT_BINARY_DIR}/index.js"
     "-L${PROJECT_BINARY_DIR}/destdir/usr/lib"
+    "-lidbfs.js"
     Fcitx5::Core
 )
 

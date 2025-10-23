@@ -1,6 +1,6 @@
 import UZIP from 'uzip'
 import { hasTouch } from './context'
-import { lsDir } from './fs'
+import { lsDir, traverseSync, USR_MOUNT_POINT } from './fs'
 import { getLocale } from './locale'
 import Module from './module'
 
@@ -28,6 +28,21 @@ function distributeFiles(manifest: UZIP.UZIPFiles, dir: string) {
   })
 }
 
+function symlink(manifest: UZIP.UZIPFiles) {
+  Object.entries(manifest).forEach(([path]) => {
+    const absolutePath = `/usr/${path}`
+    if (path.endsWith('/')) {
+      Module.FS.mkdirTree(absolutePath)
+    }
+    else {
+      try {
+        Module.FS.symlink(`${USR_MOUNT_POINT}/${path}`, absolutePath)
+      }
+      catch {}
+    }
+  })
+}
+
 export function unzip(buffer: ArrayBuffer, dir: string) {
   // UZIP hangs on empty zip.
   if (!buffer.byteLength) {
@@ -43,7 +58,7 @@ export function installPlugin(buffer: ArrayBuffer) {
     throw new Error('Invalid plugin')
   }
   const manifest = UZIP.parse(buffer)
-  const names = Object.keys(manifest).map(path => (path.match(/^plugin\/(\S+)\.json$/) ?? { 1: undefined })[1]).filter(name => name !== undefined)
+  const names = Object.keys(manifest).flatMap(path => (path.match(/^plugin\/(\S+)\.json$/) ?? { 1: [] })[1])
   if (names.length !== 1) {
     throw new Error('Invalid plugin')
   }
@@ -52,10 +67,27 @@ export function installPlugin(buffer: ArrayBuffer) {
   if (!byteArray) {
     throw new Error('Invalid plugin')
   }
-  distributeFiles(manifest, '/usr')
+  // Extract plugin to /backup/usr so that they are stored in IDBFS.
+  distributeFiles(manifest, USR_MOUNT_POINT)
+  // Symlink one plugin's files to /usr.
+  symlink(manifest)
   reload()
   addDefaultIMs(byteArray)
   return name
+}
+
+// Symlink all plugins' files from /backup/usr to /usr.
+export function restorePlugins() {
+  traverseSync((backupPath) => {
+    const path = `/usr${backupPath.slice(USR_MOUNT_POINT.length)}`
+    Module.FS.mkdirTree(path)
+  }, (backupPath) => {
+    const path = `/usr${backupPath.slice(USR_MOUNT_POINT.length)}`
+    try {
+      Module.FS.symlink(backupPath, path)
+    }
+    catch {}
+  }, undefined)(USR_MOUNT_POINT)
 }
 
 export function getInstalledPlugins() {

@@ -4,6 +4,7 @@ const mobileTests = /.*\.mobile\.spec\.ts/
 
 export default defineConfig({
   testDir: 'tests',
+  retries: 3,
   projects: [{
     name: 'Chromium',
     use: {

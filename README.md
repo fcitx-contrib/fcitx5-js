@@ -6,7 +6,7 @@ The project provides an npm package `fcitx5-js.tgz`, which powers derivative app
 
 Derivative | Note
 -|-
-[Fcitx5 Online](https://github.com/fcitx-contrib/fcitx5-online) | [Preview](https://fcitx-contrib.github.io/online/)
+[Fcitx5 Online](https://github.com/fcitx/fcitx5-online) | [Preview](https://fcitx-contrib.github.io/online/)
 [Fcitx5 Chrome](https://github.com/fcitx-contrib/fcitx5-chrome) |
 
 ## Build
