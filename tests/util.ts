@@ -33,11 +33,11 @@ export async function showPanel(page: Page) {
     ], 0, '', true, false, true, 0, false, false)
     fcitx.placePanel(0, 0, 0, 0, false)
   })
-  return expect(page.locator('#fcitx-theme')).toHaveCSS('opacity', '1')
+  return expect(page.locator('#fcitx-theme')).toHaveCSS('display', 'block')
 }
 
 export function expectPanelHidden(page: Page) {
-  return expect(page.locator('#fcitx-theme')).toHaveCSS('opacity', '0')
+  return expect(page.locator('#fcitx-theme')).toHaveCSS('display', 'none')
 }
 
 export function expectKeyboardShown(page: Page) {
