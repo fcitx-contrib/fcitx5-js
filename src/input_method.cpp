@@ -1,15 +1,14 @@
+#include "fcitx.h"
 #include "isocodes.h"
 #include <emscripten.h>
 #include <fcitx-utils/i18n.h>
 #include <fcitx/inputmethodentry.h>
 #include <fcitx/inputmethodmanager.h>
-#include <fcitx/instance.h>
 #include <nlohmann/json.hpp>
 
 #define ISO_639_3_DOMAIN "iso_639-3"
 
 namespace fcitx {
-extern std::unique_ptr<Instance> instance;
 extern IsoCodes isoCodes;
 
 static nlohmann::json json_describe_im(const fcitx::InputMethodEntry *entry) {

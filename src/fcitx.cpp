@@ -1,3 +1,4 @@
+#include "fcitx.h"
 #include "../fcitx5/src/modules/clipboard/clipboard_public.h"
 #include "../wasmfrontend/wasmfrontend.h"
 #include "../webkeyboard/webkeyboard.h"
@@ -9,19 +10,12 @@
 #include <fcitx-utils/standardpaths.h>
 #include <fcitx/action.h>
 #include <fcitx/inputmethodmanager.h>
-#include <fcitx/instance.h>
 #include <fcitx/userinterfacemanager.h>
 #include <sys/stat.h>
 
 FCITX_DEFINE_STATIC_ADDON_REGISTRY(getStaticAddon)
 
 namespace fcitx {
-
-enum class Runtime {
-    web = 0,
-    webworker = 1,
-    serviceworker = 2, // ChromeOS
-};
 
 std::unique_ptr<Instance> instance;
 WasmFrontend *frontend;
@@ -200,7 +194,8 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
         instance = std::make_unique<Instance>(FCITX_ARRAY_SIZE(argv), argv);
         break;
     }
-    case Runtime::serviceworker: {
+    case Runtime::serviceworker:
+    case Runtime::options: {
         char arg1[] = "--disable=webkeyboard,webpanel";
         char *argv[] = {arg0, arg1};
         instance = std::make_unique<Instance>(FCITX_ARRAY_SIZE(argv), argv);
@@ -215,9 +210,10 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
     clipboard = addonMgr.addon("clipboard", true);
 }
 
-EMSCRIPTEN_KEEPALIVE void reload(const char *locale, bool touch) {
+EMSCRIPTEN_KEEPALIVE void reload(const char *locale, Runtime runtime,
+                                 bool touch) {
     if (!instance) { // Pre-install plugins.
-        return init(locale, Runtime::web, touch);
+        return init(locale, runtime, touch);
     }
     instance->reloadConfig();
     instance->refresh();

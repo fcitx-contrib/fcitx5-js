@@ -1,14 +1,12 @@
+#include "fcitx.h"
 #include <emscripten.h>
 #include <fcitx/action.h>
-#include <fcitx/instance.h>
 #include <fcitx/menu.h>
 #include <fcitx/statusarea.h>
 #include <fcitx/userinterfacemanager.h>
 #include <nlohmann/json.hpp>
 
 namespace fcitx {
-extern std::unique_ptr<Instance> instance;
-
 static nlohmann::json actionToJson(Action *action, InputContext *ic) {
     nlohmann::json j;
     j["id"] = action->id();
