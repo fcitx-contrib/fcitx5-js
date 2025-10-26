@@ -5,7 +5,7 @@ import { getLocale } from './locale'
 import Module from './module'
 
 export function reload() {
-  Module.ccall('reload', 'void', ['string', 'bool'], [getLocale(), hasTouch])
+  Module.ccall('reload', 'void', ['string', 'number', 'bool'], [getLocale(), globalThis.fcitx.runtime, hasTouch])
 }
 
 const textDecoder = new TextDecoder()

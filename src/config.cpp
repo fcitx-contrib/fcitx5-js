@@ -1,3 +1,4 @@
+#include "fcitx.h"
 #include <emscripten.h>
 #include <fcitx-config/configuration.h>
 #include <fcitx-config/rawconfig.h>
@@ -6,13 +7,9 @@
 #include <fcitx/inputmethodengine.h>
 #include <fcitx/inputmethodentry.h>
 #include <fcitx/inputmethodmanager.h>
-#include <fcitx/instance.h>
 #include <nlohmann/json.hpp>
-#include <string>
 
 namespace fcitx {
-extern std::unique_ptr<Instance> instance;
-
 constexpr char globalConfigPath[] = "fcitx://config/global";
 constexpr char addonConfigPrefix[] = "fcitx://config/addon/";
 constexpr char imConfigPrefix[] = "fcitx://config/inputmethod/";

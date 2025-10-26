@@ -1,9 +1,9 @@
 #include "wasmfrontend.h"
-#include "fcitx/focusgroup.h"
+#include "../src/fcitx.h"
 #include <emscripten.h>
+#include <fcitx/focusgroup.h>
 
 namespace fcitx {
-
 WasmFrontend::WasmFrontend(Instance *instance)
     : instance_(instance),
       focusGroup_("wasm", instance->inputContextManager()) {
@@ -14,7 +14,9 @@ WasmFrontend::WasmFrontend(Instance *instance)
     // Make mostRecentInputContext not null so that current IM info can be
     // retrieved on load finish, even if no DOM element can be actually focused
     // (e.g. when focusing on address bar).
-    focusIn(false);
+    if (runtime != Runtime::options) { // No UI implementation for options page.
+        focusIn(false);
+    }
 }
 
 void WasmFrontend::createInputContext() {

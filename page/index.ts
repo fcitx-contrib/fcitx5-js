@@ -3,7 +3,7 @@ import type { Input } from './focus'
 import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
-import { SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
+import { OPTIONS, SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
 import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline } from './focus'
 import { mount, reset, rmR, traverseAsync } from './fs'
@@ -21,6 +21,21 @@ const { promise: fcitxReady, resolve } = Promise.withResolvers()
 let inputMethodsCallback = () => {}
 let statusAreaCallback = () => {}
 let notificationCallback: NotificationCallback = () => {}
+
+function getRuntime() {
+  // @ts-expect-error uncertain environment
+  if (typeof globalThis.ServiceWorkerGlobalScope !== 'undefined') {
+    return SERVICE_WORKER
+  }
+  if (globalThis.location.protocol.includes('extension')) {
+    return OPTIONS
+  }
+  // @ts-expect-error uncertain environment
+  if (typeof globalThis.WorkerGlobalScope !== 'undefined') {
+    return WEB_WORKER
+  }
+  return WEB
+}
 
 globalThis.fcitx = {
   Module,
@@ -148,8 +163,7 @@ globalThis.fcitx = {
   // Private field that indicates whether spawn a worker in current environment.
   // On f5o main thread set true to enable worker. On worker thread this is always false.
   useWorker: false,
-  // @ts-expect-error uncertain environment
-  runtime: typeof ServiceWorkerGlobalScope === 'undefined' ? (typeof globalThis.WorkerGlobalScope === 'undefined' ? WEB : WEB_WORKER) : SERVICE_WORKER,
+  runtime: getRuntime(),
   followCaret: false,
 }
 const apis = [
