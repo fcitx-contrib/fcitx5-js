@@ -184,10 +184,7 @@ for (const api of apis) {
 
 Module.onRuntimeInitialized = () => {
   mount()
-  Module.FS.syncfs(true, () => {
-    restorePlugins()
-    resolve(null)
-  })
+  restorePlugins().then(resolve)
 }
 
 export {

@@ -1,6 +1,6 @@
 import UZIP from 'uzip'
 import { hasTouch } from './context'
-import { lsDir, traverseSync, USR_MOUNT_POINT } from './fs'
+import { lsDir, sync, traverseSync, USR_MOUNT_POINT } from './fs'
 import { getLocale } from './locale'
 import Module from './module'
 
@@ -77,7 +77,8 @@ export function installPlugin(buffer: ArrayBuffer) {
 }
 
 // Symlink all plugins' files from /backup/usr to /usr.
-export function restorePlugins() {
+export async function restorePlugins() {
+  await sync('load')
   traverseSync((backupPath) => {
     const path = `/usr${backupPath.slice(USR_MOUNT_POINT.length)}`
     Module.FS.mkdirTree(path)

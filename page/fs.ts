@@ -60,11 +60,21 @@ export function mount() {
   Module.FS.mount(Module.IDBFS, { autoPersist: true }, HOME_MOUNT_POINT)
 }
 
-export function reset() {
+export function sync(direction: 'load' | 'save') {
   const { promise, resolve } = Promise.withResolvers<void>()
+  Module.FS.syncfs(direction === 'load', (err) => {
+    if (err) {
+      console.error(err)
+    }
+    // Before better understanding possible errors, don't break core functionalities, which don't rely on IDBFS.
+    resolve()
+  })
+  return promise
+}
+
+export function reset() {
   rmR(USR_MOUNT_POINT)
   rmR(HOME_MOUNT_POINT)
   // Manually trigger syncfs to ensure data is cleared.
-  Module.FS.syncfs(false, () => resolve())
-  return promise
+  return sync('save')
 }
