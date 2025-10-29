@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: lint
     env:
-      EMSCRIPTEN_VERSION: '4.0.17'
+      EMSCRIPTEN_VERSION: '4.0.18'
     strategy:
       fail-fast: false
       matrix:
@@ -100,7 +100,7 @@ jobs:
             -f ../../../fcitx5-js-dev.tar.bz2 include lib
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: artifact-${{ matrix.os }}
           path: |
@@ -128,7 +128,7 @@ jobs:
     needs: build
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: artifact-ubuntu-24.04
           merge-multiple: true

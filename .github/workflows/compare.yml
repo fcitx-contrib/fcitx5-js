@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact built on Ubuntu
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: artifact-ubuntu-24.04
           merge-multiple: true
@@ -22,7 +22,7 @@ jobs:
           mv fcitx5-js-dev.tar.bz2 fcitx5-js-dev-ubuntu.tar.bz2
 
       - name: Download artifact built on macOS
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: artifact-macos*
           merge-multiple: true
