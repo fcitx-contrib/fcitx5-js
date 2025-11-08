@@ -75,11 +75,6 @@ jobs:
         run: |
           ./emsdk install ${{ env.EMSCRIPTEN_VERSION }}
           ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
-          file=upstream/emscripten/src/lib/libdylink.js
-          pattern="jsArgs\.push(jsArg\.replace('\*', ''));"
-          grep "$pattern" $file
-          sed -i.bak "s|$pattern|jsArgs.push(jsArg.replaceAll('*', ''));|" $file
-          ! grep "$pattern" $file
 
       - name: Build
         run: |
@@ -88,6 +83,11 @@ jobs:
           emcmake cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release
           EMCC_FORCE_STDLIBS=libc++ FCITX_DISTRIBUTION=fcitx5-js cmake --build build
+          file=dist/Fcitx5.js
+          pattern="jsArgs.push(jsArg\.replace(\"\*\", \"\"));"
+          grep "$pattern" $file
+          sed -i.bak "s|$pattern|jsArgs.push(jsArg.replaceAll('*', ''));|" $file
+          ! grep "$pattern" $file
           npm pack
 
       - name: Package dev tarball
