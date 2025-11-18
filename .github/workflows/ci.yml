@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: lint
     env:
-      EMSCRIPTEN_VERSION: '4.0.19'
+      EMSCRIPTEN_VERSION: '4.0.20'
     strategy:
       fail-fast: false
       matrix:
@@ -75,11 +75,6 @@ jobs:
         run: |
           ./emsdk install ${{ env.EMSCRIPTEN_VERSION }}
           ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
-          file=upstream/emscripten/src/lib/libdylink.js
-          pattern="jsArgs\.push(jsArg\.replace('\*', ''));"
-          grep "$pattern" $file
-          sed -i.bak "s|$pattern|jsArgs.push(jsArg.replaceAll('*', ''));|" $file
-          ! grep "$pattern" $file
 
       - name: Build
         run: |
