@@ -10,7 +10,7 @@ export function lsDir(path: string) {
 }
 
 export function traverseSync(preDirCallback: SyncCallback | undefined, fileCallback: SyncCallback, postDirCallback: SyncCallback | undefined) {
-  async function closure(path: string) {
+  function closure(path: string) {
     const { mode } = Module.FS.lstat(path)
     if (Module.FS.isDir(mode)) {
       if (!path.endsWith('/')) {
@@ -28,11 +28,21 @@ export function traverseSync(preDirCallback: SyncCallback | undefined, fileCallb
   return closure
 }
 
-export const rmR = traverseSync(
-  undefined,
-  path => globalThis.fcitx.Module.FS.unlink(path),
-  path => globalThis.fcitx.Module.FS.rmdir(path),
-)
+function trimSlash(path: string) {
+  return path.replace(/\/$/, '')
+}
+
+export function rmR(path: string, star: boolean = false) {
+  return traverseSync(
+    undefined,
+    path => globalThis.fcitx.Module.FS.unlink(path),
+    (_path) => {
+      if (!(star && trimSlash(path) === trimSlash(_path))) {
+        globalThis.fcitx.Module.FS.rmdir(_path)
+      }
+    },
+  )(path)
+}
 
 export function traverseAsync(preDirCallback: AsyncCallback | undefined, fileCallback: AsyncCallback, postDirCallback: AsyncCallback | undefined) {
   async function closure(path: string) {
@@ -73,8 +83,8 @@ export function sync(direction: 'load' | 'save') {
 }
 
 export function reset() {
-  rmR(USR_MOUNT_POINT)
-  rmR(HOME_MOUNT_POINT)
+  rmR(USR_MOUNT_POINT, true /* Removing mounted dir gives ErrnoError 10. */)
+  rmR(HOME_MOUNT_POINT, true)
   // Manually trigger syncfs to ensure data is cleared.
   return sync('save')
 }
