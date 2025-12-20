@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact built on Ubuntu
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           pattern: artifact-ubuntu-24.04
           merge-multiple: true
@@ -22,7 +22,7 @@ jobs:
           mv fcitx5-js-dev.tar.bz2 fcitx5-js-dev-ubuntu.tar.bz2
 
       - name: Download artifact built on macOS
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           pattern: artifact-macos*
           merge-multiple: true
@@ -53,7 +53,7 @@ jobs:
           fi
 
       - name: Find comment
-        uses: peter-evans/find-comment@v3
+        uses: peter-evans/find-comment@v4
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -61,7 +61,7 @@ jobs:
           body-includes: "fcitx5-js.tgz comparison"
 
       - name: Create or update comment
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-id: ${{ steps.fc.outputs.comment-id }}
