@@ -37,7 +37,7 @@ nlohmann::json getConfig(const std::string &uri) {
     if (uri == globalConfigPath) {
         auto &config = instance->globalConfig().config();
         return configToJson(config);
-    } else if (stringutils::startsWith(uri, addonConfigPrefix)) {
+    } else if (uri.starts_with(addonConfigPrefix)) {
         auto [addonName, subPath] = parseAddonUri(uri);
         auto *addonInfo = instance->addonManager().addonInfo(addonName);
         if (!addonInfo) {
@@ -58,7 +58,7 @@ nlohmann::json getConfig(const std::string &uri) {
                      "Failed to get config for addon \""s + addonName + "\""}};
         }
         return configToJson(*config);
-    } else if (stringutils::startsWith(uri, imConfigPrefix)) {
+    } else if (uri.starts_with(imConfigPrefix)) {
         auto imName = uri.substr(sizeof(imConfigPrefix) - 1);
         auto *entry = instance->inputMethodManager().entry(imName);
         if (!entry) {
@@ -105,7 +105,7 @@ EMSCRIPTEN_KEEPALIVE bool set_config(const char *uri_, const char *json_) {
         } else {
             return false;
         }
-    } else if (stringutils::startsWith(uri, addonConfigPrefix)) {
+    } else if (uri.starts_with(addonConfigPrefix)) {
         auto [addonName, subPath] = parseAddonUri(uri);
         auto *addon = instance->addonManager().addon(addonName, true);
         if (addon) {
@@ -120,7 +120,7 @@ EMSCRIPTEN_KEEPALIVE bool set_config(const char *uri_, const char *json_) {
             FCITX_ERROR() << "Failed to get addon";
             return false;
         }
-    } else if (stringutils::startsWith(uri, imConfigPrefix)) {
+    } else if (uri.starts_with(imConfigPrefix)) {
         auto im = uri.substr(sizeof(imConfigPrefix) - 1);
         const auto *entry = instance->inputMethodManager().entry(im);
         auto *engine = instance->inputMethodEngine(im);
