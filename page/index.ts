@@ -6,13 +6,13 @@ import { getAddons, getConfig, setConfig } from './config'
 import { OPTIONS, SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
 import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline } from './focus'
-import { mount, reset, rmR, traverseAsync } from './fs'
+import { mount, reset, rmR, traverseAsync, traverseSync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, getLanguageName, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
 import { jsKeyToFcitxString, keyEvent } from './keycode'
 import { getLocale } from './locale'
 import Module from './module'
-import { getInstalledPlugins, installPlugin, restorePlugins, unzip } from './plugin'
+import { getInstalledPlugins, installPlugin, reload, restorePlugins, unzip } from './plugin'
 import { utf8Index2JS } from './unicode'
 import { deployRimeInWorker } from './workerAPI'
 
@@ -158,7 +158,9 @@ globalThis.fcitx = {
   },
   rmR,
   traverseAsync,
+  traverseSync,
   deployRimeInWorker,
+  reload,
   reset,
   // Private field that indicates whether spawn a worker in current environment.
   // On f5o main thread set true to enable worker. On worker thread this is always false.

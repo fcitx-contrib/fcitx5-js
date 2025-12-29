@@ -106,10 +106,12 @@ export interface FCITX {
   getInstalledPlugins: () => string[]
   unzip: (buffer: ArrayBuffer, dir: string) => void
   rmR: (path: string) => void
+  traverseSync: (preDirCallback: SyncCallback | undefined, fileCallback: SyncCallback, postDirCallback: SyncCallback | undefined) => (path: string) => void
   traverseAsync: (preDirCallback: AsyncCallback | undefined, fileCallback: AsyncCallback, postDirCallback: AsyncCallback | undefined) => (path: string) => Promise<void>
   utf8Index2JS: (text: string, index: number) => number
   setNotificationCallback: (callback: NotificationCallback) => void
   notify: NotificationCallback
+  reload: () => void
   reset: () => Promise<any>
   Module: EM_MODULE
 }
