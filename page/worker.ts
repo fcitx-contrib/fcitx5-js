@@ -43,6 +43,11 @@ globalThis.onmessage = async ({ data }: MessageEvent<MessageData>) => {
       globalThis.fcitx.rmR('/usr/share/rime-data')
       globalThis.fcitx.rmR('/home/web_user/.local')
       break
+    case 'ZIP': {
+      const buffer = await globalThis.fcitx.zip(data.data)
+      respond({ type: 'ZIP_BUFFER', data: buffer }, [buffer])
+      break
+    }
   }
   respond({ type: 'DONE' })
 }

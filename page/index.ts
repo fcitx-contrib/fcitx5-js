@@ -14,7 +14,7 @@ import { getLocale } from './locale'
 import Module from './module'
 import { getInstalledPlugins, installPlugin, reload, restorePlugins, unzip } from './plugin'
 import { utf8Index2JS } from './unicode'
-import { deployRimeInWorker } from './workerAPI'
+import { deployRimeInWorker, zip } from './workerAPI'
 
 const { promise: fcitxReady, resolve } = Promise.withResolvers()
 
@@ -162,6 +162,7 @@ globalThis.fcitx = {
   deployRimeInWorker,
   reload,
   reset,
+  zip,
   // Private field that indicates whether spawn a worker in current environment.
   // On f5o main thread set true to enable worker. On worker thread this is always false.
   useWorker: false,

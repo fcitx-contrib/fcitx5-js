@@ -21,6 +21,12 @@ declare global {
       timeout: number
     }
   } | {
+    type: 'ZIP'
+    data: Record<string, Uint8Array>
+  } | {
+    type: 'ZIP_BUFFER'
+    data: ArrayBuffer
+  } | {
     type: 'DEPLOY'
   } | {
     type: 'DONE'

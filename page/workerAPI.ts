@@ -1,9 +1,11 @@
+import UZIP from 'uzip'
 import { traverseAsync } from './fs'
 import { reload } from './plugin'
 
 let worker: Worker
 let deployed = false
 let deploying = false
+let zipBuffer: ArrayBuffer | null = null
 let res: (data: MessageData) => void
 
 function ensureWorker() {
@@ -24,6 +26,9 @@ function ensureWorker() {
         globalThis.fcitx.notify(name, icon, body, timeout)
         break
       }
+      case 'ZIP_BUFFER':
+        zipBuffer = data.data
+        break
       case 'DONE':
         res(data)
         break
@@ -80,4 +85,15 @@ export function deployRimeInWorker(): 0 | 1 {
     deploy()
   }
   return 1
+}
+
+export async function zip(manifest: UZIP.UZIPFiles): Promise<ArrayBuffer> {
+  if (!globalThis.fcitx.useWorker) {
+    return UZIP.encode(manifest)
+  }
+  ensureWorker()
+  await execute({ type: 'ZIP', data: manifest }, Object.values(manifest).map(array => array.buffer))
+  const buffer = zipBuffer!
+  zipBuffer = null
+  return buffer
 }
