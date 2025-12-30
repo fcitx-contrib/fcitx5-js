@@ -31,18 +31,19 @@ function ensureWorker() {
   }
 }
 
-function execute(msg: MessageData) {
-  return new Promise<any>((resolve) => {
-    res = resolve
-    worker.postMessage(msg)
-  })
+function execute(msg: MessageData, transfer?: Transferable[]) {
+  worker.postMessage(msg, transfer || [])
+  const { resolve, promise } = Promise.withResolvers<any>()
+  res = resolve
+  return promise
 }
 
 function copyFile(path: string) {
+  const { buffer } = globalThis.fcitx.Module.FS.readFile(path)
   return execute({ type: 'WRITE_FILE', data: {
     path,
-    buffer: globalThis.fcitx.Module.FS.readFile(path).buffer as ArrayBuffer,
-  } })
+    buffer: buffer as ArrayBuffer,
+  } }, [buffer])
 }
 
 const copyDir = traverseAsync((path: string) => execute({ type: 'MKDIR', data: path }), copyFile, undefined)

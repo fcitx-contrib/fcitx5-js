@@ -10,11 +10,11 @@ function respond(data: MessageData, transfer?: Transferable[]) {
 const copyDir = globalThis.fcitx.traverseAsync(
   (path: string) => respond({ type: 'MKDIR', data: path }),
   (path: string) => {
-    const content = globalThis.fcitx.Module.FS.readFile(path)
+    const { buffer } = globalThis.fcitx.Module.FS.readFile(path)
     respond({ type: 'WRITE_FILE', data: {
       path,
-      buffer: content.buffer as ArrayBuffer,
-    } }, [content.buffer])
+      buffer: buffer as ArrayBuffer,
+    } }, [buffer])
   },
   undefined,
 )
