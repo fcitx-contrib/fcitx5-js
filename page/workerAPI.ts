@@ -89,7 +89,7 @@ export function deployRimeInWorker(): 0 | 1 {
 
 export async function zip(manifest: UZIP.UZIPFiles): Promise<ArrayBuffer> {
   if (!globalThis.fcitx.useWorker) {
-    return UZIP.encode(manifest)
+    return UZIP.encode(manifest, true) // Disable compression for higher speed.
   }
   ensureWorker()
   await execute({ type: 'ZIP', data: manifest }, Object.values(manifest).map(array => array.buffer))

@@ -1,3 +1,5 @@
+import type * as UZIP from 'uzip'
+
 type Child = ({
   Description: string
   Option: string
@@ -113,8 +115,9 @@ export interface FCITX {
   notify: NotificationCallback
   reload: () => void
   reset: () => Promise<any>
-  zip: (manifest: Record<string, Uint8Array>) => Promise<ArrayBuffer>
+  zip: (manifest: UZIP.UZIPFiles) => Promise<ArrayBuffer>
   Module: EM_MODULE
+  UZIP: typeof UZIP
 }
 
 export const fcitxReady: Promise<null>

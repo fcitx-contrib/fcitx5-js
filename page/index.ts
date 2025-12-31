@@ -1,5 +1,6 @@
 import type { NotificationCallback } from './Fcitx5'
 import type { Input } from './focus'
+import UZIP from 'uzip'
 import { activateMenuAction, getMenuActions } from './action'
 import { commit, hidePanel, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
@@ -39,6 +40,7 @@ function getRuntime() {
 
 globalThis.fcitx = {
   Module,
+  UZIP,
   createPanel(html: string) {
     const tree = document.createElement('div')
     tree.innerHTML = html
