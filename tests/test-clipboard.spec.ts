@@ -51,3 +51,37 @@ test('Clipboard', async ({ page }) => {
   await expect(page.locator('.fcitx-aux-down')).toHaveText('No clipboard history.')
   await expect(text).toHaveCount(0)
 })
+
+test('Primary selection', async ({ page }) => {
+  const fcitxKey = 'Control+Super+K'
+  const playwrightKey = 'Control+Meta+K'
+  await init(page)
+
+  await page.evaluate(({ fcitxKey }) => {
+    const foo = document.createElement('div')
+    foo.textContent = 'foo'
+    const bar = document.createElement('div')
+    bar.textContent = 'bar'
+    document.body.append(foo, bar)
+    fcitx.setConfig('fcitx://config/addon/clipboard', { PastePrimaryKey: { 0: fcitxKey } })
+    const range = document.createRange()
+    range.setStartBefore(foo)
+    range.setEndAfter(bar)
+    window.getSelection()?.addRange(range)
+  }, { fcitxKey })
+
+  // Static text
+  const textarea = page.locator('textarea')
+  await textarea.click()
+  await page.keyboard.press(playwrightKey)
+  await expect(textarea).toHaveValue('foo\nbar')
+
+  // Editable text
+  await textarea.evaluate((el: HTMLTextAreaElement) => {
+    el.setSelectionRange(0, 3)
+  })
+  const input = page.locator('input')
+  await input.click()
+  await page.keyboard.press(playwrightKey)
+  await expect(input).toHaveValue('foo')
+})

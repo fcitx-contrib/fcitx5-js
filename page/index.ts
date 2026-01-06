@@ -14,6 +14,7 @@ import { jsKeyToFcitxString, keyEvent } from './keycode'
 import { getLocale } from './locale'
 import Module from './module'
 import { getInstalledPlugins, installPlugin, reload, restorePlugins, unzip } from './plugin'
+import { selectionChange } from './primary-selection'
 import { utf8Index2JS } from './unicode'
 import { deployRimeInWorker, zip } from './workerAPI'
 
@@ -100,6 +101,8 @@ globalThis.fcitx = {
     document.addEventListener('keyup', keyEvent)
     document.querySelector('.fcitx-decoration')?.addEventListener('mousedown', clickPanel)
     document.addEventListener('scroll', redrawCaretAndPreeditUnderline, true)
+    document.addEventListener('selectionchange', selectionChange)
+    // selectionChange() // Capture initial selection.
     if (hasTouch) {
       // This is destructive. I tried listening on touchstart of input elements, but system keyboard still shows
       // up because on iOS if you touch body that nears an input element, it's still focused before set readonly.
@@ -127,6 +130,7 @@ globalThis.fcitx = {
     document.removeEventListener('keyup', keyEvent)
     document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanel)
     document.removeEventListener('scroll', redrawCaretAndPreeditUnderline, true)
+    document.removeEventListener('selectionchange', selectionChange)
     if (hasTouch) {
       // Not ideal, but 🤷‍♂️
       document.querySelectorAll('input, textarea').forEach((el) => {

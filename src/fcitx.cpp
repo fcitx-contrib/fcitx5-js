@@ -155,6 +155,10 @@ EMSCRIPTEN_KEEPALIVE void write_clipboard(const char *text) {
     clipboard->call<IClipboard::setClipboardV2>("", text, false);
 }
 
+EMSCRIPTEN_KEEPALIVE void write_primary(const char *text) {
+    clipboard->call<IClipboard::setPrimaryV2>("", text, false);
+}
+
 EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
                                bool touch) {
     if (instance) {
