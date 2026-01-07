@@ -4,10 +4,16 @@ import { isApple } from './context'
 import { getInputElement } from './focus'
 import Module from './module'
 
+let systemInputMethodInUseCallback = () => {}
+
+export function setSystemInputMethodInUseCallback(callback: () => void) {
+  systemInputMethodInUseCallback = callback
+}
+
 function extract(event: KeyData): [string, string, number] | undefined {
   const { key, code, shiftKey, altKey, ctrlKey, metaKey } = event
   // Host IME
-  if (key === 'Process') {
+  if (key === 'Process' || event.isComposing) {
     return undefined
   }
   const capsLock = event.getModifierState('CapsLock')
@@ -22,6 +28,7 @@ export function processKey(key: string, code: string, modifiers: number, isRelea
 export function keyEvent(event: KeyData): boolean {
   const extracted = extract(event)
   if (!extracted) {
+    systemInputMethodInUseCallback()
     return false
   }
   const isRelease = event.type === 'keyup'

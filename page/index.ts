@@ -10,7 +10,7 @@ import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline
 import { mount, reset, rmR, traverseAsync, traverseSync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, getLanguageName, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
-import { jsKeyToFcitxString, keyEvent } from './keycode'
+import { jsKeyToFcitxString, keyEvent, setSystemInputMethodInUseCallback } from './keycode'
 import { getLocale } from './locale'
 import Module from './module'
 import { getInstalledPlugins, installPlugin, reload, restorePlugins, unzip } from './plugin'
@@ -162,6 +162,7 @@ globalThis.fcitx = {
   notify(name: string, icon: string, body: string, timeout: number) {
     notificationCallback(name, icon, body, timeout)
   },
+  setSystemInputMethodInUseCallback,
   rmR,
   traverseAsync,
   traverseSync,

@@ -76,6 +76,7 @@ export interface KeyData {
   altKey?: boolean
   ctrlKey?: boolean
   metaKey?: boolean
+  isComposing?: boolean
   getModifierState: (modifier: string) => boolean
   preventDefault: () => void
 }
@@ -113,6 +114,7 @@ export interface FCITX {
   utf8Index2JS: (text: string, index: number) => number
   setNotificationCallback: (callback: NotificationCallback) => void
   notify: NotificationCallback
+  setSystemInputMethodInUseCallback: (callback: () => void) => void
   reload: () => void
   reset: () => Promise<any>
   zip: (manifest: UZIP.UZIPFiles) => Promise<ArrayBuffer>

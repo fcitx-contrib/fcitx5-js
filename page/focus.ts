@@ -69,6 +69,7 @@ export function focus() {
   }
   resizeObserver?.observe(input)
   input.addEventListener('mousedown', resetInput)
+  input.addEventListener('compositionstart', resetInput)
   originalSpellCheck = input.spellcheck
   const isPassword = input.tagName === 'INPUT' && input.type === 'password'
   Module.ccall('focus_in', 'void', ['bool'], [isPassword])
@@ -86,6 +87,7 @@ export function blur() {
     return
   }
   input.removeEventListener('mousedown', resetInput)
+  input.removeEventListener('compositionstart', resetInput)
   if (hasTouch) {
     input.removeEventListener('touchstart', resetInput)
     input.removeEventListener('selectionchange', updateSelection)
