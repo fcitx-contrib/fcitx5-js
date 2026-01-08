@@ -50,6 +50,8 @@ static struct {
     {"PageDown", FcitxKey_Page_Down},
     {"Home", FcitxKey_Home},
     {"End", FcitxKey_End},
+    {"PrintScreen", FcitxKey_Print},
+    {"ScrollLock", FcitxKey_Scroll_Lock},
 
     // arrow keys
     {"ArrowUp", FcitxKey_Up},
@@ -70,6 +72,15 @@ static struct {
     {"F10", FcitxKey_F10},
     {"F11", FcitxKey_F11},
     {"F12", FcitxKey_F12},
+
+    // media keys
+    {"AudioVolumeMute", FcitxKey_AudioMute},
+    {"AudioVolumeDown", FcitxKey_AudioLowerVolume},
+    {"AudioVolumeUp", FcitxKey_AudioRaiseVolume},
+    {"MediaStop", FcitxKey_AudioStop},
+    {"MediaTrackPrevious", FcitxKey_AudioPrev},
+    {"MediaPlayPause", FcitxKey_AudioPlay},
+    {"MediaTrackNext", FcitxKey_AudioNext},
 };
 
 static struct {
@@ -140,7 +151,6 @@ static struct {
     {"Numpad7", 71},
     {"Numpad8", 72},
     {"Numpad9", 73},
-    // {OSX_VK_KEYPAD_CLEAR, }, XXX: not sure map to what
     {"NumpadComma", 121},
     {"NumpadDecimal", 83},
     {"NumpadEqual", 117},
@@ -152,10 +162,8 @@ static struct {
     // special
     {"Backspace", 14},
     {"NumpadEnter", 96},
-    // {OSX_VK_ENTER_POWERBOOK, }, XXX: not sure map to what
     {"Escape", 1},
     {"Delete", 111},
-    // {OSX_VK_HELP, }, XXX: not sure map to what
     {"Enter", 28},
     {"Space", 57},
     {"Tab", 15},
@@ -198,7 +206,67 @@ static struct {
     {"ShiftRight", 54},
 };
 
-KeySym js_key_to_fcitx_keysym(const std::string &key, const std::string &code) {
+static struct {
+    std::string jsKeycode;
+    char asciiChar;
+    char shiftedAsciiChar;
+} char_mappings[] = {
+    // alphabet
+    {"KeyA", 'a', 'A'},
+    {"KeyB", 'b', 'B'},
+    {"KeyC", 'c', 'C'},
+    {"KeyD", 'd', 'D'},
+    {"KeyE", 'e', 'E'},
+    {"KeyF", 'f', 'F'},
+    {"KeyG", 'g', 'G'},
+    {"KeyH", 'h', 'H'},
+    {"KeyI", 'i', 'I'},
+    {"KeyJ", 'j', 'J'},
+    {"KeyK", 'k', 'K'},
+    {"KeyL", 'l', 'L'},
+    {"KeyM", 'm', 'M'},
+    {"KeyN", 'n', 'N'},
+    {"KeyO", 'o', 'O'},
+    {"KeyP", 'p', 'P'},
+    {"KeyQ", 'q', 'Q'},
+    {"KeyR", 'r', 'R'},
+    {"KeyS", 's', 'S'},
+    {"KeyT", 't', 'T'},
+    {"KeyU", 'u', 'U'},
+    {"KeyV", 'v', 'V'},
+    {"KeyW", 'w', 'W'},
+    {"KeyX", 'x', 'X'},
+    {"KeyY", 'y', 'Y'},
+    {"KeyZ", 'z', 'Z'},
+
+    // number row with shift mappings
+    {"Digit0", '0', ')'},
+    {"Digit1", '1', '!'},
+    {"Digit2", '2', '@'},
+    {"Digit3", '3', '#'},
+    {"Digit4", '4', '$'},
+    {"Digit5", '5', '%'},
+    {"Digit6", '6', '^'},
+    {"Digit7", '7', '&'},
+    {"Digit8", '8', '*'},
+    {"Digit9", '9', '('},
+
+    // symbols with shift
+    {"Backquote", '`', '~'},
+    {"Backslash", '\\', '|'},
+    {"BracketLeft", '[', '{'},
+    {"BracketRight", ']', '}'},
+    {"Comma", ',', '<'},
+    {"Period", '.', '>'},
+    {"Equal", '=', '+'},
+    {"Minus", '-', '_'},
+    {"Quote", '\'', '"'},
+    {"Semicolon", ';', ':'},
+    {"Slash", '/', '?'},
+};
+
+KeySym js_key_to_fcitx_keysym(const std::string &key, const std::string &code,
+                              uint32_t modifiers) {
     for (const auto &pair : sym_mappings) {
         if (pair.jsCode == code) {
             return pair.sym;
@@ -206,6 +274,18 @@ KeySym js_key_to_fcitx_keysym(const std::string &key, const std::string &code) {
     }
     if (key.size() == 1) {
         return Key::keySymFromUnicode(key[0]);
+    }
+    // On macOS, a KeyEvent with Alt has non-ASCII sym. We map the same way with
+    // fcitx5-macos.
+    if (modifiers & uint32_t(KeyState::Alt)) {
+        for (const auto &pair : char_mappings) {
+            if (pair.jsKeycode == code) {
+                return Key::keySymFromUnicode(
+                    (modifiers & uint32_t(KeyState::Shift))
+                        ? pair.shiftedAsciiChar
+                        : pair.asciiChar);
+            }
+        }
     }
     FCITX_ERROR() << "Unrecognized key " << key << " " << code;
     return {};
@@ -222,8 +302,8 @@ uint16_t js_keycode_to_fcitx_keycode(const std::string &code) {
 
 Key js_key_to_fcitx_key(const std::string &key, const std::string &code,
                         uint32_t modifiers) {
-    return Key{js_key_to_fcitx_keysym(key, code), KeyStates{modifiers},
-               js_keycode_to_fcitx_keycode(code)};
+    return Key{js_key_to_fcitx_keysym(key, code, modifiers),
+               KeyStates{modifiers}, js_keycode_to_fcitx_keycode(code)};
 }
 
 extern "C" {
