@@ -58,14 +58,13 @@ struct JSEventSourceIO : public JSEventSourceBase<EventSourceIO> {
 struct JSEventSourceTime;
 
 // emscripten_async_call needs a C pointer as callback context parameter.
-// The actual event handler needs source and time, so pack them together.
+// The actual event handler needs source, so pack them together.
 struct ParameterPack {
     ParameterPack(std::shared_ptr<TimeCallback> callback)
         : callback_(callback) {}
 
     JSEventSourceTime *source_ = nullptr; // nullptr means not scheduled.
     std::shared_ptr<TimeCallback> callback_;
-    int time_ = 0;
 };
 
 void timeEventCallback(void *arg);
@@ -88,16 +87,15 @@ struct JSEventSourceTime : public JSEventSourceBase<EventSourceTime> {
     }
 
     void setOneShot() override {
-        int t = std::max<int64_t>(0, time_ - now(CLOCK_MONOTONIC)) / 1000;
         if (pack_->source_) {
             pack_->source_ = nullptr;
             pack_ = new ParameterPack(callback_);
         }
         pack_->source_ = this;
-        pack_->time_ = t;
         // pack_ is manually dynamically allocated, so even if
         // emscripten_async_call provides a return value from setTimeout, we
         // can't call clearTimeout, otherwise pack_ is leaked.
+        int t = std::max<int64_t>(0, time_ - now(CLOCK_MONOTONIC)) / 1000;
         emscripten_async_call(timeEventCallback, pack_, t);
     }
 
@@ -122,7 +120,7 @@ struct JSEventSourceTime : public JSEventSourceBase<EventSourceTime> {
 void timeEventCallback(void *arg) {
     auto pack = static_cast<ParameterPack *>(arg);
     if (pack->source_) {
-        (*pack->callback_)(pack->source_, pack->time_);
+        (*pack->callback_)(pack->source_, pack->source_->time());
         pack->source_ = nullptr;
     } else {
         // Source is deleted before timeout so delete instead of execute.
