@@ -47,7 +47,9 @@ else()
         "--preload-file ${INSTALL_SHARE_DIR}/locale@/usr/share/locale"
         "--preload-file ${INSTALL_SHARE_DIR}/fcitx5@/usr/share/fcitx5"
         "--preload-file ${INSTALL_LIB_DIR}/fcitx5@/usr/lib/fcitx5"
+        "-sFETCH" # cloudpinyin
     )
+    target_sources(Fcitx5 PRIVATE pthread.cpp) # mozc and stroke
     list(APPEND STATIC_ADDONS keyboard notifications)
 endif()
 

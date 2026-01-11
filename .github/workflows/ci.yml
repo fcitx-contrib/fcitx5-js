@@ -33,8 +33,6 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     needs: lint
-    env:
-      EMSCRIPTEN_VERSION: '4.0.22'
     strategy:
       fail-fast: false
       matrix:
@@ -79,6 +77,10 @@ jobs:
           pnpm --prefix=fcitx5-keyboard-web run build
           pnpm i
           pnpm --prefix=fcitx5-webview i
+
+      - name: Get emscripten version
+        run: |
+          echo "EMSCRIPTEN_VERSION=$(cat .emscripten-version)" >> $GITHUB_ENV
 
       - name: Install emsdk
         working-directory: emsdk
