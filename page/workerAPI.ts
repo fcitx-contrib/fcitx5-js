@@ -8,6 +8,16 @@ let deploying = false
 let zipBuffer: ArrayBuffer | null = null
 let res: (data: MessageData) => void
 
+let notifyData: (MessageData & { type: 'NOTIFY' }) | null = null
+
+function notify() {
+  if (!notifyData) {
+    return
+  }
+  const { name, icon, body, timeout } = notifyData.data
+  globalThis.fcitx.notify(name, icon, body, timeout)
+}
+
 function ensureWorker() {
   if (worker) {
     return
@@ -22,8 +32,11 @@ function ensureWorker() {
         globalThis.fcitx.Module.FS.writeFile(data.data.path, new Uint8Array(data.data.buffer))
         break
       case 'NOTIFY': {
-        const { name, icon, body, timeout } = data.data
-        globalThis.fcitx.notify(name, icon, body, timeout)
+        notifyData = data
+        // Delay success and error notification to after reload finishes.
+        if (!['success', 'error'].includes(data.data.icon)) {
+          notify()
+        }
         break
       }
       case 'ZIP_BUFFER':
@@ -70,6 +83,7 @@ async function deploy() {
     await copyDir('/home/web_user/.local/share/fcitx5/rime').catch()
     await execute({ type: 'DEPLOY' })
     reload()
+    notify()
   }
   catch {}
   deploying = false
