@@ -31,8 +31,8 @@ globalThis.onmessage = async ({ data }: MessageEvent<MessageData>) => {
       break
     case 'DEPLOY':
       if (!rimeLoaded) {
-        globalThis.fcitx.setNotificationCallback((name, icon, body, timeout) => {
-          respond({ type: 'NOTIFY', data: { name, icon, body, timeout } })
+        globalThis.fcitx.setNotificationCallback((name, icon, body, timeout, tipId) => {
+          respond({ type: 'NOTIFY', data: { name, icon, body, timeout, tipId } })
         })
         globalThis.fcitx.enable()
         rimeLoaded = true

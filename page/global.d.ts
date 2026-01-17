@@ -19,6 +19,7 @@ declare global {
       icon: string
       body: string
       timeout: number
+      tipId: string
     }
   } | {
     type: 'ZIP'

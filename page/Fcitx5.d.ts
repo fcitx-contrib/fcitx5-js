@@ -66,7 +66,7 @@ export interface EM_MODULE {
 
 export type SyncCallback = (path: string) => void
 export type AsyncCallback = (path: string) => Promise<void> | void
-export type NotificationCallback = (name: string, icon: string, body: string, timeout: number) => void
+export type NotificationCallback = (name: string, icon: string, body: string, timeout: number, tipId: string, actions: { id: string, text: string }[]) => void
 
 export interface KeyData {
   type: string
@@ -113,7 +113,10 @@ export interface FCITX {
   traverseAsync: (preDirCallback: AsyncCallback | undefined, fileCallback: AsyncCallback, postDirCallback: AsyncCallback | undefined) => (path: string) => Promise<void>
   utf8Index2JS: (text: string, index: number) => number
   setNotificationCallback: (callback: NotificationCallback) => void
-  notify: NotificationCallback
+  // Only for proxying rime notifications from worker, if not called from C++.
+  notify: (name: string, icon: string, body: string, timeout: number, tipId: string, actionString?: string) => void
+  activateNotificationAction: (action: string, tipId?: string) => void
+  translateDomain: (domain: string, text: string) => string
   setSystemInputMethodInUseCallback: (callback: () => void) => void
   reload: () => void
   reset: () => Promise<any>

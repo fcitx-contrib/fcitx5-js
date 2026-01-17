@@ -14,8 +14,14 @@ function notify() {
   if (!notifyData) {
     return
   }
-  const { name, icon, body, timeout } = notifyData.data
-  globalThis.fcitx.notify(name, icon, body, timeout)
+  // @ts-expect-error hacky way to get HiddenNotifications
+  const { Value } = globalThis.fcitx.getConfig('fcitx://config/addon/notifications').Children[0]
+  const disabledTips = Object.values(Value)
+  const { name, icon, body, timeout, tipId } = notifyData.data
+  notifyData = null
+  if (!disabledTips.includes(tipId)) {
+    globalThis.fcitx.notify(name, icon, body, timeout, tipId)
+  }
 }
 
 function ensureWorker() {

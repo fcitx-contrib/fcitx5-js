@@ -1,4 +1,5 @@
 import { lsDir } from './fs'
+import Module from './module'
 
 export function getLocale() {
   let supported: string[]
@@ -22,4 +23,8 @@ export function getLocale() {
     }
   }
   return 'en'
+}
+
+export function translateDomain(domain: string, text: string): string {
+  return Module.ccall('translate_domain', 'string', ['string', 'string'], [domain, text])
 }

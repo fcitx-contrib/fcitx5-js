@@ -1,12 +1,14 @@
 #include "fcitx.h"
 #include "../fcitx5/src/modules/clipboard/clipboard_public.h"
 #include "../wasmfrontend/wasmfrontend.h"
+#include "../wasmnotifications/notifications.h"
 #include "../webkeyboard/webkeyboard.h"
 #include "event_js.h"
 #include "isocodes.h"
 #include "keycode.h"
 #include <emscripten.h>
 #include <fcitx-utils/event.h>
+#include <fcitx-utils/i18n.h>
 #include <fcitx-utils/standardpaths.h>
 #include <fcitx/action.h>
 #include <fcitx/inputmethodmanager.h>
@@ -20,6 +22,7 @@ namespace fcitx {
 std::unique_ptr<Instance> instance;
 WasmFrontend *frontend;
 WebKeyboard *ui;
+Notifications *notifications;
 AddonInstance *clipboard;
 IsoCodes isoCodes;
 Runtime runtime;
@@ -159,6 +162,22 @@ EMSCRIPTEN_KEEPALIVE void write_primary(const char *text) {
     clipboard->call<IClipboard::setPrimaryV2>("", text, false);
 }
 
+EMSCRIPTEN_KEEPALIVE const char *translate_domain(const char *domain,
+                                                  const char *text) {
+    static std::string ret;
+    ret = translateDomain(domain, text);
+    return ret.c_str();
+}
+
+EMSCRIPTEN_KEEPALIVE void notification_action(const char *action,
+                                              const char *tipId) {
+    if (tipId[0]) { // action is dont-show
+        notifications->disableTip(tipId);
+    } else {
+        notifications->activateAction(action);
+    }
+}
+
 EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
                                bool touch) {
     if (instance) {
@@ -211,6 +230,8 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
     instance->initialize(); // Unnecessary to call exec.
     frontend = dynamic_cast<WasmFrontend *>(addonMgr.addon("wasmfrontend"));
     ui = dynamic_cast<WebKeyboard *>(addonMgr.addon("webkeyboard"));
+    notifications =
+        dynamic_cast<Notifications *>(addonMgr.addon("notifications"));
     clipboard = addonMgr.addon("clipboard", true);
 }
 

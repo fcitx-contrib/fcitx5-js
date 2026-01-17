@@ -1,4 +1,3 @@
-import type { NotificationCallback } from './Fcitx5'
 import type { Input } from './focus'
 import UZIP from 'uzip'
 import { activateMenuAction, getMenuActions } from './action'
@@ -11,8 +10,9 @@ import { mount, reset, rmR, traverseAsync, traverseSync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, getLanguageName, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
 import { jsKeyToFcitxString, keyEvent, setSystemInputMethodInUseCallback } from './keycode'
-import { getLocale } from './locale'
+import { getLocale, translateDomain } from './locale'
 import Module from './module'
+import { activateNotificationAction, notify, setNotificationCallback } from './notification'
 import { getInstalledPlugins, installPlugin, reload, restorePlugins, unzip } from './plugin'
 import { selectionChange } from './primary-selection'
 import { utf8Index2JS } from './unicode'
@@ -22,7 +22,6 @@ const { promise: fcitxReady, resolve } = Promise.withResolvers()
 
 let inputMethodsCallback = () => {}
 let statusAreaCallback = () => {}
-let notificationCallback: NotificationCallback = () => {}
 
 function getRuntime() {
   // @ts-expect-error uncertain environment
@@ -156,12 +155,10 @@ globalThis.fcitx = {
   updateStatusArea() {
     statusAreaCallback()
   },
-  setNotificationCallback(callback: NotificationCallback) {
-    notificationCallback = callback
-  },
-  notify(name: string, icon: string, body: string, timeout: number) {
-    notificationCallback(name, icon, body, timeout)
-  },
+  setNotificationCallback,
+  notify,
+  activateNotificationAction,
+  translateDomain,
   setSystemInputMethodInUseCallback,
   rmR,
   traverseAsync,
