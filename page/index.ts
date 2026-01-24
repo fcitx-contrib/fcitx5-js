@@ -1,7 +1,7 @@
 import type { Input } from './focus'
 import UZIP from 'uzip'
 import { activateMenuAction, getMenuActions } from './action'
-import { commit, hidePanel, placePanel, setPreedit } from './client'
+import { commit, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
 import { OPTIONS, SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
@@ -62,10 +62,9 @@ globalThis.fcitx = {
       // pushes the 6th candidate to next row. Set it none to mitigate.
       (document.querySelector('.fcitx-hoverables') as HTMLElement).style.scrollbarWidth = 'none'
     }
-    hidePanel()
+    window.fcitx.hidePanel()
   },
   placePanel,
-  hidePanel,
   setPreedit,
   commit,
   sendEventToKeyboard,

@@ -23,7 +23,6 @@ export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft
   const h = height /* NaN if no line-height is set */ || getFontSize(input) + CANDIDATE_WINDOW_OFFSET
   const panel = <HTMLElement>document.querySelector('#fcitx-theme')
   const frame = panel.getBoundingClientRect()
-  panel.style.display = ''
   panel.style.position = 'absolute'
   panel.style.zIndex = '2147483647' // absolutely above preedit underline
   if (dragging) {
@@ -36,12 +35,6 @@ export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft
   }
   panel.style.top = `${y}px`
   panel.style.left = `${x}px`
-}
-
-export function hidePanel() {
-  x = y = 0
-  const panel = <HTMLElement>document.querySelector('#fcitx-theme')
-  panel.style.display = 'none'
 }
 
 function clearPreeditUnderline() {
