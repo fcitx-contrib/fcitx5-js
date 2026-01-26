@@ -91,7 +91,8 @@ file(GLOB JS_SOURCES CONFIGURE_DEPENDS "page/*")
 add_custom_command(
     OUTPUT ${DUMMY_CPP}
     COMMAND pnpm run build && ./scripts/install.sh
-    DEPENDS ${JS_SOURCES} clipboard imselector spell quickphrase unicode
+    DEPENDS ${JS_SOURCES} fcitx5-keyboard-web/dist/index.js
+        clipboard imselector spell quickphrase unicode
         clipboard.conf.in-fmt keyboard.conf.in-fmt imselector.conf.in-fmt spell.conf.in-fmt quickphrase.conf.in-fmt unicode.conf.in-fmt
         fcitx5-translation
         webpanel.conf.in-fmt webkeyboard.conf.in-fmt chromepanel.conf.in-fmt wasmfrontend.conf.in-fmt wasmnotifications.conf.in-fmt
