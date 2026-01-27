@@ -31,7 +31,7 @@ set(EXE_LINK_OPTIONS
 set(INSTALL_LIB_DIR "${PROJECT_BINARY_DIR}/destdir/usr/lib")
 set(INSTALL_SHARE_DIR "${PROJECT_BINARY_DIR}/destdir/usr/share")
 
-set(STATIC_ADDONS webpanel webkeyboard chromepanel wasmfrontend)
+set(STATIC_ADDONS webpanel webkeyboard chromepanel wasmfrontend notifications)
 
 if (RIME_ONLY)
     foreach(ADDON ${STATIC_ADDONS})
@@ -50,7 +50,7 @@ else()
         "-sFETCH" # cloudpinyin
     )
     target_sources(Fcitx5 PRIVATE pthread.cpp) # mozc and stroke
-    list(APPEND STATIC_ADDONS keyboard notifications)
+    list(APPEND STATIC_ADDONS keyboard)
 endif()
 
 target_link_libraries(Fcitx5 ${EXE_LINK_OPTIONS})

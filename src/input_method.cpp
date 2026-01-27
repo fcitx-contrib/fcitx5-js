@@ -9,7 +9,9 @@
 #define ISO_639_3_DOMAIN "iso_639-3"
 
 namespace fcitx {
+#ifdef ENABLE_KEYBOARD
 extern IsoCodes isoCodes;
+#endif
 
 static nlohmann::json json_describe_im(const fcitx::InputMethodEntry *entry) {
     nlohmann::json j;
@@ -73,6 +75,7 @@ EMSCRIPTEN_KEEPALIVE const char *get_all_input_methods() {
 }
 
 EMSCRIPTEN_KEEPALIVE const char *get_language_name(const char *code) {
+#ifdef ENABLE_KEYBOARD
     static std::string name;
     auto entry = isoCodes.entry(code);
     if (!entry) {
@@ -80,6 +83,9 @@ EMSCRIPTEN_KEEPALIVE const char *get_language_name(const char *code) {
     }
     name = D_(ISO_639_3_DOMAIN, entry->name);
     return name.c_str();
+#else
+    return "";
+#endif
 }
 }
 } // namespace fcitx

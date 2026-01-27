@@ -24,8 +24,11 @@ WasmFrontend *frontend;
 WebKeyboard *ui;
 Notifications *notifications;
 AddonInstance *clipboard;
-IsoCodes isoCodes;
 Runtime runtime;
+
+#ifdef ENABLE_KEYBOARD
+IsoCodes isoCodes;
+#endif
 
 void notify_main_async(const std::string &str);
 
@@ -155,11 +158,15 @@ EMSCRIPTEN_KEEPALIVE void scroll(int start, int count) {
 }
 
 EMSCRIPTEN_KEEPALIVE void write_clipboard(const char *text) {
-    clipboard->call<IClipboard::setClipboardV2>("", text, false);
+    if (clipboard != nullptr) {
+        clipboard->call<IClipboard::setClipboardV2>("", text, false);
+    }
 }
 
 EMSCRIPTEN_KEEPALIVE void write_primary(const char *text) {
-    clipboard->call<IClipboard::setPrimaryV2>("", text, false);
+    if (clipboard != nullptr) {
+        clipboard->call<IClipboard::setPrimaryV2>("", text, false);
+    }
 }
 
 EMSCRIPTEN_KEEPALIVE const char *translate_domain(const char *domain,
@@ -193,8 +200,10 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
 #endif
 
     setlocale(LC_ALL, locale); // emscripten musl specific.
+#ifdef ENABLE_KEYBOARD
     isoCodes.read(ISOCODES_ISO639_JSON);
     setenv("XKB_CONFIG_ROOT", "/usr/share/xkeyboard-config-2", 1);
+#endif
 
     EventLoop::setEventLoopFactory(
         [] { return std::make_unique<JSEventLoop>(); });
