@@ -97,7 +97,9 @@ globalThis.fcitx = {
     document.addEventListener('blur', blur, true)
     document.addEventListener('keydown', keyEvent)
     document.addEventListener('keyup', keyEvent)
-    document.querySelector('.fcitx-decoration')?.addEventListener('mousedown', clickPanel)
+    for (const klass of ['.fcitx-decoration', '.fcitx-contextmenu']) {
+      document.querySelector(klass)?.addEventListener('mousedown', clickPanel)
+    }
     document.addEventListener('scroll', redrawCaretAndPreeditUnderline, true)
     document.addEventListener('selectionchange', selectionChange)
     // selectionChange() // Capture initial selection.
@@ -126,7 +128,9 @@ globalThis.fcitx = {
     document.removeEventListener('blur', blur, true)
     document.removeEventListener('keydown', keyEvent)
     document.removeEventListener('keyup', keyEvent)
-    document.querySelector('.fcitx-decoration')?.removeEventListener('mousedown', clickPanel)
+    for (const klass of ['.fcitx-decoration', '.fcitx-contextmenu']) {
+      document.querySelector(klass)?.removeEventListener('mousedown', clickPanel)
+    }
     document.removeEventListener('scroll', redrawCaretAndPreeditUnderline, true)
     document.removeEventListener('selectionchange', selectionChange)
     if (hasTouch) {
