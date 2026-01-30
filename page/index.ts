@@ -38,7 +38,9 @@ function getRuntime() {
   return WEB
 }
 
-globalThis.fcitx = {
+globalThis.fcitx = Object.assign((...args: any[]) => {
+  return Module.ccall('web_action', 'string', ['string'], [JSON.stringify(args)])
+}, {
   Module,
   UZIP,
   createPanel(html: string) {
@@ -175,22 +177,7 @@ globalThis.fcitx = {
   useWorker: false,
   runtime: getRuntime(),
   followCaret: false,
-}
-const apis = [
-  'log',
-  'copyHTML',
-  'select',
-  'highlight',
-  'page',
-  'scroll',
-  'askActions',
-  'action',
-  'resize',
-]
-for (const api of apis) {
-  const name = `_${api}`
-  globalThis.fcitx[name] = (...args: any[]) => Module.ccall('web_action', 'void', ['string', 'string'], [name, JSON.stringify(args)])
-}
+})
 
 Module.onRuntimeInitialized = () => {
   mount()

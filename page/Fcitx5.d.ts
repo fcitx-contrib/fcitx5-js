@@ -82,6 +82,7 @@ export interface KeyData {
 }
 
 export interface FCITX {
+  (name: string, ...args: any[]): string
   // Return value is for ChromeOS.
   enable: () => { keyEvent: (keyData: KeyData) => boolean } | undefined
   // ChromeOS only.
