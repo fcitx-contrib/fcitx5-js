@@ -67,6 +67,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     window.fcitx.hidePanel()
   },
   placePanel,
+  invoke: (name: string, args: string) => fcitx[name](...JSON.parse(args)),
   setPreedit,
   commit,
   sendEventToKeyboard,
