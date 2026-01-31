@@ -280,9 +280,6 @@ WebPanel::WebPanel(Instance *instance)
 void WebPanel::updateConfig() {
     window_->set_layout(config_.typography->layout.value());
     window_->set_theme(config_.basic->theme.value());
-    window_->set_caret_text(config_.caret->style.value() == CaretStyle::Text
-                                ? config_.caret->text.value()
-                                : "");
     auto style = configValueToJson(config_).dump();
     window_->set_style(style.c_str());
 }

@@ -8,8 +8,6 @@
 
 using json = nlohmann::json;
 
-std::string escape_html(const std::string &content);
-
 namespace fcitx {
 
 struct Candidate {
@@ -18,9 +16,7 @@ struct Candidate {
     std::string comment;
 
     friend void to_json(json &j, const Candidate &c) {
-        j = json{{"label", escape_html(c.label)},
-                 {"text", escape_html(c.text)},
-                 {"comment", escape_html(c.comment)}};
+        j = json{{"label", c.label}, {"text", c.text}, {"comment", c.comment}};
     }
 };
 
