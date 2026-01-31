@@ -283,10 +283,6 @@ void WebPanel::updateConfig() {
     window_->set_caret_text(config_.caret->style.value() == CaretStyle::Text
                                 ? config_.caret->text.value()
                                 : "");
-    window_->set_highlight_mark_text(config_.highlight->markStyle.value() ==
-                                             HighlightMarkStyle::Text
-                                         ? config_.highlight->markText.value()
-                                         : "");
     auto style = configValueToJson(config_).dump();
     window_->set_style(style.c_str());
 }
