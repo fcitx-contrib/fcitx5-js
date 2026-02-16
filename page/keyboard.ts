@@ -10,7 +10,9 @@ import { graphemeIndices } from './unicode'
 
 let keyboardShown = false
 const keyboardId = 'fcitx-virtual-keyboard'
+const keyboardHeight = 'min(calc(200vw / 3), 50vh)'
 const hiddenBottom = 'max(calc(-200vw / 3), -50vh)'
+const shownBottom = 'env(safe-area-inset-bottom)'
 let hasVirtualPreeditOrAux = false
 let hasCandidates = false
 
@@ -336,9 +338,8 @@ export function createKeyboard() {
   const keyboard = document.createElement('div')
   keyboard.id = keyboardId
   keyboard.style.zIndex = '2147483647'
-  keyboard.style.backgroundColor = '#e3e4e6'
   keyboard.style.width = '100vw'
-  keyboard.style.height = 'min(calc(200vw / 3), 50vh)'
+  keyboard.style.height = keyboardHeight
   keyboard.style.bottom = hiddenBottom
   keyboard.style.left = '0'
   keyboard.style.position = 'fixed'
@@ -422,7 +423,7 @@ export function showKeyboard() {
   }
   keyboardShown = true
   const keyboard = document.getElementById(keyboardId)!
-  keyboard.style.bottom = '0'
+  keyboard.style.bottom = shownBottom
   deselect()
 }
 
