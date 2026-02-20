@@ -122,6 +122,7 @@ export interface FCITX {
   reload: () => void
   reset: () => Promise<any>
   zip: (manifest: UZIP.UZIPFiles) => Promise<ArrayBuffer>
+  cli: (command: string, ...args: string[]) => number
   Module: EM_MODULE
   UZIP: typeof UZIP
 }

@@ -49,7 +49,10 @@ else()
         "--preload-file ${INSTALL_LIB_DIR}/fcitx5@/usr/lib/fcitx5"
         "-sFETCH" # cloudpinyin
     )
-    target_sources(Fcitx5 PRIVATE pthread.cpp) # mozc and stroke
+    target_sources(Fcitx5 PRIVATE
+        pthread.cpp # mozc and stroke
+        cli.cpp # libime
+    )
     list(APPEND STATIC_ADDONS keyboard)
 endif()
 

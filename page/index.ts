@@ -1,6 +1,7 @@
 import type { Input } from './focus'
 import UZIP from 'uzip'
 import { activateMenuAction, getMenuActions } from './action'
+import { cli } from './cli'
 import { commit, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
 import { OPTIONS, SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
@@ -173,6 +174,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
   reload,
   reset,
   zip,
+  cli,
   // Private field that indicates whether spawn a worker in current environment.
   // On f5o main thread set true to enable worker. On worker thread this is always false.
   useWorker: false,
