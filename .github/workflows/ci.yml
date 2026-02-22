@@ -90,6 +90,8 @@ jobs:
 
       - name: Check prebuilder js-testing release
         if: ${{ github.ref != 'refs/heads/master' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if gh api repos/fcitx-contrib/fcitx5-prebuilder/releases/tags/js-testing > /dev/null 2>&1; then
             echo "PREBUILDER_TAG=js-testing" >> $GITHUB_ENV
@@ -165,3 +167,5 @@ jobs:
       - name: Delete testing release
         if: ${{ github.ref == 'refs/heads/master' }}
         run: gh release delete testing --yes || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
