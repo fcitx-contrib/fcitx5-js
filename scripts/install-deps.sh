@@ -1,3 +1,5 @@
+PREBUILDER_TAG=${PREBUILDER_TAG:-js}
+
 deps=(
   ecm
   iso-codes
@@ -13,7 +15,7 @@ mkdir -p $EXTRACT_DIR $SPELL_DICT_DIR
 
 for dep in "${deps[@]}"; do
   file=$dep.tar.bz2
-  [[ -f cache/$file ]] || wget -P cache https://github.com/fcitx-contrib/fcitx5-prebuilder/releases/download/js/$file
+  [[ -f cache/$file ]] || wget -P cache https://github.com/fcitx-contrib/fcitx5-prebuilder/releases/download/$PREBUILDER_TAG/$file
   tar xf cache/$file -C $EXTRACT_DIR
 done
 

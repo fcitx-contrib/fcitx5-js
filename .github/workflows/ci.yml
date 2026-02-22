@@ -88,6 +88,13 @@ jobs:
           ./emsdk install ${{ env.EMSCRIPTEN_VERSION }}
           ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
 
+      - name: Check prebuilder js-testing release
+        if: ${{ github.ref != 'refs/heads/master' }}
+        run: |
+          if gh api repos/fcitx-contrib/fcitx5-prebuilder/releases/tags/js-testing > /dev/null 2>&1; then
+            echo "PREBUILDER_TAG=js-testing" >> $GITHUB_ENV
+          fi
+
       - name: Build
         run: |
           ./scripts/install-deps.sh
@@ -135,7 +142,6 @@ jobs:
     uses: ./.github/workflows/compare.yml
 
   release:
-    if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -149,9 +155,13 @@ jobs:
         uses: 'marvinpinto/action-automatic-releases@latest'
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: latest
+          automatic_release_tag: ${{ github.ref == 'refs/heads/master' && 'latest' || 'testing' }}
           prerelease: true
-          title: "Nightly Build"
+          title: ${{ github.ref == 'refs/heads/master' && 'Nightly Build' || 'Testing Build' }}
           files: |
             fcitx5-js.tgz
             fcitx5-js-dev.tar.bz2
+
+      - name: Delete testing release
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: gh release delete testing --yes || true
