@@ -97,9 +97,6 @@ jobs:
             echo "PREBUILDER_TAG=js-testing" >> $GITHUB_ENV
           fi
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: Build
         run: |
           ./scripts/install-deps.sh
