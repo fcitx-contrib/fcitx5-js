@@ -15,7 +15,7 @@ set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS "${SHARED_FLAGS}")
 set(CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS "${SHARED_FLAGS}")
 
 # -fexperimental-library is for std::osyncstream
-add_compile_options(-fPIC -fexceptions -fexperimental-library)
+add_compile_options(-fPIC -fwasm-exceptions -fexperimental-library)
 
 option(RIME_ONLY "Disable components unused by rime" OFF)
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF)

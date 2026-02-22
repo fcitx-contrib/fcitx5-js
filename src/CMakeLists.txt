@@ -15,7 +15,7 @@ target_include_directories(Fcitx5 PRIVATE
 
 set(EXE_LINK_OPTIONS
     "-sMAIN_MODULE=1"
-    "-fexceptions"
+    "-fwasm-exceptions"
     "-sSTACK_SIZE=1MB" # fcitx5-chewing's log overflows the default 64KB stack
     "-sALLOW_MEMORY_GROWTH=1"
     "-sMAXIMUM_MEMORY=4GB"
