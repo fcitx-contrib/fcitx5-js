@@ -166,6 +166,6 @@ jobs:
 
       - name: Delete testing release
         if: ${{ github.ref == 'refs/heads/master' }}
-        run: gh release delete testing --yes || true
+        run: gh release delete testing --yes --repo fcitx-contrib/fcitx5-js || true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
