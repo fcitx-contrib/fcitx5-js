@@ -28,8 +28,10 @@ export function traverseSync(preDirCallback: SyncCallback | undefined, fileCallb
   return closure
 }
 
+const ENDING_SLASH = /\/$/
+
 function trimSlash(path: string) {
-  return path.replace(/\/$/, '')
+  return path.replace(ENDING_SLASH, '')
 }
 
 export function rmR(path: string, star: boolean = false) {
