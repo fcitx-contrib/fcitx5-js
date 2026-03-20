@@ -52,13 +52,15 @@ export function unzip(buffer: ArrayBuffer, dir: string) {
   distributeFiles(manifest, dir)
 }
 
+const PLUGIN_JSON = /^plugin\/(\S+)\.json$/
+
 // Like unzip, but do some sanity checks for plugins.
 export function installPlugin(buffer: ArrayBuffer) {
   if (buffer.byteLength < 1024) {
     throw new Error('Invalid plugin')
   }
   const manifest = UZIP.parse(buffer)
-  const names = Object.keys(manifest).flatMap(path => (path.match(/^plugin\/(\S+)\.json$/) ?? { 1: [] })[1])
+  const names = Object.keys(manifest).flatMap(path => (path.match(PLUGIN_JSON) ?? { 1: [] })[1])
   if (names.length !== 1) {
     throw new Error('Invalid plugin')
   }
