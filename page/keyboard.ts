@@ -35,7 +35,7 @@ function getIndexOfPrevChar(preText: string): number {
     return 0
   }
   const indices = graphemeIndices(preText)
-  return indices[indices.length - 1]
+  return indices.at(-1)!
 }
 
 function getIndexOfNextChar(preText: string, postText: string): number {

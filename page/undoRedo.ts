@@ -61,7 +61,7 @@ function calculateDiff(a: string, b: string): TextOperation {
 
   const remainingA = a.slice(prefixLength, a.length - suffixLength)
   const remainingB = b.slice(prefixLength, b.length - suffixLength)
-  const time = new Date().getTime()
+  const time = Date.now()
 
   if (remainingA && !remainingB) {
     return {
@@ -98,7 +98,7 @@ export function onTextChange(text: string) {
   const diff = calculateDiff(currentText, text)
   let merged = false
   if (undoes.length && !redoes.length) {
-    const lastUndo = undoes[undoes.length - 1]
+    const lastUndo = undoes.at(-1)!
     if (diff.time - lastUndo.time < MERGE_TIMEOUT) {
       if (lastUndo.type === 'insert' && diff.type === 'insert') {
         if (lastUndo.start + lastUndo.text.length === diff.start) {
