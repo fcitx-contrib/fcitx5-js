@@ -130,8 +130,8 @@ export interface FCITX {
   reset: () => Promise<any>
   zip: (manifest: UZIP.UZIPFiles) => Promise<ArrayBuffer>
   cli: (command: string, ...args: string[]) => number
-  getCustomPhrases: () => CustomPhrase[]
-  setCustomPhrases: (phrases: CustomPhrase[]) => void
+  getCustomPhrases: (path: string) => CustomPhrase[]
+  setCustomPhrases: (path: string, phrases: CustomPhrase[]) => void
   Module: EM_MODULE
   UZIP: typeof UZIP
 }

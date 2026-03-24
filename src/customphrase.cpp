@@ -12,11 +12,6 @@ typedef void (*CustomPhraseForeach)(
 
 extern "C" {
 
-static std::string customphrase_path() {
-    return std::string(getenv("HOME")) +
-           "/.local/share/fcitx5/pinyin/customphrase";
-}
-
 static void customphrase_foreach_callback(const char *key, const char *value,
                                           int order, void *userData) {
     auto *arr = static_cast<nlohmann::json *>(userData);
@@ -26,7 +21,7 @@ static void customphrase_foreach_callback(const char *key, const char *value,
                                            {"enabled", order > 0}}));
 }
 
-EMSCRIPTEN_KEEPALIVE const char *customphrase_get() {
+EMSCRIPTEN_KEEPALIVE const char *customphrase_get(const char *path) {
     static std::string ret;
     auto j = nlohmann::json::array();
 
@@ -42,7 +37,7 @@ EMSCRIPTEN_KEEPALIVE const char *customphrase_get() {
     if (create != nullptr && load != nullptr && foreach != nullptr &&
         destroy != nullptr) {
         void *dict = create();
-        load(dict, customphrase_path().c_str());
+        load(dict, path);
         foreach (dict, customphrase_foreach_callback, &j)
             ;
         destroy(dict);
@@ -52,7 +47,7 @@ EMSCRIPTEN_KEEPALIVE const char *customphrase_get() {
     return ret.c_str();
 }
 
-EMSCRIPTEN_KEEPALIVE void customphrase_set(const char *json) {
+EMSCRIPTEN_KEEPALIVE void customphrase_set(const char *path, const char *json) {
     auto create = reinterpret_cast<CustomPhraseCreate>(
         dlsym(RTLD_DEFAULT, "customphrase_create"));
     auto add = reinterpret_cast<CustomPhraseAdd>(
@@ -79,7 +74,7 @@ EMSCRIPTEN_KEEPALIVE void customphrase_set(const char *json) {
             item["phrase"].get<std::string>().c_str(), order);
     }
 
-    save(dict, customphrase_path().c_str());
+    save(dict, path);
     destroy(dict);
 }
 }
