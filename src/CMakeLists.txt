@@ -52,6 +52,7 @@ else()
     target_sources(Fcitx5 PRIVATE
         pthread.cpp # mozc and stroke
         cli.cpp # libime
+        customphrase.cpp # pinyin
     )
     list(APPEND STATIC_ADDONS keyboard)
 endif()
