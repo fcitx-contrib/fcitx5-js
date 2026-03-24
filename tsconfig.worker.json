@@ -5,7 +5,8 @@
     "lib": ["ESNext", "WebWorker"],
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
+    "types": ["node"],
     "strict": true,
     "isolatedModules": true
   },
