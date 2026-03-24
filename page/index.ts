@@ -6,6 +6,7 @@ import { commit, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
 import { OPTIONS, SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
+import { getCustomPhrases, setCustomPhrases } from './custom-phrase'
 import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline } from './focus'
 import { mount, reset, rmR, traverseAsync, traverseSync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, getLanguageName, setCurrentInputMethod, setInputMethods } from './input-method'
@@ -175,6 +176,8 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
   reset,
   zip,
   cli,
+  getCustomPhrases,
+  setCustomPhrases,
   // Private field that indicates whether spawn a worker in current environment.
   // On f5o main thread set true to enable worker. On worker thread this is always false.
   useWorker: false,

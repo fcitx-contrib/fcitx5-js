@@ -81,6 +81,13 @@ export interface KeyData {
   preventDefault: () => void
 }
 
+export interface CustomPhrase {
+  keyword: string
+  phrase: string
+  order: number
+  enabled: boolean
+}
+
 export interface FCITX {
   (name: string, ...args: any[]): string
   // Return value is for ChromeOS.
@@ -123,6 +130,8 @@ export interface FCITX {
   reset: () => Promise<any>
   zip: (manifest: UZIP.UZIPFiles) => Promise<ArrayBuffer>
   cli: (command: string, ...args: string[]) => number
+  getCustomPhrases: () => CustomPhrase[]
+  setCustomPhrases: (phrases: CustomPhrase[]) => void
   Module: EM_MODULE
   UZIP: typeof UZIP
 }
