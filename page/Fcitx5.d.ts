@@ -132,6 +132,7 @@ export interface FCITX {
   cli: (command: string, ...args: string[]) => number
   getCustomPhrases: (path: string) => CustomPhrase[]
   setCustomPhrases: (path: string, phrases: CustomPhrase[]) => void
+  lsDir: (path: string) => string[]
   Module: EM_MODULE
   UZIP: typeof UZIP
 }

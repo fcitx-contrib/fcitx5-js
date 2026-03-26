@@ -9,7 +9,7 @@ async function readTextFile(page: Page, path: string): Promise<string> {
 test('IDBFS works', async ({ page }) => {
   await init(page)
 
-  expect(await page.evaluate(() => window.fcitx.Module.FS.readdir('/backup')), '/backup/usr is automatically created').toEqual(['.', '..', 'usr'])
+  expect(await page.evaluate(() => window.fcitx.lsDir('/backup')), '/backup/usr is automatically created').toEqual(['usr'])
 
   await page.evaluate(() => window.fcitx.Module.FS.mkdirTree('/backup/usr/local'))
   await page.evaluate(() => window.fcitx.Module.FS.writeFile('/backup/usr/local/foo.txt', 'bar'))
@@ -20,6 +20,6 @@ test('IDBFS works', async ({ page }) => {
 
   await page.evaluate(() => window.fcitx.reset())
   await init(page)
-  expect(await page.evaluate(() => window.fcitx.Module.FS.readdir('/backup/usr')), 'Data cleared after reset').toEqual(['.', '..'])
-  expect(await page.evaluate(() => window.fcitx.Module.FS.readdir('/home/web_user'))).toEqual(['.', '..', '.config'])
+  expect(await page.evaluate(() => window.fcitx.lsDir('/backup/usr')), 'Data cleared after reset').toEqual([])
+  expect(await page.evaluate(() => window.fcitx.lsDir('/home/web_user'))).toEqual(['.config'])
 })

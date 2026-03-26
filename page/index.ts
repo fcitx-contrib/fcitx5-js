@@ -8,7 +8,7 @@ import { OPTIONS, SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
 import { getCustomPhrases, setCustomPhrases } from './custom-phrase'
 import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline } from './focus'
-import { mount, reset, rmR, traverseAsync, traverseSync } from './fs'
+import { lsDir, mount, reset, rmR, traverseAsync, traverseSync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, getLanguageName, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
 import { jsKeyToFcitxString, keyEvent, setSystemInputMethodInUseCallback } from './keycode'
@@ -169,6 +169,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
   translateDomain,
   setSystemInputMethodInUseCallback,
   rmR,
+  lsDir,
   traverseAsync,
   traverseSync,
   deployRimeInWorker,
