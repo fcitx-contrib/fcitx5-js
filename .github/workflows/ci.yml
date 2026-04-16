@@ -45,11 +45,6 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/checkout@v6
-        with:
-          repository: emscripten-core/emsdk
-          path: emsdk
-
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
@@ -82,11 +77,10 @@ jobs:
         run: |
           echo "EMSCRIPTEN_VERSION=$(cat .emscripten-version)" >> $GITHUB_ENV
 
-      - name: Install emsdk
-        working-directory: emsdk
-        run: |
-          ./emsdk install ${{ env.EMSCRIPTEN_VERSION }}
-          ./emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
+      - name: Setup emsdk
+        uses: emscripten-core/setup-emsdk@v16
+        with:
+          version: ${{ env.EMSCRIPTEN_VERSION }}
 
       - name: Check prebuilder js-testing release
         if: ${{ github.ref != 'refs/heads/master' }}
@@ -100,7 +94,6 @@ jobs:
       - name: Build
         run: |
           ./scripts/install-deps.sh
-          . emsdk/emsdk_env.sh
           emcmake cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release
           EMCC_FORCE_STDLIBS=libc++ FCITX_DISTRIBUTION=fcitx5-js cmake --build build
@@ -121,7 +114,7 @@ jobs:
             -f ../../../fcitx5-js-dev.tar.bz2 include lib
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: artifact-${{ matrix.os }}
           path: |
@@ -148,7 +141,7 @@ jobs:
     needs: build
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: artifact-ubuntu-24.04
           merge-multiple: true
