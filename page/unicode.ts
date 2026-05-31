@@ -19,3 +19,17 @@ export function utf8Index2JS(text: string, index: number) {
   }
   return i
 }
+
+export function jsIndexToCharCount(text: string, jsIndex: number): number {
+  let count = 0
+  let i = 0
+  while (i < jsIndex) {
+    const codePoint = text.codePointAt(i)
+    if (codePoint === undefined) {
+      break
+    }
+    i += codePoint > 0xFFFF ? 2 : 1
+    count++
+  }
+  return count
+}

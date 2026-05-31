@@ -26,6 +26,8 @@ class WasmFrontend : public AddonInstance {
     void focusIn(bool isPassword);
     void focusOut();
     void resetInput();
+    void setSurroundingText(const std::string &text, unsigned int cursor,
+                            unsigned int anchor);
 
   private:
     Instance *instance_;
