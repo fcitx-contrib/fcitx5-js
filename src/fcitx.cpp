@@ -62,6 +62,12 @@ EMSCRIPTEN_KEEPALIVE void focus_out() { frontend->focusOut(); }
 
 EMSCRIPTEN_KEEPALIVE void reset_input() { frontend->resetInput(); }
 
+EMSCRIPTEN_KEEPALIVE void set_surrounding_text(const char *text,
+                                               unsigned int cursor,
+                                               unsigned int anchor) {
+    frontend->setSurroundingText(text, cursor, anchor);
+}
+
 EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
                                       uint32_t modifiers, bool isRelease) {
     return frontend->keyEvent(js_key_to_fcitx_key(key, code, modifiers),

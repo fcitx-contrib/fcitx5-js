@@ -34,6 +34,8 @@ void WasmFrontend::focusIn(bool isPassword) {
     CapabilityFlags flags = CapabilityFlag::Preedit;
     if (isPassword) {
         flags |= CapabilityFlag::Password;
+    } else {
+        flags |= CapabilityFlag::SurroundingText;
     }
     ic_->setCapabilityFlags(flags);
     ic_->focusIn();
@@ -42,6 +44,13 @@ void WasmFrontend::focusIn(bool isPassword) {
 void WasmFrontend::focusOut() { ic_->focusOut(); }
 
 void WasmFrontend::resetInput() { ic_->reset(); }
+
+void WasmFrontend::setSurroundingText(const std::string &text,
+                                      unsigned int cursor,
+                                      unsigned int anchor) {
+    ic_->surroundingText().setText(text, cursor, anchor);
+    ic_->updateSurroundingText();
+}
 
 WasmInputContext::WasmInputContext(WasmFrontend *frontend,
                                    InputContextManager &inputContextManager)

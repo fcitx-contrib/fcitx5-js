@@ -1,14 +1,59 @@
 import getCaretCoordinates from 'textarea-caret'
 import { getFontSize, UNDERLINE_OFFSET_RATIO } from './caret'
 import { getInputElement, setSpellCheck } from './focus'
+import Module from './module'
 import { onTextChange } from './undoRedo'
-import { utf8Index2JS } from './unicode'
+import { jsIndexToCharCount, utf8Index2JS } from './unicode'
 
 let x = 0
 let y = 0
 
 let preedit = ''
 let preeditIndex = 0
+let lastSurroundingText: string | null = null
+let lastCursor = 0
+let lastAnchor = 0
+
+export function sendSurroundingText() {
+  const input = getInputElement()
+  if (!input) {
+    return
+  }
+  if (input.tagName === 'INPUT' && input.type === 'password') {
+    return
+  }
+
+  const value = input.value
+  const start = input.selectionStart ?? value.length
+  const end = input.selectionEnd ?? value.length
+
+  let text: string
+  let cursor: number
+  let anchor: number
+
+  if (preedit) {
+    const preeditStart = start - preeditIndex
+    const preeditEnd = preeditStart + preedit.length
+    text = value.slice(0, preeditStart) + value.slice(preeditEnd)
+    cursor = jsIndexToCharCount(text, preeditStart)
+    anchor = cursor
+  }
+  else {
+    text = value
+    cursor = jsIndexToCharCount(value, start)
+    anchor = jsIndexToCharCount(value, end)
+  }
+
+  if (text === lastSurroundingText && cursor === lastCursor && anchor === lastAnchor) {
+    return
+  }
+
+  lastSurroundingText = text
+  lastCursor = cursor
+  lastAnchor = anchor
+
+  Module.ccall('set_surrounding_text', 'void', ['string', 'number', 'number'], [text, cursor, anchor])
+}
 
 // compared with macOS pinyin
 const CANDIDATE_WINDOW_OFFSET = 6

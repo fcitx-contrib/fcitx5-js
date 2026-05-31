@@ -1,5 +1,5 @@
 import { redrawCaret, removeCaret } from './caret'
-import { redrawPreeditUnderline, resetPreedit } from './client'
+import { redrawPreeditUnderline, resetPreedit, sendSurroundingText } from './client'
 import { hasTouch } from './context'
 import { hideKeyboard, showKeyboard, updateSelection } from './keyboard'
 import Module from './module'
@@ -73,6 +73,9 @@ export function focus() {
   originalSpellCheck = input.spellcheck
   const isPassword = input.tagName === 'INPUT' && input.type === 'password'
   Module.ccall('focus_in', 'void', ['bool'], [isPassword])
+  sendSurroundingText()
+  input.addEventListener('input', sendSurroundingText)
+  input.addEventListener('selectionchange', sendSurroundingText)
 }
 
 export function blur() {
@@ -88,6 +91,8 @@ export function blur() {
   }
   input.removeEventListener('mousedown', resetInput)
   input.removeEventListener('compositionstart', resetInput)
+  input.removeEventListener('input', sendSurroundingText)
+  input.removeEventListener('selectionchange', sendSurroundingText)
   if (hasTouch) {
     input.removeEventListener('touchstart', resetInput)
     input.removeEventListener('selectionchange', updateSelection)
