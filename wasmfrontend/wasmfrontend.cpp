@@ -60,6 +60,11 @@ WasmInputContext::WasmInputContext(WasmFrontend *frontend,
 
 WasmInputContext::~WasmInputContext() { destroy(); }
 
+void WasmInputContext::deleteSurroundingTextImpl(int offset,
+                                                 unsigned int size) {
+    EM_ASM(fcitx.deleteSurroundingText($0, $1), offset, size);
+}
+
 void WasmInputContext::commitStringImpl(const std::string &text) {
     EM_ASM(fcitx.commit(UTF8ToString($0)), text.c_str());
 }

@@ -209,3 +209,45 @@ export function redrawPreeditUnderline() {
 export function hasPreedit() {
   return !!preedit
 }
+
+export function deleteSurroundingText(offset: number, size: number) {
+  const input = getInputElement()
+  if (!input) {
+    return
+  }
+
+  const text = input.value
+  const jsCursor = input.selectionStart!
+  const chars = [...text]
+
+  let charCursor = 0
+  let currentJsIndex = 0
+  for (const char of chars) {
+    if (currentJsIndex >= jsCursor) {
+      break
+    }
+    currentJsIndex += char.length
+    charCursor++
+  }
+
+  const startCharIndex = charCursor + offset
+  const endCharIndex = startCharIndex + size
+
+  if (startCharIndex < 0 || endCharIndex > chars.length || startCharIndex >= endCharIndex) {
+    return
+  }
+
+  let startJsIndex = 0
+  for (let i = 0; i < startCharIndex; i++) {
+    startJsIndex += chars[i].length
+  }
+  let endJsIndex = startJsIndex
+  for (let i = startCharIndex; i < endCharIndex; i++) {
+    endJsIndex += chars[i].length
+  }
+
+  input.setRangeText('', startJsIndex, endJsIndex, 'end')
+  input.dispatchEvent(new Event('change'))
+  input.dispatchEvent(new Event('input'))
+  onTextChange(input.value)
+}

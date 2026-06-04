@@ -2,7 +2,7 @@ import type { Input } from './focus'
 import UZIP from 'uzip'
 import { activateMenuAction, getMenuActions } from './action'
 import { cli } from './cli'
-import { commit, placePanel, setPreedit } from './client'
+import { commit, deleteSurroundingText, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
 import { OPTIONS, SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
@@ -72,6 +72,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
   invoke: (name: string, args: string) => fcitx[name](...JSON.parse(args)),
   setPreedit,
   commit,
+  deleteSurroundingText,
   sendEventToKeyboard,
   getLanguageName,
   setCurrentInputMethod,
