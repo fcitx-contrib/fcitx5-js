@@ -173,6 +173,9 @@ ____ commit pre|edit ____
   }
   else {
     onTextChange(input.value)
+    // Relying on event handler could be too late for next key stroke in thai e2e test.
+    // In practice this is not needed.
+    sendSurroundingText()
   }
 }
 
