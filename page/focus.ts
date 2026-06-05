@@ -76,6 +76,9 @@ export function focus() {
   sendSurroundingText()
   input.addEventListener('input', sendSurroundingText)
   input.addEventListener('selectionchange', sendSurroundingText)
+  // Relying on selectionchange could be too late for next key stroke in punctuation e2e test.
+  // In practice this is not needed.
+  input.addEventListener('click', sendSurroundingText)
 }
 
 export function blur() {
@@ -91,6 +94,7 @@ export function blur() {
   }
   input.removeEventListener('mousedown', resetInput)
   input.removeEventListener('compositionstart', resetInput)
+  input.removeEventListener('click', sendSurroundingText)
   input.removeEventListener('input', sendSurroundingText)
   input.removeEventListener('selectionchange', sendSurroundingText)
   if (hasTouch) {
