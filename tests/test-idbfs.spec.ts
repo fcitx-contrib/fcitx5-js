@@ -11,9 +11,21 @@ test('IDBFS works', async ({ page }) => {
 
   expect(await page.evaluate(() => window.fcitx.lsDir('/backup')), '/backup/usr is automatically created').toEqual(['usr'])
 
-  await page.evaluate(() => window.fcitx.Module.FS.mkdirTree('/backup/usr/local'))
-  await page.evaluate(() => window.fcitx.Module.FS.writeFile('/backup/usr/local/foo.txt', 'bar'))
-  await page.evaluate(() => window.fcitx.Module.FS.writeFile('/home/web_user/bar.txt', 'baz'))
+  await page.evaluate(async () => {
+    const waitPersist = (op: () => void) => new Promise<void>((resolve) => {
+      window.fcitx.Module.IDBFS.onAutoPersistStateChanged = (active: boolean) => {
+        if (!active) {
+          resolve()
+        }
+      }
+      op()
+    })
+
+    await waitPersist(() => window.fcitx.Module.FS.mkdirTree('/backup/usr/local'))
+    await waitPersist(() => window.fcitx.Module.FS.writeFile('/backup/usr/local/foo.txt', 'bar'))
+    await waitPersist(() => window.fcitx.Module.FS.writeFile('/home/web_user/bar.txt', 'baz'))
+  })
+
   await init(page)
   expect(await readTextFile(page, '/backup/usr/local/foo.txt'), 'Data persists after reload').toBe('bar')
   expect(await readTextFile(page, '/home/web_user/bar.txt')).toBe('baz')
