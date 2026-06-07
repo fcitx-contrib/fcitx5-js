@@ -25,6 +25,7 @@ jobs:
           npm i -g pnpm
           pnpm --prefix=fcitx5-keyboard-web i
           pnpm --prefix=fcitx5-keyboard-web run build
+          pnpm --prefix=fcitx5-webview i
           pnpm i
 
       - name: Lint
@@ -70,8 +71,8 @@ jobs:
           npm i -g pnpm
           pnpm --prefix=fcitx5-keyboard-web i
           pnpm --prefix=fcitx5-keyboard-web run build
-          pnpm i
           pnpm --prefix=fcitx5-webview i
+          pnpm i
 
       - name: Get emscripten version
         run: |
