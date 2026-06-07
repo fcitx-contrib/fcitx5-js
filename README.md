@@ -24,6 +24,7 @@ pnpm i
 pnpm --prefix=fcitx5-keyboard-web i
 pnpm --prefix=fcitx5-keyboard-web run build
 pnpm --prefix=fcitx5-webview i
+pnpm --prefix=fcitx5-webview run build
 ./scripts/install-deps.sh
 ```
 
@@ -33,7 +34,7 @@ https://emscripten.org/docs/getting_started/downloads.html
 ### Build with CMake
 ```sh
 emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
-EMCC_FORCE_STDLIBS=libc++ FCITX_DISTRIBUTION=fcitx5-js cmake --build build
+EMCC_FORCE_STDLIBS=libc++ cmake --build build
 ```
 You can also use `Ctrl+Shift+B` (or `Cmd+Shift+B` on macOS) in VSCode to execute a task.
 
