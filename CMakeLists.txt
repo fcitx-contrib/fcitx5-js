@@ -97,7 +97,7 @@ file(GLOB JS_SOURCES CONFIGURE_DEPENDS "page/*")
 add_custom_command(
     OUTPUT ${DUMMY_CPP}
     COMMAND pnpm run build && ./scripts/install.sh
-    DEPENDS ${JS_SOURCES} fcitx5-keyboard-web/dist/index.js
+    DEPENDS ${JS_SOURCES} fcitx5-keyboard-web/dist/index.js fcitx5-webview/dist/index.js
         clipboard imselector spell quickphrase unicode
         ${FMT_TARGETS} fcitx5-translation
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

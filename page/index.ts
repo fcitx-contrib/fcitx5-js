@@ -1,4 +1,5 @@
 import type { Input } from './focus'
+import { initPanel } from 'fcitx5-webview'
 import UZIP from 'uzip'
 import { activateMenuAction, getMenuActions } from './action'
 import { cli } from './cli'
@@ -45,22 +46,8 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
 }, {
   Module,
   UZIP,
-  createPanel(html: string) {
-    const tree = document.createElement('div')
-    tree.innerHTML = html
-    for (const el of [...tree.children]) {
-      switch (el.tagName) {
-        case 'STYLE':
-          document.head.append(el)
-          break
-        case 'DIV':
-          document.body.append(el)
-          break
-        case 'SCRIPT':
-          eval(el.textContent!) // eslint-disable-line no-eval
-          break
-      }
-    }
+  createPanel() {
+    initPanel(document.body)
     if (isFirefox) {
       // Firefox doesn't support assigning numeric scrollbar width. Event the thinnest scrollbar
       // pushes the 6th candidate to next row. Set it none to mitigate.
@@ -178,6 +165,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
   reset,
   zip,
   cli,
+  distribution: 'fcitx5-js',
   getCustomPhrases,
   setCustomPhrases,
   // Private field that indicates whether spawn a worker in current environment.
