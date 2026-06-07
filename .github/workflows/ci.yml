@@ -73,6 +73,7 @@ jobs:
           pnpm --prefix=fcitx5-keyboard-web i
           pnpm --prefix=fcitx5-keyboard-web run build
           pnpm --prefix=fcitx5-webview i
+          pnpm --prefix=fcitx5-webview run build
           pnpm i
 
       - name: Get emscripten version
