@@ -21,21 +21,18 @@ WebPanel::WebPanel(Instance *instance)
         const auto &list = ic->inputPanel().candidateList();
         if (!list)
             return;
-        if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
-            const auto &bulk = list->toBulk();
-            if (!bulk) {
-                return;
-            }
-            try {
-                bulk->candidateFromAll(index).select(ic);
-            } catch (const std::invalid_argument &e) {
-                FCITX_ERROR() << "select candidate index out of range";
-            }
+        const auto &bulk = list->toBulk();
+        if (scrollState_ == candidate_window::scroll_state_t::scrolling &&
+            !bulk) {
             return;
         }
         try {
+            const auto &candidate =
+                scrollState_ == candidate_window::scroll_state_t::scrolling
+                    ? bulk->candidateFromAll(index)
+                    : list->candidate(index);
             // Engine is responsible for updating UI
-            list->candidate(index).select(ic);
+            candidate.select(ic);
         } catch (const std::invalid_argument &e) {
             FCITX_ERROR() << "select candidate index out of range";
         }
@@ -112,23 +109,16 @@ WebPanel::WebPanel(Instance *instance)
         auto *actionableList = list->toActionable();
         if (!actionableList)
             return;
-        if (scrollState_ == candidate_window::scroll_state_t::scrolling) {
-            const auto &bulk = list->toBulk();
-            if (!bulk) {
-                return;
-            }
-            try {
-                const auto &candidate = bulk->candidateFromAll(index);
-                if (actionableList->hasAction(candidate)) {
-                    actionableList->triggerAction(candidate, id);
-                }
-            } catch (const std::invalid_argument &e) {
-                FCITX_ERROR() << "action candidate index out of range";
-            }
+        const auto &bulk = list->toBulk();
+        if (scrollState_ == candidate_window::scroll_state_t::scrolling &&
+            !bulk) {
             return;
         }
         try {
-            const auto &candidate = list->candidate(index);
+            const auto &candidate =
+                scrollState_ == candidate_window::scroll_state_t::scrolling
+                    ? bulk->candidateFromAll(index)
+                    : list->candidate(index);
             if (actionableList->hasAction(candidate)) {
                 actionableList->triggerAction(candidate, id);
             }
