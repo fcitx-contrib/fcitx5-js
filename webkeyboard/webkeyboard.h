@@ -3,6 +3,7 @@
 #include <fcitx/addonfactory.h>
 #include <fcitx/addoninstance.h>
 #include <fcitx/addonmanager.h>
+#include <fcitx/candidatelist.h>
 #include <fcitx/instance.h>
 #include <nlohmann/json.hpp>
 
@@ -19,6 +20,21 @@ struct Candidate {
         j = json{{"label", c.label}, {"text", c.text}, {"comment", c.comment}};
     }
 };
+
+inline void to_json(json &j, const CandidateAction &action) {
+    j = json{{"id", action.id()},
+             {"text", action.text()},
+             {"checked", action.isChecked()},
+             {"checkable", action.isCheckable()},
+             {"separator", action.isSeparator()}};
+}
+
+inline void to_json(json &j, const std::span<const CandidateAction> &actions) {
+    j = json::array();
+    for (const auto &action : actions) {
+        j.push_back(action);
+    }
+}
 
 class WebKeyboard final : public VirtualKeyboardUserInterface {
   public:
@@ -49,7 +65,8 @@ class WebKeyboard final : public VirtualKeyboardUserInterface {
 
     void setCandidatesAsync(const std::vector<Candidate> &candidates,
                             int highlighted, int scrollState, bool scrollStart,
-                            bool scrollEnd, bool hasClientPreedit);
+                            bool scrollEnd, bool hasClientPreedit,
+                            const std::span<const CandidateAction> &actions);
     void expand();
 };
 
