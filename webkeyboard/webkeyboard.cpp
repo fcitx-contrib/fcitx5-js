@@ -58,7 +58,7 @@ void WebKeyboard::update(UserInterfaceComponent component,
             notify_main_async(R"JSON({"type":"CLEAR"})JSON");
         } else {
             setCandidatesAsync(candidates, highlighted, 0, false, false,
-                               !inputPanel.clientPreedit().empty());
+                               !inputPanel.clientPreedit().empty(), {});
         }
         break;
     }
@@ -68,10 +68,10 @@ void WebKeyboard::update(UserInterfaceComponent component,
     }
 }
 
-void WebKeyboard::setCandidatesAsync(const std::vector<Candidate> &candidates,
-                                     int highlighted, int scrollState,
-                                     bool scrollStart, bool scrollEnd,
-                                     bool hasClientPreedit) {
+void WebKeyboard::setCandidatesAsync(
+    const std::vector<Candidate> &candidates, int highlighted, int scrollState,
+    bool scrollStart, bool scrollEnd, bool hasClientPreedit,
+    const std::span<const CandidateAction> &actions) {
     auto j = json{{"type", "CANDIDATES"},
                   {"data",
                    {{"candidates", candidates},
@@ -79,7 +79,8 @@ void WebKeyboard::setCandidatesAsync(const std::vector<Candidate> &candidates,
                     {"scrollState", scrollState},
                     {"scrollStart", scrollStart},
                     {"scrollEnd", scrollEnd},
-                    {"hasClientPreedit", hasClientPreedit}}}};
+                    {"hasClientPreedit", hasClientPreedit},
+                    {"tabActions", actions}}}};
     notify_main_async(j.dump());
 }
 
@@ -112,8 +113,13 @@ void WebKeyboard::scroll(int start, int count) {
             break;
         }
     }
+    std::span<const CandidateAction> tabbedActions;
+    if (const auto &tabbed = list->toTabbed()) {
+        tabbedActions = tabbed->tabActions();
+    }
     setCandidatesAsync(candidates, start == 0 ? 0 : -1, 2, start == 0,
-                       endReached, !ic->inputPanel().clientPreedit().empty());
+                       endReached, !ic->inputPanel().clientPreedit().empty(),
+                       tabbedActions);
 }
 
 void WebKeyboard::updateStatusArea(InputContext *ic) {

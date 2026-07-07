@@ -159,6 +159,19 @@ EMSCRIPTEN_KEEPALIVE void activate_candidate_action(int index, int id) {
     }
 }
 
+EMSCRIPTEN_KEEPALIVE void activate_candidate_tab_action(int id) {
+    auto ic = instance->mostRecentInputContext();
+    const auto &list = ic->inputPanel().candidateList();
+    if (!list) {
+        return;
+    }
+    auto *tabbedList = list->toTabbed();
+    if (!tabbedList) {
+        return;
+    }
+    tabbedList->triggerTabAction(id);
+}
+
 EMSCRIPTEN_KEEPALIVE void scroll(int start, int count) {
     ui->scroll(start, count);
 }

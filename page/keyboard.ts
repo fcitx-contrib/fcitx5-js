@@ -355,6 +355,8 @@ export function createKeyboard() {
           return backspaceSlide(event.data)
         case 'CANDIDATE_ACTION':
           return fcitx.Module.ccall('activate_candidate_action', 'void', ['number', 'number'], [event.data.index, event.data.id])
+        case 'CANDIDATE_TAB_ACTION':
+          return fcitx.Module.ccall('activate_candidate_tab_action', 'void', ['number'], [event.data])
         case 'COLLAPSE':
           return getInputElement()?.blur()
         case 'COMMIT':
