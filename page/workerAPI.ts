@@ -28,7 +28,7 @@ function ensureWorker() {
   if (worker) {
     return
   }
-  worker = new Worker(globalThis.fcitx.Module.locateFile('worker.js'), { type: 'module' })
+  worker = new Worker(globalThis.fcitx.Module.locateFile('worker.js', ''), { type: 'module' })
   worker.onmessage = ({ data }: MessageEvent<MessageData>) => {
     switch (data.type) {
       case 'MKDIR':

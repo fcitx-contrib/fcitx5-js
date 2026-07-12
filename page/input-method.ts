@@ -1,7 +1,7 @@
 import Module from './module'
 
 export function setCurrentInputMethod(im: string) {
-  return Module.ccall('set_current_input_method', 'void', ['string'], [im])
+  return Module.ccall('set_current_input_method', null, ['string'], [im])
 }
 
 export function currentInputMethod() {
@@ -13,7 +13,7 @@ export function getInputMethods() {
 }
 
 export function setInputMethods(ims: string[]) {
-  return Module.ccall('set_input_methods', 'void', ['string'], [JSON.stringify(ims)])
+  return Module.ccall('set_input_methods', null, ['string'], [JSON.stringify(ims)])
 }
 
 export function getAllInputMethods() {

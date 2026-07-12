@@ -350,13 +350,13 @@ export function createKeyboard() {
     sendEvent(event) {
       switch (event.type) {
         case 'ASK_CANDIDATE_ACTIONS':
-          return fcitx.Module.ccall('ask_candidate_actions', 'void', ['number'], [event.data])
+          return fcitx.Module.ccall('ask_candidate_actions', null, ['number'], [event.data])
         case 'BACKSPACE_SLIDE':
           return backspaceSlide(event.data)
         case 'CANDIDATE_ACTION':
-          return fcitx.Module.ccall('activate_candidate_action', 'void', ['number', 'number'], [event.data.index, event.data.id])
+          return fcitx.Module.ccall('activate_candidate_action', null, ['number', 'number'], [event.data.index, event.data.id])
         case 'CANDIDATE_TAB_ACTION':
-          return fcitx.Module.ccall('activate_candidate_tab_action', 'void', ['number'], [event.data])
+          return fcitx.Module.ccall('activate_candidate_tab_action', null, ['number'], [event.data])
         case 'COLLAPSE':
           return getInputElement()?.blur()
         case 'COMMIT':
@@ -376,7 +376,7 @@ export function createKeyboard() {
           break
         }
         case 'GLOBE':
-          return fcitx.Module.ccall('toggle', 'void', [], [])
+          return fcitx.Module.ccall('toggle', null, [], [])
         case 'KEY_DOWN':
         case 'KEY_UP':
           if (!processKey(event.data.key, event.data.code, 1 << 29 /* KeyState::Virtual */, event.type === 'KEY_UP')) {
@@ -388,7 +388,7 @@ export function createKeyboard() {
         case 'REDO':
           return redo()
         case 'SCROLL':
-          return fcitx.Module.ccall('scroll', 'void', ['number', 'number'], [event.data.start, event.data.count])
+          return fcitx.Module.ccall('scroll', null, ['number', 'number'], [event.data.start, event.data.count])
         case 'SELECT': {
           const input = getInputElement()
           if (input) {
@@ -407,7 +407,7 @@ export function createKeyboard() {
           break
         }
         case 'SELECT_CANDIDATE':
-          return fcitx.Module.ccall('select_candidate', 'void', ['number'], [event.data])
+          return fcitx.Module.ccall('select_candidate', null, ['number'], [event.data])
         case 'SET_INPUT_METHOD':
           return fcitx.setCurrentInputMethod(event.data)
         case 'STATUS_AREA_ACTION':

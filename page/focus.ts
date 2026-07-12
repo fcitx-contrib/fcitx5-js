@@ -24,7 +24,7 @@ export function clickPanel() {
 }
 
 export function resetInput() {
-  Module.ccall('reset_input', 'void', [], [])
+  Module.ccall('reset_input', null, [], [])
 }
 
 export function isInputElement(element: Element | null): element is Input {
@@ -72,7 +72,7 @@ export function focus() {
   input.addEventListener('compositionstart', resetInput)
   originalSpellCheck = input.spellcheck
   const isPassword = input.tagName === 'INPUT' && input.type === 'password'
-  Module.ccall('focus_in', 'void', ['bool'], [isPassword])
+  Module.ccall('focus_in', null, ['boolean'], [isPassword])
   sendSurroundingText()
   input.addEventListener('input', sendSurroundingText)
   input.addEventListener('selectionchange', sendSurroundingText)
@@ -108,7 +108,7 @@ export function blur() {
   resizeObserver?.unobserve(input)
   input.spellcheck = originalSpellCheck
   input = null
-  Module.ccall('focus_out', 'void', [], [])
+  Module.ccall('focus_out', null, [], [])
   resetPreedit()
 }
 

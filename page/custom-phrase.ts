@@ -6,5 +6,5 @@ export function getCustomPhrases(path: string) {
 }
 
 export function setCustomPhrases(path: string, phrases: CustomPhrase[]) {
-  Module.ccall('customphrase_set', 'void', ['string', 'string'], [path, JSON.stringify(phrases)])
+  Module.ccall('customphrase_set', null, ['string', 'string'], [path, JSON.stringify(phrases)])
 }

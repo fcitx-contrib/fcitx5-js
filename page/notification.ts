@@ -12,5 +12,5 @@ export function notify(name: string, icon: string, body: string, timeout: number
 }
 
 export function activateNotificationAction(action: string, tipId?: string) {
-  Module.ccall('notification_action', 'void', ['string', 'string'], [action, tipId ?? ''])
+  Module.ccall('notification_action', null, ['string', 'string'], [action, tipId ?? ''])
 }

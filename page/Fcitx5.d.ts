@@ -1,3 +1,5 @@
+/// <reference types="emscripten" />
+
 import type * as UZIP from 'uzip'
 
 type Child = ({
@@ -36,32 +38,10 @@ interface AddonCategory {
   name: string
 }
 
-interface FS {
-  isDir: (mode: number) => boolean
-  lstat: (path: string) => { mode: number }
-  mkdir: (path: string) => void
-  mkdirTree: (path: string) => void
-  mount: (type: any, opts: { autoPersist?: boolean }, mountpoint: string) => void
-  readFile: {
-    (path: string): Uint8Array
-    (path: string, options: { encoding: 'utf8' }): string
-  }
-  readdir: (path: string) => string[]
-  rmdir: (path: string) => void
-  symlink: (target: string, path: string) => void
-  syncfs: (populate: boolean, callback: (err: any) => void) => void
-  unlink: (path: string) => void
-  writeFile: (path: string, data: Uint8Array | string) => void
-}
-
-type WASM_TYPE = 'void' | 'bool' | 'number' | 'string'
-
-export interface EM_MODULE {
-  ccall: (name: string, retType: WASM_TYPE, argsType: WASM_TYPE[], args: any[]) => any
-  locateFile: (file: string) => string
-  onRuntimeInitialized: () => void
-  FS: FS
-  IDBFS: any
+export interface EM_MODULE extends EmscriptenModule {
+  ccall: typeof ccall
+  FS: typeof FS
+  IDBFS: typeof IDBFS & { onAutoPersistStateChanged?: (active: boolean) => void }
 }
 
 export type SyncCallback = (path: string) => void
