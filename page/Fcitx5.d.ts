@@ -40,7 +40,6 @@ interface AddonCategory {
 
 export interface EM_MODULE extends EmscriptenModule {
   ccall: typeof ccall
-  locateFile: (file: string, scriptDirectory?: string) => string
   FS: typeof FS
   IDBFS: typeof IDBFS & { onAutoPersistStateChanged?: (active: boolean) => void }
 }
