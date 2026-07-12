@@ -19,6 +19,9 @@
     "test": "playwright test"
   },
   "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "@types/emscripten": "^1.41.5"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^9.0.0",
     "@playwright/test": "1.60.0",

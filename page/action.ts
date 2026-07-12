@@ -5,5 +5,5 @@ export function getMenuActions() {
 }
 
 export function activateMenuAction(id: number) {
-  return Module.ccall('activate_menu_action', 'void', ['number'], [id])
+  return Module.ccall('activate_menu_action', null, ['number'], [id])
 }

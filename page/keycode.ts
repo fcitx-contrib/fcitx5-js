@@ -22,7 +22,7 @@ function extract(event: KeyData): [string, string, number] | undefined {
 }
 
 export function processKey(key: string, code: string, modifiers: number, isRelease: boolean): boolean {
-  return Module.ccall('process_key', 'bool', ['string', 'string', 'number', 'bool'], [key, code, modifiers, isRelease])
+  return Module.ccall('process_key', 'boolean', ['string', 'string', 'number', 'boolean'], [key, code, modifiers, isRelease])
 }
 
 export function keyEvent(event: KeyData): boolean {
@@ -41,7 +41,7 @@ export function keyEvent(event: KeyData): boolean {
     if (!isRelease && ['c', 'x'].includes(extracted[0]) && ((isApple && extracted[2] === (1 << 6)) || (!isApple && extracted[2] === (1 << 2)))) {
       const selectedText = input.value.substring(input.selectionStart ?? 0, input.selectionEnd ?? 0)
       if (selectedText) {
-        Module.ccall('write_clipboard', 'void', ['string'], [selectedText])
+        Module.ccall('write_clipboard', null, ['string'], [selectedText])
       }
     }
   }

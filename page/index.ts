@@ -82,7 +82,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     if (globalThis.fcitx.runtime === WEB && hasTouch) {
       createKeyboard() // Must be called before init as webkeyboard will manipulate DOM.
     }
-    Module.ccall('init', 'void', ['string', 'number', 'bool'], [getLocale(), globalThis.fcitx.runtime, hasTouch])
+    Module.ccall('init', null, ['string', 'number', 'boolean'], [getLocale(), globalThis.fcitx.runtime, hasTouch])
     if (globalThis.fcitx.runtime !== WEB) {
       return { keyEvent }
     }

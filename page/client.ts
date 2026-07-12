@@ -52,7 +52,7 @@ export function sendSurroundingText() {
   lastCursor = cursor
   lastAnchor = anchor
 
-  Module.ccall('set_surrounding_text', 'void', ['string', 'number', 'number'], [text, cursor, anchor])
+  Module.ccall('set_surrounding_text', null, ['string', 'number', 'number'], [text, cursor, anchor])
 }
 
 // compared with macOS pinyin
