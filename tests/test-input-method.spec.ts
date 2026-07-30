@@ -20,7 +20,7 @@ DefaultIM=keyboard-th
 # Name
 Name=keyboard-th
 # Layout
-Layout=
+# Layout=
 
 [GroupOrder]
 0=Default
