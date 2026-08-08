@@ -172,15 +172,15 @@ msgstr "Indikator-Textfarbe"
 
 #: webpanel/webpanel.h:135 webpanel/webpanel.h:190
 msgid "Preedit color pre-caret"
-msgstr "Voredigations-Farbe vor Caret"
+msgstr "Preedit-Farbe vor Caret"
 
 #: webpanel/webpanel.h:138 webpanel/webpanel.h:193
 msgid "Preedit caret color"
-msgstr "Voredigations-Caret-Farbe"
+msgstr "Preedit-Caret-Farbe"
 
 #: webpanel/webpanel.h:141 webpanel/webpanel.h:196
 msgid "Preedit color post-caret"
-msgstr "Voredigations-Farbe nach Caret"
+msgstr "Preedit-Farbe nach Caret"
 
 #: webpanel/webpanel.h:143 webpanel/webpanel.h:198
 msgid "Border color"
@@ -356,15 +356,15 @@ msgstr "Kommentar-Schnittstärke"
 
 #: webpanel/webpanel.h:304
 msgid "Preedit font family"
-msgstr "Voredigations-Schriftart"
+msgstr "Preedit-Schriftart"
 
 #: webpanel/webpanel.h:306
 msgid "Preedit font size"
-msgstr "Voredigations-Schriftgröße"
+msgstr "Preedit-Schriftgröße"
 
 #: webpanel/webpanel.h:309
 msgid "Preedit font weight"
-msgstr "Voredigations-Schnittstärke"
+msgstr "Preedit-Schnittstärke"
 
 #: webpanel/webpanel.h:311
 msgid "User font dir"

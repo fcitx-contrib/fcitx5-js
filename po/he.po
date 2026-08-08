@@ -68,7 +68,7 @@ msgstr "משלש"
 
 #: webpanel/webpanel.h:33
 msgid "Blink"
-msgstr "צלילה"
+msgstr "הבהוב"
 
 #: webpanel/webpanel.h:33
 msgid "Static"
@@ -84,7 +84,7 @@ msgstr "סרגל"
 
 #: webpanel/webpanel.h:41
 msgid "Move"
-msgstr "העתקה"
+msgstr "הזזה"
 
 #: webpanel/webpanel.h:42
 msgid "Add"

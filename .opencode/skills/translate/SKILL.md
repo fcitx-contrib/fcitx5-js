@@ -153,6 +153,7 @@ Use these translations consistently:
 | custom phrase | 自定义词组 | 自訂詞組 | пользовательская фраза |
 | plugin | 插件 | 外掛程式 | плагин |
 | shortcut | 快捷键 | 快捷鍵 | сочетание клавиш |
+| preedit | 预编辑 | 預編輯 | предварительного редактирования |
 
 ## General Translation Rules
 
@@ -161,6 +162,7 @@ Use these translations consistently:
 3. **Respect platform conventions** — Use terminology that the target platform's users would expect.
 4. **No machine-translation artifacts** — Avoid overly formal or stilted phrasing. Translations should read naturally.
 5. **Do not translate** — brand names, file paths, command names, technical identifiers, or code. Also keep well-known UI/design terms in their original form if translating them would cause confusion.
+   - **Never invent words.** If a target language has no natural translation for a technical IME term such as *preedit*, keep the English term (e.g. German: use "Preedit", **not** a made-up word like "Voredigations"). Reuse the translations already established in `po/<locale>.po` for consistency; when a locale's term is missing, check the Terminology Reference above and the existing locale files before translating.
 6. **Preserve format specifiers** — all `%d`, `%s`, `%1$d`, positional specifiers etc. must appear in the translation in the same order.
 7. **Punctuation** — Use the punctuation conventions of the target language (e.g. Chinese full-width ？。、 vs English half-width ?.).
 8. **Reuse sibling translations** — For msgids that match `../fcitx5-macos/po/<lang>.po`, copy the existing `msgstr` rather than retranslating.
