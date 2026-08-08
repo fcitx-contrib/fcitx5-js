@@ -10,3 +10,5 @@ preview/index.js
 preview/index.js.map
 test-results
 *.tsbuildinfo
+*~
+*.pot
