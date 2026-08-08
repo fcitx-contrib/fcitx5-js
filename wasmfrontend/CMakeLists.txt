@@ -1,5 +1,3 @@
-add_definitions(-DFCITX_GETTEXT_DOMAIN=\"fcitx5-wasm\")
-
 add_library(wasmfrontend STATIC wasmfrontend.cpp)
 target_link_libraries(wasmfrontend Fcitx5::Core)
 target_include_directories(wasmfrontend PUBLIC

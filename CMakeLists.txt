@@ -69,6 +69,7 @@ set(XKEYBOARDCONFIG_XKBBASE "${CMAKE_INSTALL_PREFIX}/share/xkeyboard-config-2")
 set(XKEYBOARDCONFIG_DATADIR "${CMAKE_INSTALL_PREFIX}/share")
 
 set(CMAKE_INSTALL_LIBDATADIR "${CMAKE_INSTALL_PREFIX}/lib")
+set(FCITX_INSTALL_LOCALEDIR "${CMAKE_INSTALL_PREFIX}/share/locale")
 set(EVENT_LOOP_BACKEND "none" CACHE STRING "")
 add_subdirectory(fcitx5)
 
@@ -94,15 +95,22 @@ endif()
 list(TRANSFORM FMT_TARGETS APPEND ".conf.in-fmt")
 
 file(GLOB JS_SOURCES CONFIGURE_DEPENDS "page/*")
+file(GLOB PO_SOURCES CONFIGURE_DEPENDS "po/*.po")
 add_custom_command(
     OUTPUT ${DUMMY_CPP}
     COMMAND pnpm run build && ./scripts/install.sh
     DEPENDS ${JS_SOURCES} fcitx5-keyboard-web/dist/index.js fcitx5-webview/dist/index.js
         clipboard imselector spell quickphrase unicode
-        ${FMT_TARGETS} fcitx5-translation
+        ${FMT_TARGETS} ${PO_SOURCES} fcitx5-translation fcitx5-js-translation
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Generating the pre.js, index.js and installing shared libraries"
 )
 add_custom_target(NonCppDependencies ALL DEPENDS ${DUMMY_CPP})
 
 add_subdirectory(src)
+
+set(FCITX5_AID_TARGETS webpanel)
+foreach(AID_TARGET IN LISTS FCITX5_AID_TARGETS)
+    target_compile_definitions(${AID_TARGET} PRIVATE -DFCITX_GETTEXT_DOMAIN=\"fcitx5-js\")
+endforeach()
+add_subdirectory(po)
