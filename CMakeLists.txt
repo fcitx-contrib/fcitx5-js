@@ -71,6 +71,13 @@ set(XKEYBOARDCONFIG_DATADIR "${CMAKE_INSTALL_PREFIX}/share")
 set(CMAKE_INSTALL_LIBDATADIR "${CMAKE_INSTALL_PREFIX}/lib")
 set(FCITX_INSTALL_LOCALEDIR "${CMAKE_INSTALL_PREFIX}/share/locale")
 set(EVENT_LOOP_BACKEND "none" CACHE STRING "")
+
+# Workaround duplicated libxkbcommon.a for ECM 6.29.0 (fa26209).
+find_package(ECM REQUIRED 1.0.0)
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/fcitx5/cmake" ${ECM_MODULE_PATH} ${CMAKE_MODULE_PATH})
+find_package(XKBCommon REQUIRED COMPONENTS XKBCommon)
+set_property(TARGET XKBCommon::XKBCommon PROPERTY INTERFACE_LINK_LIBRARIES "")
+
 add_subdirectory(fcitx5)
 
 # Disable multiple so and symlink.
