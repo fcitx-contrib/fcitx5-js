@@ -20,10 +20,6 @@ add_compile_options(-fPIC -fwasm-exceptions -fexperimental-library)
 option(RIME_ONLY "Disable components unused by rime" OFF)
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
 
-if (RIME_ONLY)
-    option(ENABLE_KEYBOARD "" OFF)
-endif()
-
 if (ENABLE_ASAN)
     # Very slow. Not recommended to use with chinese-addons.
     add_compile_options(-fsanitize=address)
@@ -44,6 +40,18 @@ list(APPEND CMAKE_FIND_ROOT_PATH "${FIND_ROOT_PATH}")
 
 set(ENV{PKG_CONFIG_SYSROOT_DIR} "${PROJECT_BINARY_DIR}/sysroot")
 set(ENV{PKG_CONFIG_PATH} "${PREBUILDER_LIB_DIR}/pkgconfig:${PREBUILDER_SHARE_DIR}/pkgconfig")
+
+if (RIME_ONLY)
+    option(ENABLE_KEYBOARD "" OFF)
+else()
+    option(ENABLE_KEYBOARD "" ON)
+
+    # Workaround duplicated libxkbcommon.a for ECM 6.29.0 (fa26209).
+    find_package(ECM REQUIRED 6.29.0 NO_MODULE)
+    set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/fcitx5/cmake" ${ECM_MODULE_PATH} ${CMAKE_MODULE_PATH})
+    find_package(XKBCommon REQUIRED COMPONENTS XKBCommon)
+    set_property(TARGET XKBCommon::XKBCommon PROPERTY INTERFACE_LINK_LIBRARIES "")
+endif()
 
 find_package(nlohmann_json)
 
@@ -71,6 +79,7 @@ set(XKEYBOARDCONFIG_DATADIR "${CMAKE_INSTALL_PREFIX}/share")
 set(CMAKE_INSTALL_LIBDATADIR "${CMAKE_INSTALL_PREFIX}/lib")
 set(FCITX_INSTALL_LOCALEDIR "${CMAKE_INSTALL_PREFIX}/share/locale")
 set(EVENT_LOOP_BACKEND "none" CACHE STRING "")
+
 add_subdirectory(fcitx5)
 
 # Disable multiple so and symlink.
