@@ -23,15 +23,18 @@ void WebKeyboard::update(UserInterfaceComponent component,
         int highlighted = -1;
         std::vector<Candidate> candidates;
         const InputPanel &inputPanel = inputContext->inputPanel();
-        auto auxUp = instance_->outputFilter(inputContext, inputPanel.auxUp())
-                         .toString();
-        auto preedit =
-            instance_->outputFilter(inputContext, inputPanel.preedit())
-                .toString();
+        Text preedit, auxUp;
+        if (!inputPanel.empty()) {
+            preedit =
+                instance_->outputFilter(inputContext, inputPanel.preedit());
+            auxUp = instance_->outputFilter(inputContext, inputPanel.auxUp());
+        } else if (!inputPanel.overlayMessage().empty()) {
+            auxUp = inputPanel.overlayMessage();
+        }
         notify_main_async(json{{"type", "PREEDIT"},
                                {"data",
-                                {{"auxUp", auxUp},
-                                 {"preedit", preedit},
+                                {{"auxUp", auxUp.toString()},
+                                 {"preedit", preedit.toString()},
                                  {"caret", inputPanel.preedit().cursor()}}}}
                               .dump());
         if (const auto &list = inputPanel.candidateList()) {
