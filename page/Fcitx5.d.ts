@@ -112,6 +112,9 @@ export interface FCITX {
   cli: (command: string, ...args: string[]) => number
   getCustomPhrases: (path: string) => CustomPhrase[]
   setCustomPhrases: (path: string, phrases: CustomPhrase[]) => void
+  // Whether the candidate window is used instead of the virtual keyboard.
+  // On touch devices the virtual keyboard is used, so no candidate window.
+  hasCandidateWindow: () => boolean
   lsDir: (path: string) => string[]
   Module: EM_MODULE
   UZIP: typeof UZIP

@@ -168,6 +168,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
   distribution: 'fcitx5-js',
   getCustomPhrases,
   setCustomPhrases,
+  hasCandidateWindow: () => globalThis.fcitx.runtime === WEB && !hasTouch,
   // Private field that indicates whether spawn a worker in current environment.
   // On f5o main thread set true to enable worker. On worker thread this is always false.
   useWorker: false,
