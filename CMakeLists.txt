@@ -46,11 +46,12 @@ if (RIME_ONLY)
 else()
     option(ENABLE_KEYBOARD "" ON)
 
-    # Workaround duplicated libxkbcommon.a for ECM 6.29.0 (fa26209).
-    find_package(ECM REQUIRED 6.29.0 NO_MODULE)
-    set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/fcitx5/cmake" ${ECM_MODULE_PATH} ${CMAKE_MODULE_PATH})
-    find_package(XKBCommon REQUIRED COMPONENTS XKBCommon)
-    set_property(TARGET XKBCommon::XKBCommon PROPERTY INTERFACE_LINK_LIBRARIES "")
+    # Workaround duplicated libxkbcommon.a for ECM 6.27.0 (fa26209).
+    add_library(XKBCommon::XKBCommon UNKNOWN IMPORTED)
+    set_target_properties(XKBCommon::XKBCommon PROPERTIES
+        IMPORTED_LOCATION "${PREBUILDER_LIB_DIR}/libxkbcommon.a"
+        INTERFACE_INCLUDE_DIRECTORIES "${PREBUILDER_INCLUDE_DIR}"
+    )
 endif()
 
 find_package(nlohmann_json)
