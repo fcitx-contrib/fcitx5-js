@@ -7,6 +7,7 @@
 #include "isocodes.h"
 #include "keycode.h"
 #include <emscripten.h>
+#include <fcitx-config/option.h>
 #include <fcitx-utils/event.h>
 #include <fcitx-utils/i18n.h>
 #include <fcitx-utils/standardpaths.h>
@@ -281,6 +282,10 @@ EMSCRIPTEN_KEEPALIVE void reload(const char *locale, Runtime runtime,
         }
     }
     instance->inputMethodManager().load();
+}
+
+EMSCRIPTEN_KEEPALIVE bool is_regex_valid(const char *pattern) {
+    return fcitx::RegexConstrain().check(pattern);
 }
 }
 } // namespace fcitx
