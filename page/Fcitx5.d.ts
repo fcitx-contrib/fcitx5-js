@@ -91,6 +91,7 @@ export interface FCITX {
   setConfig: (uri: string, json: object) => void
   getAddons: () => AddonCategory[]
   jsKeyToFcitxString: (event: KeyboardEvent) => string
+  fcitxStringToLocalizedString: (key: string) => string
   getMenuActions: () => MenuAction[]
   activateMenuAction: (id: number) => void
   installPlugin: (buffer: ArrayBuffer) => string

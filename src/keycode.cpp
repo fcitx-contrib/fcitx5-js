@@ -315,5 +315,12 @@ js_key_to_fcitx_string(const char *key, const char *code, uint32_t modifiers) {
     ret = js_key_to_fcitx_key(key, code, modifiers).normalize().toString();
     return ret.c_str();
 }
+
+EMSCRIPTEN_KEEPALIVE const char *
+fcitx_string_to_localized_string(const char *key) noexcept {
+    static std::string ret;
+    ret = Key{key}.toString(KeyStringFormat::Localized);
+    return ret.c_str();
+}
 }
 } // namespace fcitx
