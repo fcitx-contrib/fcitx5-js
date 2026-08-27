@@ -16,3 +16,10 @@ test('Language name', async ({ page }) => {
   const name = await page.evaluate(() => fcitx.getLanguageName('ami'))
   expect(name).toEqual('阿美语')
 })
+
+test('Key name', async ({ page }) => {
+  await init(page)
+
+  const name = await page.evaluate(() => fcitx.fcitxStringToLocalizedString('Control+Insert'))
+  expect(name).toEqual('Control+插入')
+})

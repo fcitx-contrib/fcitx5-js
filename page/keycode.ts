@@ -61,3 +61,7 @@ export function jsKeyToFcitxString(event: KeyboardEvent) {
   }
   return Module.ccall('js_key_to_fcitx_string', 'string', ['string', 'string', 'number'], extracted)
 }
+
+export function fcitxStringToLocalizedString(key: string): string {
+  return Module.ccall('fcitx_string_to_localized_string', 'string', ['string'], [key])
+}
