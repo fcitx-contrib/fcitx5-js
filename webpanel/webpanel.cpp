@@ -1,4 +1,5 @@
 #include <emscripten.h>
+#include <fcitx/candidatelist.h>
 #include <fcitx/inputpanel.h>
 #include <nlohmann/json.hpp>
 
@@ -125,6 +126,16 @@ WebPanel::WebPanel(Instance *instance)
         } catch (const std::invalid_argument &e) {
             FCITX_ERROR() << "action candidate index out of range";
         }
+    });
+    window_->set_tab_action_callback([this](int id) {
+        auto ic = instance_->mostRecentInputContext();
+        const auto &list = ic->inputPanel().candidateList();
+        if (!list)
+            return;
+        auto *tabbedList = list->toTabbed();
+        if (!tabbedList)
+            return;
+        tabbedList->triggerTabAction(id);
     });
     eventHandler_ = instance_->watchEvent(
         EventType::InputContextKeyEvent, EventWatcherPhase::PreInputMethod,
@@ -330,6 +341,7 @@ void WebPanel::update(UserInterfaceComponent component,
         bool hasPrev = false;
         bool hasNext = false;
         std::vector<candidate_window::Candidate> candidates;
+        std::vector<candidate_window::CandidateAction> tabActions;
         int size = 0;
         candidate_window::layout_t layout = config_.typography->layout.value();
         candidate_window::writing_mode_t writingMode =
@@ -421,6 +433,14 @@ void WebPanel::update(UserInterfaceComponent component,
                          .toString(),
                      actions, candidate.spaceBetweenComment()});
             }
+            // Tab actions
+            if (const auto &tabbed = list->toTabbed()) {
+                for (const auto &action : tabbed->tabActions()) {
+                    tabActions.push_back(
+                        {action.id(), action.text(), action.isChecked(),
+                         action.isCheckable(), action.isSeparator()});
+                }
+            }
             highlighted = list->cursorIndex();
         } else {
             scrollState_ = candidate_window::scroll_state_t::none;
@@ -431,6 +451,7 @@ void WebPanel::update(UserInterfaceComponent component,
         bool candidatesEmpty = candidates.empty();
         // Must be called after set_layout and set_writing_mode so that proper
         // states are read after set.
+        window_->set_tab_actions(std::move(tabActions));
         window_->set_candidates(std::move(candidates), highlighted,
                                 scrollState_, false, false);
         updatePanelShowFlags(!candidatesEmpty, PanelShowFlag::HasCandidates);
@@ -514,6 +535,15 @@ void WebPanel::scroll(int start, int count) {
         }
     }
     scrollState_ = candidate_window::scroll_state_t::scrolling;
+    std::vector<candidate_window::CandidateAction> tabActions;
+    if (const auto &tabbed = list->toTabbed()) {
+        for (const auto &action : tabbed->tabActions()) {
+            tabActions.push_back({action.id(), action.text(),
+                                  action.isChecked(), action.isCheckable(),
+                                  action.isSeparator()});
+        }
+    }
+    window_->set_tab_actions(std::move(tabActions));
     window_->set_candidates(std::move(candidates), -1, scrollState_, start == 0,
                             endReached);
     updateClient(ic);
