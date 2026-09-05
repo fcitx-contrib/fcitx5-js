@@ -1,0 +1,509 @@
+# Swedish translations for fcitx5-js package.
+# Copyright (C) 2026 fcitx5-js's contributors
+# This file is distributed under the same license as the fcitx5-js package.
+msgid ""
+msgstr ""
+"Project-Id-Version: fcitx 5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-05 00:06-0400\n"
+"PO-Revision-Date: 2026-09-05 00:06-0400\n"
+"Last-Translator: Codex <noreply@openai.com>\n"
+"Language-Team: Swedish\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: webpanel/webpanel.h:17 webpanel/webpanel.h:25
+msgid "System"
+msgstr "System"
+
+#: webpanel/webpanel.h:17
+msgid "Light"
+msgstr "Ljust"
+
+#: webpanel/webpanel.h:17
+msgid "Dark"
+msgstr "Mörkt"
+
+#: webpanel/webpanel.h:18
+msgid "Horizontal"
+msgstr "Horisontell"
+
+#: webpanel/webpanel.h:18
+msgid "Vertical"
+msgstr "Vertikal"
+
+#: webpanel/webpanel.h:19
+msgid "Horizontal top-bottom"
+msgstr "Horisontell uppifrån och ned"
+
+#: webpanel/webpanel.h:20
+msgid "Vertical right-left"
+msgstr "Vertikal från höger till vänster"
+
+#: webpanel/webpanel.h:21
+msgid "Vertical left-right"
+msgstr "Vertikal från vänster till höger"
+
+#: webpanel/webpanel.h:25
+msgid "macOS 26"
+msgstr "macOS 26"
+
+#: webpanel/webpanel.h:26
+msgid "macOS 15"
+msgstr "macOS 15"
+
+#: webpanel/webpanel.h:29 webpanel/webpanel.h:37 webpanel/webpanel.h:41
+msgid "None"
+msgstr "Ingen"
+
+#: webpanel/webpanel.h:29
+msgid "Arrow"
+msgstr "Pil"
+
+#: webpanel/webpanel.h:30
+msgid "Triangle"
+msgstr "Triangel"
+
+#: webpanel/webpanel.h:33
+msgid "Blink"
+msgstr "Blinkande"
+
+#: webpanel/webpanel.h:33
+msgid "Static"
+msgstr "Statisk"
+
+#: webpanel/webpanel.h:34 webpanel/webpanel.h:38 webpanel/webpanel.h:318
+msgid "Text"
+msgstr "Text"
+
+#: webpanel/webpanel.h:37
+msgid "Bar"
+msgstr "Stapel"
+
+#: webpanel/webpanel.h:41
+msgid "Move"
+msgstr "Flytta"
+
+#: webpanel/webpanel.h:42
+msgid "Add"
+msgstr "Lägg till"
+
+#: webpanel/webpanel.h:84
+msgid "Follow caret"
+msgstr "Följ textmarkören"
+
+#: webpanel/webpanel.h:87
+msgid "Theme"
+msgstr "Tema"
+
+#: webpanel/webpanel.h:89
+msgid "Default theme"
+msgstr "Standardtema"
+
+#: webpanel/webpanel.h:91
+msgid "User theme"
+msgstr "Användartema"
+
+#: webpanel/webpanel.h:93
+msgid "Export current theme"
+msgstr "Exportera aktuellt tema"
+
+#: webpanel/webpanel.h:97 webpanel/webpanel.h:150 webpanel/webpanel.h:331
+msgid "Override default"
+msgstr "Åsidosätt standard"
+
+#: webpanel/webpanel.h:98 webpanel/webpanel.h:153
+msgid "Highlight color"
+msgstr "Framhävningsfärg"
+
+#: webpanel/webpanel.h:101 webpanel/webpanel.h:156
+msgid "Highlight color on hover"
+msgstr "Framhävningsfärg vid hovring"
+
+#: webpanel/webpanel.h:104 webpanel/webpanel.h:159
+msgid "Highlight text color"
+msgstr "Framhävd textfärg"
+
+#: webpanel/webpanel.h:107 webpanel/webpanel.h:162
+msgid "Highlight text color on press"
+msgstr "Framhävd textfärg vid tryck"
+
+#: webpanel/webpanel.h:110 webpanel/webpanel.h:165
+msgid "Highlight label color"
+msgstr "Framhävd etikettfärg"
+
+#: webpanel/webpanel.h:113 webpanel/webpanel.h:168
+msgid "Highlight comment color"
+msgstr "Framhävd kommentarsfärg"
+
+#: webpanel/webpanel.h:116 webpanel/webpanel.h:171
+msgid "Highlight mark color"
+msgstr "Färg för framhävd markering"
+
+#: webpanel/webpanel.h:118 webpanel/webpanel.h:173
+msgid "Panel color"
+msgstr "Panelfärg"
+
+#: webpanel/webpanel.h:120 webpanel/webpanel.h:175
+msgid "Text color"
+msgstr "Textfärg"
+
+#: webpanel/webpanel.h:122 webpanel/webpanel.h:177
+msgid "Label color"
+msgstr "Etikettfärg"
+
+#: webpanel/webpanel.h:124 webpanel/webpanel.h:179
+msgid "Comment color"
+msgstr "Kommentarsfärg"
+
+#: webpanel/webpanel.h:127 webpanel/webpanel.h:182
+msgid "Paging button color"
+msgstr "Färg på sidbläddringsknapp"
+
+#: webpanel/webpanel.h:130 webpanel/webpanel.h:185
+msgid "Disabled paging button color"
+msgstr "Färg på inaktiverad sidbläddringsknapp"
+
+#: webpanel/webpanel.h:132 webpanel/webpanel.h:187
+msgid "Indicator text color"
+msgstr "Indikatortextfärg"
+
+#: webpanel/webpanel.h:135 webpanel/webpanel.h:190
+msgid "Preedit color pre-caret"
+msgstr "Preedit-färg före textmarkören"
+
+#: webpanel/webpanel.h:138 webpanel/webpanel.h:193
+msgid "Preedit caret color"
+msgstr "Preedit-textmarkörens färg"
+
+#: webpanel/webpanel.h:141 webpanel/webpanel.h:196
+msgid "Preedit color post-caret"
+msgstr "Preedit-färg efter textmarkören"
+
+#: webpanel/webpanel.h:143 webpanel/webpanel.h:198
+msgid "Border color"
+msgstr "Kantfärg"
+
+#: webpanel/webpanel.h:145 webpanel/webpanel.h:200
+msgid "Divider color"
+msgstr "Avdelarfärg"
+
+#: webpanel/webpanel.h:152
+msgid "Same with light mode"
+msgstr "Samma som ljust läge"
+
+#: webpanel/webpanel.h:205
+msgid "Enable scroll"
+msgstr "Aktivera rullning"
+
+#: webpanel/webpanel.h:206
+msgid "Auto expand"
+msgstr "Expandera automatiskt"
+
+#: webpanel/webpanel.h:207
+msgid "Show scroll bar"
+msgstr "Visa rullningslist"
+
+#: webpanel/webpanel.h:209
+msgid "Animation"
+msgstr "Animering"
+
+#: webpanel/webpanel.h:211
+msgid "Max row count"
+msgstr "Högsta antal rader"
+
+#: webpanel/webpanel.h:213
+msgid "Max column count"
+msgstr "Högsta antal kolumner"
+
+#: webpanel/webpanel.h:215
+msgid "Expand"
+msgstr "Expandera"
+
+#: webpanel/webpanel.h:217
+msgid "Collapse"
+msgstr "Fäll ihop"
+
+#: webpanel/webpanel.h:219
+msgid "Up"
+msgstr "Upp"
+
+#: webpanel/webpanel.h:221
+msgid "Down"
+msgstr "Ned"
+
+#: webpanel/webpanel.h:222
+msgid "Left"
+msgstr "Vänster"
+
+#: webpanel/webpanel.h:223
+msgid "Right"
+msgstr "Höger"
+
+#: webpanel/webpanel.h:225
+msgid "Row start"
+msgstr "Radens början"
+
+#: webpanel/webpanel.h:226
+msgid "Row end"
+msgstr "Radens slut"
+
+#: webpanel/webpanel.h:228
+msgid "Page up"
+msgstr "Sida upp"
+
+#: webpanel/webpanel.h:230
+msgid "Page down"
+msgstr "Sida ned"
+
+#: webpanel/webpanel.h:231
+msgid "Commit"
+msgstr "Bekräfta"
+
+#: webpanel/webpanel.h:233
+msgid "Select candidate"
+msgstr "Välj kandidat"
+
+#: webpanel/webpanel.h:236
+msgid "Use main keyboard number keys to select candidate"
+msgstr "Använd siffertangenterna på huvudtangentbordet för att välja kandidat"
+
+#: webpanel/webpanel.h:239
+msgid "Use keypad number keys to select candidate"
+msgstr ""
+"Använd siffertangenterna på det numeriska tangentbordet för att välja "
+"kandidat"
+
+#: webpanel/webpanel.h:241
+msgid "Optimize for Hyper key"
+msgstr "Optimera för Hyper-tangenten"
+
+#: webpanel/webpanel.h:247
+msgid "Layout"
+msgstr "Layout"
+
+#: webpanel/webpanel.h:251
+msgid "Writing mode"
+msgstr "Skrivläge"
+
+#: webpanel/webpanel.h:254
+msgid "Typography awareness for IM"
+msgstr "Typografimedvetenhet för inmatningsmetod"
+
+#: webpanel/webpanel.h:257
+msgid "Vertical comments align right"
+msgstr "Högerjustera vertikala kommentarer"
+
+#: webpanel/webpanel.h:261
+msgid "Paging buttons style"
+msgstr "Stil för sidbläddringsknappar"
+
+#: webpanel/webpanel.h:267
+msgid "Image"
+msgstr "Bild"
+
+#: webpanel/webpanel.h:270
+msgid "Keep panel color when has image"
+msgstr "Behåll panelfärgen när en bild används"
+
+#: webpanel/webpanel.h:271
+msgid "Blur"
+msgstr "Oskärpa"
+
+#: webpanel/webpanel.h:273
+msgid "Radius of blur (px)"
+msgstr "Radie för oskärpa (px)"
+
+#: webpanel/webpanel.h:274
+msgid "Shadow"
+msgstr "Skugga"
+
+#: webpanel/webpanel.h:282
+msgid "Text font family"
+msgstr "Textens typsnittsfamilj"
+
+#: webpanel/webpanel.h:284
+msgid "Text font size"
+msgstr "Textens typsnittsstorlek"
+
+#: webpanel/webpanel.h:286
+msgid "Text font weight"
+msgstr "Textens typsnittsvikt"
+
+#: webpanel/webpanel.h:289
+msgid "Label font family"
+msgstr "Etikettens typsnittsfamilj"
+
+#: webpanel/webpanel.h:291
+msgid "Label font size"
+msgstr "Etikettens typsnittsstorlek"
+
+#: webpanel/webpanel.h:293
+msgid "Label font weight"
+msgstr "Etikettens typsnittsvikt"
+
+#: webpanel/webpanel.h:296
+msgid "Comment font family"
+msgstr "Kommentarens typsnittsfamilj"
+
+#: webpanel/webpanel.h:298
+msgid "Comment font size"
+msgstr "Kommentarens typsnittsstorlek"
+
+#: webpanel/webpanel.h:301
+msgid "Comment font weight"
+msgstr "Kommentarens typsnittsvikt"
+
+#: webpanel/webpanel.h:304
+msgid "Preedit font family"
+msgstr "Preedit-typsnittsfamilj"
+
+#: webpanel/webpanel.h:306
+msgid "Preedit font size"
+msgstr "Preedit-typsnittsstorlek"
+
+#: webpanel/webpanel.h:309
+msgid "Preedit font weight"
+msgstr "Preedit-typsnittsvikt"
+
+#: webpanel/webpanel.h:311
+msgid "User font dir"
+msgstr "Katalog för användartypsnitt"
+
+#: webpanel/webpanel.h:312
+msgid "System font dir"
+msgstr "Katalog för systemtypsnitt"
+
+#: webpanel/webpanel.h:317
+msgid "Style"
+msgstr "Stil"
+
+#: webpanel/webpanel.h:323
+msgid "Mark style"
+msgstr "Markeringsstil"
+
+#: webpanel/webpanel.h:324
+msgid "Mark text"
+msgstr "Markeringstext"
+
+#: webpanel/webpanel.h:326
+msgid "Hover behavior"
+msgstr "Beteende vid hovring"
+
+#: webpanel/webpanel.h:333
+msgid "Border width (px)"
+msgstr "Kantbredd (px)"
+
+#: webpanel/webpanel.h:336
+msgid "Border radius (px)"
+msgstr "Kantradie (px)"
+
+#: webpanel/webpanel.h:337
+msgid "Margin (px)"
+msgstr "Marginal (px)"
+
+#: webpanel/webpanel.h:340
+msgid "Highlight radius (px)"
+msgstr "Framhävningsradie (px)"
+
+#: webpanel/webpanel.h:343
+msgid "Top padding (px)"
+msgstr "Utfyllnad upptill (px)"
+
+#: webpanel/webpanel.h:345
+msgid "Right padding (px)"
+msgstr "Utfyllnad till höger (px)"
+
+#: webpanel/webpanel.h:347
+msgid "Bottom padding (px)"
+msgstr "Utfyllnad nedtill (px)"
+
+#: webpanel/webpanel.h:350
+msgid "Left padding (px)"
+msgstr "Utfyllnad till vänster (px)"
+
+#: webpanel/webpanel.h:352
+msgid "Gap between label, text and comment (px)"
+msgstr "Avstånd mellan etikett, text och kommentar (px)"
+
+#: webpanel/webpanel.h:355
+msgid "Vertical minimum width (px)"
+msgstr "Minsta vertikala bredd (px)"
+
+#: webpanel/webpanel.h:358
+msgid "Scroll cell width (px)"
+msgstr "Rullcellens bredd (px)"
+
+#: webpanel/webpanel.h:361
+msgid "Horizontal divider width (px)"
+msgstr "Horisontell avdelarbredd (px)"
+
+#: webpanel/webpanel.h:367
+msgid "User CSS"
+msgstr "Användar-CSS"
+
+#: webpanel/webpanel.h:368
+msgid "Copy HTML"
+msgstr "Kopiera HTML"
+
+#: webpanel/webpanel.h:369
+msgid "Plugin dir"
+msgstr "Katalog för insticksmoduler"
+
+#: webpanel/webpanel.h:371
+msgid "I know there may be risks for using plugins"
+msgstr "Jag förstår att användning av insticksmoduler kan medföra risker"
+
+#: webpanel/webpanel.h:374
+msgid "Plugins"
+msgstr "Insticksmoduler"
+
+#: webpanel/webpanel.h:377
+msgid "Basic"
+msgstr "Grundläggande"
+
+#: webpanel/webpanel.h:378
+msgid "Light mode"
+msgstr "Ljust läge"
+
+#: webpanel/webpanel.h:379
+msgid "Dark mode"
+msgstr "Mörkt läge"
+
+#: webpanel/webpanel.h:380
+msgid "Typography"
+msgstr "Typografi"
+
+#: webpanel/webpanel.h:381
+msgid "Scroll mode"
+msgstr "Rullningsläge"
+
+#: webpanel/webpanel.h:382
+msgid "Background"
+msgstr "Bakgrund"
+
+#: webpanel/webpanel.h:383
+msgid "Font"
+msgstr "Typsnitt"
+
+#: webpanel/webpanel.h:384
+msgid "Caret"
+msgstr "Textmarkör"
+
+#: webpanel/webpanel.h:385
+msgid "Highlight"
+msgstr "Framhävning"
+
+#: webpanel/webpanel.h:386
+msgid "Size"
+msgstr "Storlek"
+
+#: webpanel/webpanel.h:387
+msgid "Advanced"
+msgstr "Avancerat"
+
+#: wasmnotifications/notifications.conf.in.in:2
+msgid "Notifications"
+msgstr "Notiser"
