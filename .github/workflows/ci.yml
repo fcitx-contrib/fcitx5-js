@@ -33,15 +33,17 @@ jobs:
         run: ./scripts/lint.sh
 
   build:
+    name: Build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     needs: lint
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-24.04 }
-          - { os: ubuntu-24.04-arm }
-          - { os: macos-26 }
+          - { name: ubuntu-24.04, os: ubuntu-24.04 }
+          - { name: ubuntu-24.04-arm, os: ubuntu-24.04-arm }
+          - { name: macos-26, os: macos-26 }
+          - { name: rime-only, os: ubuntu-24.04, rime_only: 'ON' }
     steps:
       - uses: actions/checkout@v7
         with:
@@ -98,11 +100,16 @@ jobs:
         run: |
           ./scripts/install-deps.sh
           emcmake cmake -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_BUILD_TYPE=Release \
+            -DRIME_ONLY=${{ matrix.rime_only || 'OFF' }}
           EMCC_FORCE_STDLIBS=libc++ cmake --build build
-          npm pack
+
+      - name: Pack
+        if: ${{ matrix.rime_only != 'ON' }}
+        run: npm pack
 
       - name: Package dev tarball
+        if: ${{ matrix.rime_only != 'ON' }}
         env:
           LC_ALL: C
         run: |
@@ -117,6 +124,7 @@ jobs:
             -f ../../../fcitx5-js-dev.tar.bz2 include lib
 
       - name: Upload artifact
+        if: ${{ matrix.rime_only != 'ON' }}
         uses: actions/upload-artifact@v7
         with:
           name: artifact-${{ matrix.os }}
@@ -125,6 +133,7 @@ jobs:
             fcitx5-js-dev.tar.bz2
 
       - name: Test
+        if: ${{ matrix.rime_only != 'ON' }}
         run: |
           npx playwright install
           npx playwright install-deps

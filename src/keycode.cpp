@@ -1,6 +1,10 @@
 #include "keycode.h"
+#include <config.h>
 #include <emscripten.h>
 #include <fcitx-utils/log.h>
+#ifdef ENABLE_KEYBOARD
+#include <xkbcommon/xkbcommon.h>
+#endif
 
 #include "../deps/input-event-codes.h"
 
@@ -208,64 +212,55 @@ static struct {
     {"ShiftRight", KEY_RIGHTSHIFT},
 };
 
-static struct {
-    std::string jsKeycode;
-    char asciiChar;
-    char shiftedAsciiChar;
-} char_mappings[] = {
-    // alphabet
-    {"KeyA", 'a', 'A'},
-    {"KeyB", 'b', 'B'},
-    {"KeyC", 'c', 'C'},
-    {"KeyD", 'd', 'D'},
-    {"KeyE", 'e', 'E'},
-    {"KeyF", 'f', 'F'},
-    {"KeyG", 'g', 'G'},
-    {"KeyH", 'h', 'H'},
-    {"KeyI", 'i', 'I'},
-    {"KeyJ", 'j', 'J'},
-    {"KeyK", 'k', 'K'},
-    {"KeyL", 'l', 'L'},
-    {"KeyM", 'm', 'M'},
-    {"KeyN", 'n', 'N'},
-    {"KeyO", 'o', 'O'},
-    {"KeyP", 'p', 'P'},
-    {"KeyQ", 'q', 'Q'},
-    {"KeyR", 'r', 'R'},
-    {"KeyS", 's', 'S'},
-    {"KeyT", 't', 'T'},
-    {"KeyU", 'u', 'U'},
-    {"KeyV", 'v', 'V'},
-    {"KeyW", 'w', 'W'},
-    {"KeyX", 'x', 'X'},
-    {"KeyY", 'y', 'Y'},
-    {"KeyZ", 'z', 'Z'},
+uint16_t js_keycode_to_fcitx_keycode(const std::string &code) {
+    for (const auto &pair : code_mappings) {
+        if (pair.jsKeycode == code) {
+            return pair.linuxKeycode + 8 /* evdev offset */;
+        }
+    }
+    return 0;
+}
 
-    // number row with shift mappings
-    {"Digit0", '0', ')'},
-    {"Digit1", '1', '!'},
-    {"Digit2", '2', '@'},
-    {"Digit3", '3', '#'},
-    {"Digit4", '4', '$'},
-    {"Digit5", '5', '%'},
-    {"Digit6", '6', '^'},
-    {"Digit7", '7', '&'},
-    {"Digit8", '8', '*'},
-    {"Digit9", '9', '('},
+#ifdef ENABLE_KEYBOARD
+static std::pair<struct xkb_context *, struct xkb_keymap *> &
+cached_us_keymap() noexcept {
+    static std::pair<struct xkb_context *, struct xkb_keymap *> cached = [] {
+        auto *context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+        if (!context) {
+            return std::pair<struct xkb_context *, struct xkb_keymap *>{};
+        }
+        struct xkb_rule_names names = {
+            .rules = "evdev",
+            .model = "pc105",
+            .layout = "us",
+        };
+        auto *keymap = xkb_keymap_new_from_names(context, &names,
+                                                 XKB_KEYMAP_COMPILE_NO_FLAGS);
+        if (!keymap) {
+            xkb_context_unref(context);
+            return std::pair<struct xkb_context *, struct xkb_keymap *>{};
+        }
+        return std::pair{context, keymap};
+    }();
+    return cached;
+}
 
-    // symbols with shift
-    {"Backquote", '`', '~'},
-    {"Backslash", '\\', '|'},
-    {"BracketLeft", '[', '{'},
-    {"BracketRight", ']', '}'},
-    {"Comma", ',', '<'},
-    {"Period", '.', '>'},
-    {"Equal", '=', '+'},
-    {"Minus", '-', '_'},
-    {"Quote", '\'', '"'},
-    {"Semicolon", ';', ':'},
-    {"Slash", '/', '?'},
-};
+static KeySym us_keysym_for_code(const std::string &code,
+                                 uint32_t modifiers) noexcept {
+    auto *keymap = cached_us_keymap().second;
+    auto keycode = js_keycode_to_fcitx_keycode(code);
+    if (!keymap || keycode == 0) {
+        return {};
+    }
+    const xkb_keysym_t *syms = nullptr;
+    auto level = modifiers & uint32_t(KeyState::Shift) ? 1 : 0;
+    if (xkb_keymap_key_get_syms_by_level(keymap, keycode, 0, level, &syms) <=
+        0) {
+        return {};
+    }
+    return static_cast<KeySym>(syms[0]);
+}
+#endif
 
 KeySym js_key_to_fcitx_keysym(const std::string &key, const std::string &code,
                               uint32_t modifiers) {
@@ -277,29 +272,18 @@ KeySym js_key_to_fcitx_keysym(const std::string &key, const std::string &code,
     if (key.size() == 1) {
         return Key::keySymFromUnicode(key[0]);
     }
+#ifdef ENABLE_KEYBOARD
     // On macOS, a KeyEvent with Alt has non-ASCII sym. We map the same way with
     // fcitx5-macos.
     if (modifiers & uint32_t(KeyState::Alt)) {
-        for (const auto &pair : char_mappings) {
-            if (pair.jsKeycode == code) {
-                return Key::keySymFromUnicode(
-                    (modifiers & uint32_t(KeyState::Shift))
-                        ? pair.shiftedAsciiChar
-                        : pair.asciiChar);
-            }
+        auto sym = us_keysym_for_code(code, modifiers);
+        if (sym != FcitxKey_None) {
+            return sym;
         }
     }
+#endif
     FCITX_ERROR() << "Unrecognized key " << key << " " << code;
     return {};
-}
-
-uint16_t js_keycode_to_fcitx_keycode(const std::string &code) {
-    for (const auto &pair : code_mappings) {
-        if (pair.jsKeycode == code) {
-            return pair.linuxKeycode + 8 /* evdev offset */;
-        }
-    }
-    return 0;
 }
 
 Key js_key_to_fcitx_key(const std::string &key, const std::string &code,
