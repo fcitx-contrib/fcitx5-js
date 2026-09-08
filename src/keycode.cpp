@@ -1,7 +1,10 @@
 #include "keycode.h"
+#include <config.h>
 #include <emscripten.h>
 #include <fcitx-utils/log.h>
+#ifdef ENABLE_KEYBOARD
 #include <xkbcommon/xkbcommon.h>
+#endif
 
 #include "../deps/input-event-codes.h"
 
@@ -218,6 +221,7 @@ uint16_t js_keycode_to_fcitx_keycode(const std::string &code) {
     return 0;
 }
 
+#ifdef ENABLE_KEYBOARD
 static std::pair<struct xkb_context *, struct xkb_keymap *> &
 cached_us_keymap() noexcept {
     static std::pair<struct xkb_context *, struct xkb_keymap *> cached = [] {
@@ -256,6 +260,7 @@ static KeySym us_keysym_for_code(const std::string &code,
     }
     return static_cast<KeySym>(syms[0]);
 }
+#endif
 
 KeySym js_key_to_fcitx_keysym(const std::string &key, const std::string &code,
                               uint32_t modifiers) {
@@ -267,6 +272,7 @@ KeySym js_key_to_fcitx_keysym(const std::string &key, const std::string &code,
     if (key.size() == 1) {
         return Key::keySymFromUnicode(key[0]);
     }
+#ifdef ENABLE_KEYBOARD
     // On macOS, a KeyEvent with Alt has non-ASCII sym. We map the same way with
     // fcitx5-macos.
     if (modifiers & uint32_t(KeyState::Alt)) {
@@ -275,6 +281,7 @@ KeySym js_key_to_fcitx_keysym(const std::string &key, const std::string &code,
             return sym;
         }
     }
+#endif
     FCITX_ERROR() << "Unrecognized key " << key << " " << code;
     return {};
 }
