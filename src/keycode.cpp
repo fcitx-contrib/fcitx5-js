@@ -58,6 +58,7 @@ static struct {
     {"End", FcitxKey_End},
     {"PrintScreen", FcitxKey_Print},
     {"ScrollLock", FcitxKey_Scroll_Lock},
+    {"NumLock", FcitxKey_Num_Lock},
 
     // arrow keys
     {"ArrowUp", FcitxKey_Up},
@@ -78,6 +79,18 @@ static struct {
     {"F10", FcitxKey_F10},
     {"F11", FcitxKey_F11},
     {"F12", FcitxKey_F12},
+    {"F13", FcitxKey_F13},
+    {"F14", FcitxKey_F14},
+    {"F15", FcitxKey_F15},
+    {"F16", FcitxKey_F16},
+    {"F17", FcitxKey_F17},
+    {"F18", FcitxKey_F18},
+    {"F19", FcitxKey_F19},
+    {"F20", FcitxKey_F20},
+    {"F21", FcitxKey_F21},
+    {"F22", FcitxKey_F22},
+    {"F23", FcitxKey_F23},
+    {"F24", FcitxKey_F24},
 
     // media keys
     {"AudioVolumeMute", FcitxKey_AudioMute},
@@ -173,6 +186,7 @@ static struct {
     {"Enter", KEY_ENTER},
     {"Space", KEY_SPACE},
     {"Tab", KEY_TAB},
+    {"NumLock", KEY_NUMLOCK},
 
     // function
     {"F1", KEY_F1},
@@ -187,6 +201,18 @@ static struct {
     {"F10", KEY_F10},
     {"F11", KEY_F11},
     {"F12", KEY_F12},
+    {"F13", KEY_F13},
+    {"F14", KEY_F14},
+    {"F15", KEY_F15},
+    {"F16", KEY_F16},
+    {"F17", KEY_F17},
+    {"F18", KEY_F18},
+    {"F19", KEY_F19},
+    {"F20", KEY_F20},
+    {"F21", KEY_F21},
+    {"F22", KEY_F22},
+    {"F23", KEY_F23},
+    {"F24", KEY_F24},
 
     // cursor
     {"ArrowUp", KEY_UP},
