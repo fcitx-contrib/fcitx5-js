@@ -7,6 +7,10 @@ import { jsIndexToCharCount, utf8Index2JS } from './unicode'
 
 let x = 0
 let y = 0
+let anchorOffsetTop = 0
+let anchorOffsetLeft = 0
+let dragOffsetX = 0
+let dragOffsetY = 0
 
 let preedit = ''
 let preeditIndex = 0
@@ -59,25 +63,39 @@ export function sendSurroundingText() {
 const CANDIDATE_WINDOW_OFFSET = 6
 
 export function placePanel(dx: number, dy: number, anchorTop: number, anchorLeft: number, dragging: boolean) {
+  const panel = <HTMLElement>document.querySelector('#fcitx-theme')
+  const frame = panel.getBoundingClientRect()
+  panel.style.position = 'absolute'
+  panel.style.zIndex = '2147483647' // absolutely above preedit underline
+  anchorOffsetTop = anchorTop - frame.top
+  anchorOffsetLeft = anchorLeft - frame.left
+  if (dragging) {
+    x += dx
+    y += dy
+    dragOffsetX += dx
+    dragOffsetY += dy
+  }
+  else {
+    dragOffsetX = 0
+    dragOffsetY = 0
+    repositionPanel()
+    return
+  }
+  panel.style.top = `${y}px`
+  panel.style.left = `${x}px`
+}
+
+export function repositionPanel() {
   const input = getInputElement()
-  if (!input) {
+  const panel = <HTMLElement>document.querySelector('#fcitx-theme')
+  if (!input || panel.classList.contains('fcitx-hidden')) {
     return
   }
   const rect = input.getBoundingClientRect()
   const { top, left, height } = getCaretCoordinates(input, input.selectionStart! - (globalThis.fcitx.followCaret ? 0 : preeditIndex))
   const h = height /* NaN if no line-height is set */ || getFontSize(input) + CANDIDATE_WINDOW_OFFSET
-  const panel = <HTMLElement>document.querySelector('#fcitx-theme')
-  const frame = panel.getBoundingClientRect()
-  panel.style.position = 'absolute'
-  panel.style.zIndex = '2147483647' // absolutely above preedit underline
-  if (dragging) {
-    x += dx
-    y += dy
-  }
-  else {
-    x = rect.left + left - (anchorLeft - frame.left)
-    y = rect.top + top - (anchorTop - frame.top) + h
-  }
+  x = window.scrollX + rect.left + left - input.scrollLeft - anchorOffsetLeft + dragOffsetX
+  y = window.scrollY + rect.top + top - input.scrollTop - anchorOffsetTop + h + dragOffsetY
   panel.style.top = `${y}px`
   panel.style.left = `${x}px`
 }
