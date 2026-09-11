@@ -1,5 +1,5 @@
 import { redrawCaret, removeCaret } from './caret'
-import { redrawPreeditUnderline, resetPreedit, sendSurroundingText } from './client'
+import { redrawPreeditUnderline, repositionPanel, resetPreedit, sendSurroundingText } from './client'
 import { hasTouch } from './context'
 import { hideKeyboard, showKeyboard, updateSelection } from './keyboard'
 import Module from './module'
@@ -32,6 +32,7 @@ export function isInputElement(element: Element | null): element is Input {
 }
 
 export function redrawCaretAndPreeditUnderline() {
+  repositionPanel()
   redrawPreeditUnderline()
   if (hasTouch) {
     redrawCaret({ target: input })
