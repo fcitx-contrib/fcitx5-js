@@ -89,3 +89,20 @@ test('Numpad', async ({ page }) => {
   await tapKeyboard(page, numpad.getByText('1', { exact: true }))
   await expect(textarea).toHaveValue('1')
 })
+
+test('Number input type opens numpad', async ({ page }) => {
+  await init(page)
+
+  const input = page.locator('input')
+  input.evaluate((el: HTMLInputElement) => el.type = 'number')
+  await input.tap()
+  await expectKeyboardShown(page)
+
+  const numpad = page.locator('.fcitx-keyboard-numpad')
+  await expect(numpad).toBeVisible()
+
+  await tapKeyboard(page, numpad.getByText('1', { exact: true }))
+  await tapKeyboard(page, numpad.getByText('2', { exact: true }))
+  await tapKeyboard(page, numpad.getByText('3', { exact: true }))
+  await expect(input).toHaveValue('123')
+})

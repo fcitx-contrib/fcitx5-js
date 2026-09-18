@@ -23,7 +23,7 @@ export function sendSurroundingText() {
   if (!input) {
     return
   }
-  if (input.tagName === 'INPUT' && input.type === 'password') {
+  if (input.tagName === 'INPUT' && (input.type === 'password' || input.type === 'number')) {
     return
   }
 

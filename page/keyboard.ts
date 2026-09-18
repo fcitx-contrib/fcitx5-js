@@ -142,8 +142,10 @@ function moveSelection(input: HTMLInputElement | HTMLTextAreaElement, newCaret: 
 }
 
 function replaceSelection(input: HTMLInputElement | HTMLTextAreaElement, replacement: string) {
-  const pre = input.value.slice(0, input.selectionStart!) + replacement
-  updateInput(input, pre + input.value.slice(input.selectionEnd!), pre.length)
+  const start = input.selectionStart ?? input.value.length
+  const end = input.selectionEnd ?? input.value.length
+  const pre = input.value.slice(0, start) + replacement
+  updateInput(input, pre + input.value.slice(end), pre.length)
 }
 
 function simulate(key: string, code: string) {
