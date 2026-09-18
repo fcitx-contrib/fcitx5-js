@@ -12,7 +12,7 @@ test('keyboard-us', async ({ page }) => {
   await tapKeyboard(page, 'a@')
   await expect(textarea).toHaveValue('a')
 
-  await tapKeyboard(page, page.locator('.fcitx-keyboard-key.fcitx-keyboard-backspace'))
+  await tapKeyboard(page, page.locator('.fcitx-keyboard .fcitx-keyboard-backspace'))
   await expect(textarea).toHaveValue('')
 })
 
@@ -57,4 +57,35 @@ test('Space label preserved when collapse on editor', async ({ page }) => {
   await tapReturn(page)
   await expect(space).toHaveText('Keyboard - English (US)')
   await expect(space).toHaveCSS('font-size', fontSize)
+})
+
+test('Numpad', async ({ page }) => {
+  await init(page)
+
+  const textarea = page.locator('textarea')
+  await textarea.tap()
+  await expectKeyboardShown(page)
+
+  const symbol = page.locator('.fcitx-keyboard-symbol')
+  const symbolBox = await getBox(symbol)
+  await page.evaluate(async ({ x, y }) => {
+    const mask = document.querySelector('.fcitx-keyboard-mask')!
+    const touch = { identifier: 0, target: mask, clientX: x, clientY: y } as unknown as Touch
+    const dispatchTouch = (type: string, touches: Touch[]) => {
+      const event = new Event(type, { bubbles: true, cancelable: true })
+      Object.defineProperties(event, {
+        touches: { value: touches },
+        changedTouches: { value: [touch] },
+      })
+      mask.dispatchEvent(event)
+    }
+    dispatchTouch('touchstart', [touch])
+    await new Promise(resolve => setTimeout(resolve, 400))
+    dispatchTouch('touchend', [])
+  }, { x: symbolBox.x + symbolBox.width / 2, y: symbolBox.y + symbolBox.height / 2 })
+
+  const numpad = page.locator('.fcitx-keyboard-numpad')
+  await expect(numpad).toBeVisible()
+  await tapKeyboard(page, numpad.getByText('1', { exact: true }))
+  await expect(textarea).toHaveValue('1')
 })

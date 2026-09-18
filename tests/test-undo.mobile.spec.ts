@@ -55,7 +55,7 @@ test('Delete merge', async ({ page }) => {
   await textarea.tap()
   await expectKeyboardShown(page)
 
-  const backspace = page.locator('.fcitx-keyboard-backspace')
+  const backspace = page.locator('.fcitx-keyboard .fcitx-keyboard-backspace')
   await tapKeyboard(page, backspace)
   await tapKeyboard(page, backspace)
 
@@ -73,7 +73,7 @@ test('Delete no merge', async ({ page }) => {
   await textarea.tap()
   await expectKeyboardShown(page)
 
-  const backspace = page.locator('.fcitx-keyboard-backspace')
+  const backspace = page.locator('.fcitx-keyboard .fcitx-keyboard-backspace')
   await tapKeyboard(page, backspace)
   await page.waitForTimeout(5000)
   await tapKeyboard(page, backspace)

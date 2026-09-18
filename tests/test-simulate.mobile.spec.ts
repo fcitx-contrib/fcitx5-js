@@ -293,7 +293,7 @@ test('Backspace', async ({ page }) => {
   await textarea.tap()
   await expectKeyboardShown(page)
 
-  const backspace = page.locator('.fcitx-keyboard-backspace')
+  const backspace = page.locator('.fcitx-keyboard .fcitx-keyboard-backspace')
   await tapKeyboard(page, backspace)
   await expect(textarea).toHaveValue('a只')
 

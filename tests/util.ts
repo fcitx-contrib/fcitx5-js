@@ -58,5 +58,5 @@ export function getSelection(locator: Locator): Promise<[number, number]> {
 }
 
 export function tapReturn(page: Page) {
-  return page.locator('.fcitx-keyboard-return-bar .fcitx-keyboard-toolbar-button').tap()
+  return page.locator('.fcitx-keyboard-return-button').tap()
 }

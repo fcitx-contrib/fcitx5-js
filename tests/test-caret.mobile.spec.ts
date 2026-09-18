@@ -30,7 +30,7 @@ test('Input and Backspace', async ({ page }) => {
   const { x: x1 } = await getBox(caret)
   expect(x1).toBeGreaterThan(x0)
 
-  await tapKeyboard(page, page.locator('.fcitx-keyboard-key.fcitx-keyboard-backspace'))
+  await tapKeyboard(page, page.locator('.fcitx-keyboard .fcitx-keyboard-backspace'))
   const { x } = await getBox(caret)
   expect(x).toEqual(x0)
 })
