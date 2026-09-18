@@ -59,6 +59,9 @@ endif()
 
 target_link_libraries(Fcitx5 ${EXE_LINK_OPTIONS})
 
+# Work around fcitx5 67891da6 using this private variable from the caller's
+# scope when locating Fcitx5ImportAddon.cpp.in.
+get_target_property(_Fcitx5Macro_SELF_DIR Fcitx5Utils SOURCE_DIR)
 fcitx5_import_addons(Fcitx5
     REGISTRY_VARNAME getStaticAddon
     ADDONS ${STATIC_ADDONS}
