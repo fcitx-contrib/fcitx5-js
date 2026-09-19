@@ -1,7 +1,7 @@
 import { redrawCaret, removeCaret } from './caret'
 import { redrawPreeditUnderline, repositionPanel, resetPreedit, sendSurroundingText } from './client'
 import { hasTouch } from './context'
-import { hideKeyboard, showKeyboard, updateSelection } from './keyboard'
+import { hideKeyboard, sendSystemEventToKeyboard, showKeyboard, updateSelection } from './keyboard'
 import Module from './module'
 import { resetStacks } from './undoRedo'
 
@@ -74,6 +74,10 @@ export function focus() {
   originalSpellCheck = input.spellcheck
   const isPassword = input.tagName === 'INPUT' && input.type === 'password'
   Module.ccall('focus_in', null, ['boolean'], [isPassword])
+  if (hasTouch && input.tagName === 'INPUT') {
+    const inputType = input.type === 'number' ? 'number' : 'text'
+    sendSystemEventToKeyboard({ type: 'INPUT_TYPE', data: inputType })
+  }
   sendSurroundingText()
   input.addEventListener('input', sendSurroundingText)
   input.addEventListener('selectionchange', sendSurroundingText)
