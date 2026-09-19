@@ -94,7 +94,7 @@ test('Number input type opens numpad', async ({ page }) => {
   await init(page)
 
   const input = page.locator('input')
-  input.evaluate((el: HTMLInputElement) => el.type = 'number')
+  await input.evaluate((el: HTMLInputElement) => el.type = 'number')
   await input.tap()
   await expectKeyboardShown(page)
 
