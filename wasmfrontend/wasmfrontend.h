@@ -11,6 +11,8 @@ namespace fcitx {
 
 class WasmInputContext;
 
+void setWasmFrontendInitialFocus(bool enabled);
+
 class WasmFrontend : public AddonInstance {
   public:
     WasmFrontend(Instance *instance);
