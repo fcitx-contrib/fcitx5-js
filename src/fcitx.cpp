@@ -211,6 +211,8 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
         return;
     }
     fcitx::runtime = runtime;
+    // The options page has no UI implementation to consume the initial focus.
+    setWasmFrontendInitialFocus(runtime != Runtime::options);
     umask(007); // Fix config file's mode
     StandardPaths::global().syncUmask();
 #ifdef NDEBUG
