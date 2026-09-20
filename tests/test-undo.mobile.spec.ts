@@ -3,11 +3,11 @@ import { expect, test } from '@playwright/test'
 import { expectKeyboardShown, getSelection, init, tapKeyboard } from './util'
 
 function undo(page: Page) {
-  return page.locator('.fcitx-keyboard-toolbar > .fcitx-keyboard-toolbar-button:nth-child(1)').tap()
+  return page.locator('.fcitx-keyboard-toolbar > .fcitx-keyboard-toolbar-button:nth-child(2)').tap()
 }
 
 function redo(page: Page) {
-  return page.locator('.fcitx-keyboard-toolbar > .fcitx-keyboard-toolbar-button:nth-child(2)').tap()
+  return page.locator('.fcitx-keyboard-toolbar > .fcitx-keyboard-toolbar-button:nth-child(3)').tap()
 }
 
 test('Continuous insert', async ({ page }) => {

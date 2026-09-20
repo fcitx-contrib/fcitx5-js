@@ -41,7 +41,7 @@ test('Body has margin', async ({ page }) => {
   expect(box.x).toBe(0)
 })
 
-test('Space label preserved when collapse on editor', async ({ page }) => {
+test('Space label preserved when collapse on status area', async ({ page }) => {
   await init(page)
 
   const textarea = page.locator('textarea')
@@ -51,7 +51,7 @@ test('Space label preserved when collapse on editor', async ({ page }) => {
   const fontSize = await space.evaluate(el => getComputedStyle(el).fontSize)
   expect(Number.parseFloat(fontSize)).toBeGreaterThan(10)
 
-  await page.locator('.fcitx-keyboard-toolbar-button:nth-child(5)').tap()
+  await page.locator('.fcitx-keyboard-toolbar-button:nth-child(6)').tap()
   await page.locator('button').tap()
   await textarea.tap()
   await tapReturn(page)

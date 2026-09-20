@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import { browserName, expectKeyboardShown, getSelection, init, tapKeyboard } from './util'
 
 function openEditor(page: Page) {
-  return page.locator('.fcitx-keyboard-toolbar-button:nth-child(3)').tap()
+  return page.locator('.fcitx-keyboard-toolbar > .fcitx-keyboard-toolbar-button:nth-child(4)').tap()
 }
 
 function getButton(page: Page, n: number) {
