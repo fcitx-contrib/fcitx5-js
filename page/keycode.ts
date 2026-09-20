@@ -18,6 +18,10 @@ function extract(event: KeyData): [string, string, number] | undefined {
   }
   const capsLock = event.getModifierState('CapsLock')
   const modifiers = Number(shiftKey) | Number(capsLock) << 1 | Number(ctrlKey) << 2 | Number(altKey) << 3 | Number(metaKey) << 6
+  // Rime good_old_caps_lock: false needs it.
+  if (key.length === 1 && key >= 'A' && key <= 'Z' && shiftKey && capsLock) {
+    return [key.toLowerCase(), code, modifiers]
+  }
   return [key, code, modifiers]
 }
 
