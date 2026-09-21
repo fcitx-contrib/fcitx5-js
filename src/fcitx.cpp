@@ -55,23 +55,32 @@ EMSCRIPTEN_KEEPALIVE int deployRimeInWorker() {
 
 extern "C" {
 
-EMSCRIPTEN_KEEPALIVE void focus_in(bool isPassword) {
-    frontend->focusIn(isPassword);
+EMSCRIPTEN_KEEPALIVE uint32_t create_input_context(const char *program) {
+    return frontend->createInputContext(program);
 }
 
-EMSCRIPTEN_KEEPALIVE void focus_out() { frontend->focusOut(); }
+EMSCRIPTEN_KEEPALIVE void destroy_input_context(uint32_t id) {
+    frontend->destroyInputContext(id);
+}
 
-EMSCRIPTEN_KEEPALIVE void reset_input() { frontend->resetInput(); }
+EMSCRIPTEN_KEEPALIVE void focus_in(uint32_t id, bool isPassword) {
+    frontend->focusIn(id, isPassword);
+}
 
-EMSCRIPTEN_KEEPALIVE void set_surrounding_text(const char *text,
+EMSCRIPTEN_KEEPALIVE void focus_out(uint32_t id) { frontend->focusOut(id); }
+
+EMSCRIPTEN_KEEPALIVE void reset_input(uint32_t id) { frontend->resetInput(id); }
+
+EMSCRIPTEN_KEEPALIVE void set_surrounding_text(uint32_t id, const char *text,
                                                unsigned int cursor,
                                                unsigned int anchor) {
-    frontend->setSurroundingText(text, cursor, anchor);
+    frontend->setSurroundingText(id, text, cursor, anchor);
 }
 
-EMSCRIPTEN_KEEPALIVE bool process_key(const char *key, const char *code,
-                                      uint32_t modifiers, bool isRelease) {
-    return frontend->keyEvent(js_key_to_fcitx_key(key, code, modifiers),
+EMSCRIPTEN_KEEPALIVE bool process_key(uint32_t id, const char *key,
+                                      const char *code, uint32_t modifiers,
+                                      bool isRelease) {
+    return frontend->keyEvent(id, js_key_to_fcitx_key(key, code, modifiers),
                               isRelease);
 }
 
@@ -211,8 +220,6 @@ EMSCRIPTEN_KEEPALIVE void init(const char *locale, Runtime runtime,
         return;
     }
     fcitx::runtime = runtime;
-    // The options page has no UI implementation to consume the initial focus.
-    setWasmFrontendInitialFocus(runtime != Runtime::options);
     umask(007); // Fix config file's mode
     StandardPaths::global().syncUmask();
 #ifdef NDEBUG

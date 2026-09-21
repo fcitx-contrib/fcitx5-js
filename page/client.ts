@@ -1,6 +1,6 @@
 import getCaretCoordinates from 'textarea-caret'
 import { getFontSize, UNDERLINE_OFFSET_RATIO } from './caret'
-import { getInputElement, setSpellCheck } from './focus'
+import { getInputContextId, getInputElement, setSpellCheck } from './focus'
 import Module from './module'
 import { onTextChange } from './undoRedo'
 import { jsIndexToCharCount, utf8Index2JS } from './unicode'
@@ -20,7 +20,8 @@ let lastAnchor = 0
 
 export function sendSurroundingText() {
   const input = getInputElement()
-  if (!input) {
+  const contextId = getInputContextId()
+  if (!input || contextId === null) {
     return
   }
   if (input.tagName === 'INPUT' && (input.type === 'password' || input.type === 'number')) {
@@ -56,7 +57,13 @@ export function sendSurroundingText() {
   lastCursor = cursor
   lastAnchor = anchor
 
-  Module.ccall('set_surrounding_text', null, ['string', 'number', 'number'], [text, cursor, anchor])
+  Module.ccall('set_surrounding_text', null, ['number', 'string', 'number', 'number'], [contextId, text, cursor, anchor])
+}
+
+export function resetSurroundingText() {
+  lastSurroundingText = null
+  lastCursor = 0
+  lastAnchor = 0
 }
 
 // compared with macOS pinyin
@@ -161,7 +168,7 @@ function drawPreeditUnderline(input: HTMLElement, start: number) {
   }
 }
 
-function changeInput(commitText: string, preeditText: string, index: number) {
+function changeInput(input: HTMLInputElement | HTMLTextAreaElement, commitText: string, preeditText: string, index: number) {
 /*
 ____ pre|edit ____
     ^        ^
@@ -169,11 +176,6 @@ ____ pre|edit ____
 
 ____ commit pre|edit ____
 */
-  const input = getInputElement()
-  if (!input) {
-    return
-  }
-
   const i = utf8Index2JS(preeditText, index)
   const start = input.selectionStart! - preeditIndex
   const end = preedit ? start + preedit.length : input.selectionEnd!
@@ -197,16 +199,19 @@ ____ commit pre|edit ____
   }
 }
 
-export function setPreedit(text: string, index: number) {
-  if (!preedit && !text) {
-    // Don't execute changeInput for a common scene: commit (which already clears preedit) and clear preedit.
-    return
+export function setPreedit(contextId: number, text: string, index: number) {
+  const input = getInputElement(contextId)
+  // Don't execute changeInput for a common scene: commit (which already clears preedit) and clear preedit.
+  if (input && (preedit || text)) {
+    changeInput(input, '', text, index)
   }
-  changeInput('', text, index)
 }
 
-export function commit(text: string) {
-  changeInput(text, '', 0)
+export function commit(contextId: number, text: string) {
+  const input = getInputElement(contextId)
+  if (input) {
+    changeInput(input, text, '', 0)
+  }
 }
 
 export function resetPreedit() {
@@ -231,8 +236,8 @@ export function hasPreedit() {
   return !!preedit
 }
 
-export function deleteSurroundingText(offset: number, size: number) {
-  const input = getInputElement()
+export function deleteSurroundingText(contextId: number, offset: number, size: number) {
+  const input = getInputElement(contextId)
   if (!input) {
     return
   }

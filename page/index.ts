@@ -8,7 +8,7 @@ import { getAddons, getConfig, setConfig } from './config'
 import { OPTIONS, SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
 import { getCustomPhrases, setCustomPhrases } from './custom-phrase'
-import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline } from './focus'
+import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline, startInputContextTracking, stopInputContextTracking } from './focus'
 import { lsDir, mount, reset, rmR, traverseAsync, traverseSync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, getLanguageName, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
@@ -87,6 +87,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     if (globalThis.fcitx.runtime !== WEB) {
       return { keyEvent }
     }
+    startInputContextTracking()
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
     document.addEventListener('keydown', keyEvent)
@@ -127,6 +128,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     }
     document.removeEventListener('scroll', redrawCaretAndPreeditUnderline, true)
     document.removeEventListener('selectionchange', selectionChange)
+    stopInputContextTracking()
     if (hasTouch) {
       // Not ideal, but 🤷‍♂️
       document.querySelectorAll('input, textarea').forEach((el) => {

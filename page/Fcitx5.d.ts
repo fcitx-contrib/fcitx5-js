@@ -73,9 +73,11 @@ export interface FCITX {
   // Return value is for ChromeOS.
   enable: () => { keyEvent: (keyData: KeyData) => boolean } | undefined
   // ChromeOS only.
-  commit: (text: string) => void
+  commit: (contextId: number, text: string) => void
   // ChromeOS only.
-  setPreedit: (text: string, index: number) => void
+  setPreedit: (contextId: number, text: string, index: number) => void
+  // ChromeOS only.
+  deleteSurroundingText: (contextId: number, offset: number, size: number) => void
   disable: () => void
   getLanguageName: (code: string) => string
   currentInputMethod: () => string
