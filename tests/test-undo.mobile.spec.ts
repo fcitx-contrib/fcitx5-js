@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import { expectKeyboardShown, getSelection, init, tapKeyboard } from './util'
+import { captureInputContextId, expectKeyboardShown, getSelection, init, tapKeyboard } from './util'
 
 function undo(page: Page) {
   return page.locator('.fcitx-keyboard-toolbar > .fcitx-keyboard-toolbar-button:nth-child(2)').tap()
@@ -126,17 +126,13 @@ test('Reset stacks', async ({ page }) => {
 test('Preedit not counted in stack', async ({ page }) => {
   await init(page)
   const textarea = page.locator('textarea')
-  await textarea.tap()
+  const contextId = await captureInputContextId(page, () => textarea.tap())
   await expectKeyboardShown(page)
 
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('yu', 0)
-  })
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, 'yu', 0), contextId)
   await expect(textarea).toHaveValue('yu')
 
-  await page.evaluate(() => {
-    window.fcitx.commit('预')
-  })
+  await page.evaluate(contextId => window.fcitx.commit(contextId, '预'), contextId)
   await expect(textarea).toHaveValue('预')
 
   await undo(page)

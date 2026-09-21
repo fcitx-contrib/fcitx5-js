@@ -7,15 +7,21 @@
 #include <fcitx/focusgroup.h>
 #include <fcitx/instance.h>
 
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <unordered_map>
+
 namespace fcitx {
 
 class WasmInputContext;
 
-void setWasmFrontendInitialFocus(bool enabled);
+using WasmInputContextId = uint32_t;
 
 class WasmFrontend : public AddonInstance {
   public:
     WasmFrontend(Instance *instance);
+    ~WasmFrontend();
     Instance *instance() { return instance_; }
 
     void reloadConfig() override {}
@@ -23,18 +29,23 @@ class WasmFrontend : public AddonInstance {
     const Configuration *getConfig() const override { return nullptr; }
     void setConfig(const RawConfig &config) override {}
 
-    void createInputContext();
-    bool keyEvent(const Key &key, bool isRelease);
-    void focusIn(bool isPassword);
-    void focusOut();
-    void resetInput();
-    void setSurroundingText(const std::string &text, unsigned int cursor,
-                            unsigned int anchor);
+    WasmInputContextId createInputContext(const std::string &program);
+    void destroyInputContext(WasmInputContextId id);
+    bool keyEvent(WasmInputContextId id, const Key &key, bool isRelease);
+    void focusIn(WasmInputContextId id, bool isPassword);
+    void focusOut(WasmInputContextId id);
+    void resetInput(WasmInputContextId id);
+    void setSurroundingText(WasmInputContextId id, const std::string &text,
+                            unsigned int cursor, unsigned int anchor);
 
   private:
+    WasmInputContext *findInputContext(WasmInputContextId id) const;
+
     Instance *instance_;
     FocusGroup focusGroup_;
-    WasmInputContext *ic_;
+    std::unordered_map<WasmInputContextId, std::unique_ptr<WasmInputContext>>
+        inputContexts_;
+    WasmInputContextId nextInputContextId_ = 0;
     std::unique_ptr<HandlerTableEntry<EventHandler>> eventHandler_;
 };
 
@@ -48,7 +59,8 @@ class WasmFrontendFactory : public AddonFactory {
 class WasmInputContext : public InputContext {
   public:
     WasmInputContext(WasmFrontend *frontend,
-                     InputContextManager &inputContextManager);
+                     InputContextManager &inputContextManager,
+                     const std::string &program, WasmInputContextId id);
     ~WasmInputContext();
 
     const char *frontend() const override { return "wasm"; }
@@ -59,5 +71,6 @@ class WasmInputContext : public InputContext {
 
   private:
     WasmFrontend *frontend_;
+    WasmInputContextId id_;
 };
 } // namespace fcitx

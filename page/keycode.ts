@@ -1,7 +1,8 @@
 import type { KeyData } from './Fcitx5'
+import { sendSurroundingText } from './client'
 import { WEB } from './constant'
 import { isApple } from './context'
-import { getInputElement } from './focus'
+import { getInputContextId, getInputElement } from './focus'
 import Module from './module'
 
 let systemInputMethodInUseCallback = () => {}
@@ -26,7 +27,13 @@ function extract(event: KeyData): [string, string, number] | undefined {
 }
 
 export function processKey(key: string, code: string, modifiers: number, isRelease: boolean): boolean {
-  return Module.ccall('process_key', 'boolean', ['string', 'string', 'number', 'boolean'], [key, code, modifiers, isRelease])
+  // A pathname change can replace the input context without firing focus, so initialize its surrounding text before the first key.
+  sendSurroundingText()
+  const contextId = getInputContextId()
+  if (contextId === null) {
+    return false
+  }
+  return Module.ccall('process_key', 'boolean', ['number', 'string', 'string', 'number', 'boolean'], [contextId, key, code, modifiers, isRelease])
 }
 
 export function keyEvent(event: KeyData): boolean {

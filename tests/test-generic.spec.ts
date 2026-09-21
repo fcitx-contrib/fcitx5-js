@@ -45,8 +45,7 @@ test('Password', async ({ page }) => {
   const input = page.locator('input')
   input.evaluate((el: HTMLInputElement) => el.type = 'password')
   await page.evaluate(() => {
-    window.fcitx.setInputMethods(['keyboard-us', 'keyboard-th'])
-    window.fcitx.setCurrentInputMethod('keyboard-th')
+    window.fcitx.setInputMethods(['keyboard-th'])
   })
 
   await input.click()

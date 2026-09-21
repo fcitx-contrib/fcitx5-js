@@ -8,6 +8,38 @@ export async function init(page: Page) {
   })
 }
 
+export async function captureInputContextId(page: Page, activate: () => Promise<void>) {
+  await page.evaluate(() => {
+    const original = fcitx.Module.ccall
+    const capture: { id?: number, original: typeof original } = { original }
+    fcitx.__inputContextCapture = capture
+    fcitx.Module.ccall = ((...args: Parameters<typeof original>) => {
+      const result = original(...args)
+      if (args[0] === 'focus_in') {
+        capture.id = (args[3] as number[])[0]
+      }
+      return result
+    }) as typeof original
+  })
+  try {
+    await activate()
+    return await page.evaluate(() => {
+      const id = fcitx.__inputContextCapture.id
+      if (id === undefined) {
+        throw new Error('Input context was not focused')
+      }
+      return id
+    })
+  }
+  finally {
+    await page.evaluate(() => {
+      const capture = fcitx.__inputContextCapture
+      fcitx.Module.ccall = capture.original
+      delete fcitx.__inputContextCapture
+    })
+  }
+}
+
 export function browserName(page: Page) {
   return page.context().browser()!.browserType().name()
 }

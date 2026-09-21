@@ -1,15 +1,13 @@
 import type { Locator } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import { browserName, getBox, init } from './util'
+import { browserName, captureInputContextId, getBox, init } from './util'
 
 test('Caret with emoji', async ({ page }) => {
   await init(page)
 
   const textarea = page.locator('textarea')
-  await textarea.click()
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('🐦‍🔥she', 13)
-  })
+  const contextId = await captureInputContextId(page, () => textarea.click())
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, '🐦‍🔥she', 13), contextId)
   expect(await textarea.evaluate((el: HTMLTextAreaElement) => el.selectionStart)).toBe('🐦‍🔥sh'.length)
 })
 
@@ -23,15 +21,11 @@ test('Disable spellcheck', async ({ page }) => {
   const textarea = page.locator('textarea')
   expect(await getSpellCheck(textarea), 'Original value set by browser is true').toBe(true)
 
-  await textarea.click()
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('pin xie', 7)
-  })
+  const contextId = await captureInputContextId(page, () => textarea.click())
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, 'pin xie', 7), contextId)
   expect(await getSpellCheck(textarea), 'Spellcheck is turned off when there is preedit').toBe(false)
 
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('', 0)
-  })
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, '', 0), contextId)
   expect(await getSpellCheck(textarea), 'Original spellcheck value is restored').toBe(true)
 })
 
@@ -43,15 +37,11 @@ test('Respect original spellcheck value (manually set false)', async ({ page }) 
     el.spellcheck = false
   })
 
-  await textarea.click()
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('pin xie', 7)
-  })
+  const contextId = await captureInputContextId(page, () => textarea.click())
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, 'pin xie', 7), contextId)
   expect(await getSpellCheck(textarea), 'Spellcheck is turned off when there is preedit').toBe(false)
 
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('', 0)
-  })
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, '', 0), contextId)
   expect(await getSpellCheck(textarea), 'Original spellcheck value is restored').toBe(false)
 })
 
@@ -63,23 +53,17 @@ test('Underline', async ({ page }) => {
     el.style.width = '20px'
     el.style.fontSize = '16px'
   })
-  await textarea.focus()
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('aa', 0)
-  })
+  const contextId = await captureInputContextId(page, () => textarea.focus())
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, 'aa', 0), contextId)
   const underline = page.locator('.fcitx-preedit-underline')
   await expect(underline).toHaveCount(1)
   const box = await getBox(underline)
   expect(box.height).toBe(1)
 
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('', 0)
-  })
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, '', 0), contextId)
   await expect(underline, 'Clearing preedit should clear underline').not.toBeAttached()
 
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('aaa', 0)
-  })
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, 'aaa', 0), contextId)
   await expect(underline).toHaveCount(2)
   const firstBox = await getBox(underline.nth(0))
   const secondBox = await getBox(underline.nth(1))
@@ -89,9 +73,7 @@ test('Underline', async ({ page }) => {
   expect(secondBox.y).toBeGreaterThan(box.y)
   expect(secondBox.width, 'a should be thinner than aa').toBeLessThan(box.width)
 
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('啊', 0)
-  })
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, '啊', 0), contextId)
   await expect(underline).toHaveCount(1)
   const aBox = await getBox(underline)
   expect(aBox.height).toBe(1)
@@ -107,13 +89,13 @@ test('Underline follows page scroll', async ({ page }) => {
   await init(page)
 
   const textarea = page.locator('textarea')
-  await textarea.focus()
+  const contextId = await captureInputContextId(page, () => textarea.focus())
   const container = page.locator('.container')
-  await container.evaluate((el) => {
+  await container.evaluate((el, contextId) => {
     el.style.width = '110vw'
     el.style.height = '110vh'
-    window.fcitx.setPreedit('a', 0)
-  })
+    window.fcitx.setPreedit(contextId, 'a', 0)
+  }, contextId)
 
   const underline = page.locator('.fcitx-preedit-underline')
   const box = await getBox(underline)
@@ -144,8 +126,8 @@ test('Underline follows container scroll', async ({ page }) => {
     el.style.width = '120px'
     el.style.height = '120px'
   })
-  await textarea.focus()
-  await page.evaluate(() => window.fcitx.setPreedit('a', 0))
+  const contextId = await captureInputContextId(page, () => textarea.focus())
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, 'a', 0), contextId)
   const underline = page.locator('.fcitx-preedit-underline')
   const box = await getBox(underline)
 
@@ -168,11 +150,11 @@ test('Underline follows input horizontal scroll', async ({ page }) => {
   const input = page.locator('input')
   await input.evaluate(el => el.style.width = '20px')
 
-  await input.focus()
-  await page.evaluate(() => {
-    window.fcitx.commit('a')
-    window.fcitx.setPreedit('aaaaa', 0)
-  })
+  const contextId = await captureInputContextId(page, () => input.focus())
+  await page.evaluate((contextId) => {
+    window.fcitx.commit(contextId, 'a')
+    window.fcitx.setPreedit(contextId, 'aaaaa', 0)
+  }, contextId)
   const underline = page.locator('.fcitx-preedit-underline')
   const box = await getBox(underline)
 
@@ -194,11 +176,11 @@ test('Underline follows input vertical scroll', async ({ page }) => {
   await init(page)
 
   const textarea = page.locator('textarea')
-  await textarea.focus()
-  await page.evaluate(() => {
-    window.fcitx.commit('\n')
-    window.fcitx.setPreedit('a\nb', 0)
-  })
+  const contextId = await captureInputContextId(page, () => textarea.focus())
+  await page.evaluate((contextId) => {
+    window.fcitx.commit(contextId, '\n')
+    window.fcitx.setPreedit(contextId, 'a\nb', 0)
+  }, contextId)
   const underline = page.locator('.fcitx-preedit-underline')
   await expect(underline).toHaveCount(1)
   await textarea.evaluate(el => el.scrollBy(0, 50))
@@ -209,10 +191,8 @@ test('Underline follows input resize', async ({ page }) => {
   await init(page)
 
   const textarea = page.locator('textarea')
-  await textarea.focus()
-  await page.evaluate(() => {
-    window.fcitx.setPreedit('aaaaaaaaaaaaaaaa', 0)
-  })
+  const contextId = await captureInputContextId(page, () => textarea.focus())
+  await page.evaluate(contextId => window.fcitx.setPreedit(contextId, 'aaaaaaaaaaaaaaaa', 0), contextId)
   const underline = page.locator('.fcitx-preedit-underline')
   await expect(underline).toHaveCount(1)
 
