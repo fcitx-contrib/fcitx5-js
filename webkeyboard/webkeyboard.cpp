@@ -1,4 +1,5 @@
 #include "webkeyboard.h"
+#include "../src/action.h"
 #include <emscripten.h>
 #include <fcitx/action.h>
 #include <fcitx/inputpanel.h>
@@ -12,8 +13,6 @@ void notify_main_async(const std::string &str) {
     EM_ASM(fcitx.sendEventToKeyboard(UTF8ToString($0)), str.c_str());
 }
 
-nlohmann::json getMenuActions(InputContext *ic);
-
 WebKeyboard::WebKeyboard(Instance *instance) : instance_(instance) {}
 
 void WebKeyboard::update(UserInterfaceComponent component,
@@ -23,6 +22,10 @@ void WebKeyboard::update(UserInterfaceComponent component,
         int highlighted = -1;
         std::vector<Candidate> candidates;
         const InputPanel &inputPanel = inputContext->inputPanel();
+        const auto &list = inputPanel.candidateList();
+        const auto candidateContext = beginCandidateUpdate(
+            inputContext, list && list->toBulk() ? CandidateIndexMode::All
+                                                 : CandidateIndexMode::Page);
         Text preedit, auxUp;
         if (!inputPanel.empty()) {
             preedit =
@@ -37,10 +40,10 @@ void WebKeyboard::update(UserInterfaceComponent component,
                                  {"preedit", preedit.toString()},
                                  {"caret", inputPanel.preedit().cursor()}}}}
                               .dump());
-        if (const auto &list = inputPanel.candidateList()) {
+        if (list) {
             const auto &bulk = list->toBulk();
             if (bulk) {
-                return expand();
+                return expand(candidateContext);
             }
             int size = list->size();
             candidates.reserve(size);
@@ -60,7 +63,8 @@ void WebKeyboard::update(UserInterfaceComponent component,
         if (auxUp.empty() && preedit.empty() && candidates.empty()) {
             notify_main_async(R"JSON({"type":"CLEAR"})JSON");
         } else {
-            setCandidatesAsync(candidates, highlighted, 0, false, false,
+            setCandidatesAsync(candidateContext, candidates, highlighted, 0,
+                               false, false,
                                !inputPanel.clientPreedit().empty(), {});
         }
         break;
@@ -72,12 +76,15 @@ void WebKeyboard::update(UserInterfaceComponent component,
 }
 
 void WebKeyboard::setCandidatesAsync(
+    const CandidateContext &candidateContext,
     const std::vector<Candidate> &candidates, int highlighted, int scrollState,
     bool scrollStart, bool scrollEnd, bool hasClientPreedit,
     const std::span<const CandidateAction> &actions) {
     auto j = json{{"type", "CANDIDATES"},
                   {"data",
-                   {{"candidates", candidates},
+                   {{"inputContext", candidateContext.inputContext},
+                    {"generation", candidateContext.generation},
+                    {"candidates", candidates},
                     {"highlighted", highlighted},
                     {"scrollState", scrollState},
                     {"scrollStart", scrollStart},
@@ -88,10 +95,16 @@ void WebKeyboard::setCandidatesAsync(
 }
 
 // Vertically 2 screens.
-void WebKeyboard::expand() { scroll(0, 60); }
+void WebKeyboard::expand(const CandidateContext &candidateContext) {
+    scroll(candidateContext.inputContext, candidateContext.generation, 0, 60);
+}
 
-void WebKeyboard::scroll(int start, int count) {
-    auto ic = instance_->mostRecentInputContext();
+void WebKeyboard::scroll(std::string_view inputContext, uint32_t generation,
+                         int start, int count) {
+    auto *ic = candidateInputContext(inputContext, generation);
+    if (!ic) {
+        return;
+    }
     const auto &list = ic->inputPanel().candidateList();
     if (!list) {
         return;
@@ -120,15 +133,17 @@ void WebKeyboard::scroll(int start, int count) {
     if (const auto &tabbed = list->toTabbed()) {
         tabbedActions = tabbed->tabActions();
     }
-    setCandidatesAsync(candidates, start == 0 ? 0 : -1, 2, start == 0,
-                       endReached, !ic->inputPanel().clientPreedit().empty(),
+    setCandidatesAsync({std::string(inputContext), generation}, candidates,
+                       start == 0 ? 0 : -1, 2, start == 0, endReached,
+                       !ic->inputPanel().clientPreedit().empty(),
                        tabbedActions);
 }
 
 void WebKeyboard::updateStatusArea(InputContext *ic) {
     notify_main_async(
-        json{{"type", "STATUS_AREA"}, {"data", getMenuActions(ic)}}.dump());
+        json{{"type", "STATUS_AREA"}, {"data", statusAreaData(ic)}}.dump());
 }
+
 } // namespace fcitx
 
 FCITX_ADDON_FACTORY_V2(webkeyboard, fcitx::WebKeyboardFactory)

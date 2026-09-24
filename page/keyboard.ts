@@ -289,7 +289,7 @@ export function sendEventToKeyboard(message: string) {
       hasCandidates = false
       break
     case 'STATUS_AREA':
-      globalThis.fcitx.updateStatusArea()
+      globalThis.fcitx.updateStatusArea(event.data)
       break
   }
   onMessage(message)
@@ -352,13 +352,13 @@ export function createKeyboard() {
     sendEvent(event) {
       switch (event.type) {
         case 'ASK_CANDIDATE_ACTIONS':
-          return fcitx.Module.ccall('ask_candidate_actions', null, ['number'], [event.data])
+          return fcitx.Module.ccall('ask_candidate_actions', null, ['number', 'string', 'number'], [event.data.index, event.data.inputContext, event.data.generation])
         case 'BACKSPACE_SLIDE':
           return backspaceSlide(event.data)
         case 'CANDIDATE_ACTION':
-          return fcitx.Module.ccall('activate_candidate_action', null, ['number', 'number'], [event.data.index, event.data.id])
+          return fcitx.Module.ccall('activate_candidate_action', null, ['number', 'number', 'string', 'number'], [event.data.index, event.data.id, event.data.inputContext, event.data.generation])
         case 'CANDIDATE_TAB_ACTION':
-          return fcitx.Module.ccall('activate_candidate_tab_action', null, ['number'], [event.data])
+          return fcitx.Module.ccall('activate_candidate_tab_action', null, ['number', 'string', 'number'], [event.data.id, event.data.inputContext, event.data.generation])
         case 'COLLAPSE':
           return getInputElement()?.blur()
         case 'COMMIT':
@@ -390,7 +390,7 @@ export function createKeyboard() {
         case 'REDO':
           return redo()
         case 'SCROLL':
-          return fcitx.Module.ccall('scroll', null, ['number', 'number'], [event.data.start, event.data.count])
+          return fcitx.Module.ccall('scroll', null, ['number', 'number', 'string', 'number'], [event.data.start, event.data.count, event.data.inputContext, event.data.generation])
         case 'SELECT': {
           const input = getInputElement()
           if (input) {
@@ -409,11 +409,11 @@ export function createKeyboard() {
           break
         }
         case 'SELECT_CANDIDATE':
-          return fcitx.Module.ccall('select_candidate', null, ['number'], [event.data])
+          return fcitx.Module.ccall('select_candidate', null, ['number', 'string', 'number'], [event.data.index, event.data.inputContext, event.data.generation])
         case 'SET_INPUT_METHOD':
           return fcitx.setCurrentInputMethod(event.data)
         case 'STATUS_AREA_ACTION':
-          return activateMenuAction(event.data)
+          return activateMenuAction(event.data.id, event.data.inputContext, event.data.generation)
         case 'UNDO':
           return undo()
       }

@@ -3,6 +3,7 @@
 #include "../wasmfrontend/wasmfrontend.h"
 #include "../wasmnotifications/notifications.h"
 #include "../webkeyboard/webkeyboard.h"
+#include "candidate.h"
 #include "event_js.h"
 #include "isocodes.h"
 #include "keycode.h"
@@ -33,17 +34,22 @@ IsoCodes isoCodes;
 
 void notify_main_async(const std::string &str);
 
-static void answerCandidateAction(ActionableCandidateList *actionableList,
+static void answerCandidateAction(std::string_view inputContext,
+                                  uint32_t generation,
+                                  ActionableCandidateList *actionableList,
                                   const CandidateWord &candidate, int index) {
     if (actionableList->hasAction(candidate)) {
         json actions = json::array();
         for (const auto &action : actionableList->candidateActions(candidate)) {
             actions.push_back({{"id", action.id()}, {"text", action.text()}});
         }
-        notify_main_async(
-            json{{"type", "CANDIDATE_ACTIONS"},
-                 {"data", {{"index", index}, {"actions", actions}}}}
-                .dump());
+        notify_main_async(json{{"type", "CANDIDATE_ACTIONS"},
+                               {"data",
+                                {{"inputContext", inputContext},
+                                 {"generation", generation},
+                                 {"index", index},
+                                 {"actions", actions}}}}
+                              .dump());
     }
 }
 
@@ -86,33 +92,34 @@ EMSCRIPTEN_KEEPALIVE bool process_key(uint32_t id, const char *key,
 
 EMSCRIPTEN_KEEPALIVE void toggle() { instance->toggle(); }
 
-// For virtual keyboard (scroll mode whenever possible) and ChromeOS (normal
-// mode) only.
-EMSCRIPTEN_KEEPALIVE void select_candidate(int index) {
-    auto ic = instance->mostRecentInputContext();
+EMSCRIPTEN_KEEPALIVE void select_candidate(int index, const char *inputContext,
+                                           uint32_t generation) {
+    auto *ic = inputContext && *inputContext
+                   ? candidateInputContext(inputContext, generation)
+                   : nullptr;
+    if (!ic) {
+        return;
+    }
     const auto &list = ic->inputPanel().candidateList();
     if (!list)
         return;
-    const auto &bulk = list->toBulk();
-    if (runtime != Runtime::serviceworker &&
-        bulk) { // ChromeOS doesn't support scroll mode.
-        try {
-            bulk->candidateFromAll(index).select(ic);
-        } catch (const std::invalid_argument &e) {
-            FCITX_ERROR() << "select candidate index out of range";
-        }
-        return;
-    }
     try {
         // Engine is responsible for updating UI
-        list->candidate(index).select(ic);
+        candidateAt(*list, index).select(ic);
     } catch (const std::invalid_argument &e) {
         FCITX_ERROR() << "select candidate index out of range";
     }
 }
 
-EMSCRIPTEN_KEEPALIVE void ask_candidate_actions(int index) {
-    auto ic = instance->mostRecentInputContext();
+EMSCRIPTEN_KEEPALIVE void ask_candidate_actions(int index,
+                                                const char *inputContext,
+                                                uint32_t generation) {
+    auto *ic = inputContext && *inputContext
+                   ? candidateInputContext(inputContext, generation)
+                   : nullptr;
+    if (!ic) {
+        return;
+    }
     const auto &list = ic->inputPanel().candidateList();
     if (!list)
         return;
@@ -120,26 +127,24 @@ EMSCRIPTEN_KEEPALIVE void ask_candidate_actions(int index) {
     if (!actionableList) {
         return;
     }
-    const auto &bulk = list->toBulk();
-    if (bulk) {
-        try {
-            auto &candidate = bulk->candidateFromAll(index);
-            answerCandidateAction(actionableList, candidate, index);
-        } catch (const std::invalid_argument &e) {
-            FCITX_ERROR() << "action candidate index out of range";
-        }
-        return;
-    }
     try {
-        auto &candidate = list->candidate(index);
-        answerCandidateAction(actionableList, candidate, index);
+        const auto &candidate = candidateAt(*list, index);
+        answerCandidateAction(inputContext, generation, actionableList,
+                              candidate, index);
     } catch (const std::invalid_argument &e) {
         FCITX_ERROR() << "action candidate index out of range";
     }
 }
 
-EMSCRIPTEN_KEEPALIVE void activate_candidate_action(int index, int id) {
-    auto ic = instance->mostRecentInputContext();
+EMSCRIPTEN_KEEPALIVE void activate_candidate_action(int index, int id,
+                                                    const char *inputContext,
+                                                    uint32_t generation) {
+    auto *ic = inputContext && *inputContext
+                   ? candidateInputContext(inputContext, generation)
+                   : nullptr;
+    if (!ic) {
+        return;
+    }
     const auto &list = ic->inputPanel().candidateList();
     if (!list)
         return;
@@ -147,20 +152,8 @@ EMSCRIPTEN_KEEPALIVE void activate_candidate_action(int index, int id) {
     if (!actionableList) {
         return;
     }
-    const auto &bulk = list->toBulk();
-    if (bulk) {
-        try {
-            const auto &candidate = bulk->candidateFromAll(index);
-            if (actionableList->hasAction(candidate)) {
-                actionableList->triggerAction(candidate, id);
-            }
-        } catch (const std::invalid_argument &e) {
-            FCITX_ERROR() << "action candidate index out of range";
-        }
-        return;
-    }
     try {
-        auto &candidate = list->candidate(index);
+        const auto &candidate = candidateAt(*list, index);
         if (actionableList->hasAction(candidate)) {
             actionableList->triggerAction(candidate, id);
         }
@@ -169,8 +162,15 @@ EMSCRIPTEN_KEEPALIVE void activate_candidate_action(int index, int id) {
     }
 }
 
-EMSCRIPTEN_KEEPALIVE void activate_candidate_tab_action(int id) {
-    auto ic = instance->mostRecentInputContext();
+EMSCRIPTEN_KEEPALIVE void
+activate_candidate_tab_action(int id, const char *inputContext,
+                              uint32_t generation) {
+    auto *ic = inputContext && *inputContext
+                   ? candidateInputContext(inputContext, generation)
+                   : nullptr;
+    if (!ic) {
+        return;
+    }
     const auto &list = ic->inputPanel().candidateList();
     if (!list) {
         return;
@@ -182,8 +182,11 @@ EMSCRIPTEN_KEEPALIVE void activate_candidate_tab_action(int id) {
     tabbedList->triggerTabAction(id);
 }
 
-EMSCRIPTEN_KEEPALIVE void scroll(int start, int count) {
-    ui->scroll(start, count);
+EMSCRIPTEN_KEEPALIVE void scroll(int start, int count, const char *inputContext,
+                                 uint32_t generation) {
+    if (inputContext && *inputContext && ui) {
+        ui->scroll(inputContext, generation, start, count);
+    }
 }
 
 EMSCRIPTEN_KEEPALIVE void write_clipboard(const char *text) {

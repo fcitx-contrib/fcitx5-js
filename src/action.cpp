@@ -1,4 +1,6 @@
+#include "action.h"
 #include "fcitx.h"
+#include "inputcontexttoken.h"
 #include <emscripten.h>
 #include <fcitx/action.h>
 #include <fcitx/menu.h>
@@ -7,6 +9,13 @@
 #include <nlohmann/json.hpp>
 
 namespace fcitx {
+
+namespace {
+
+uint32_t statusAreaGeneration = 0;
+
+} // namespace
+
 static nlohmann::json actionToJson(Action *action, InputContext *ic) {
     nlohmann::json j;
     j["id"] = action->id();
@@ -27,7 +36,7 @@ static nlohmann::json actionToJson(Action *action, InputContext *ic) {
     return j;
 }
 
-nlohmann::json getMenuActions(InputContext *ic) {
+static nlohmann::json menuActionsToJson(InputContext *ic) {
     nlohmann::json actions = nlohmann::json::array();
     auto &statusArea = ic->statusArea();
     for (auto *action : statusArea.allActions()) {
@@ -40,18 +49,35 @@ nlohmann::json getMenuActions(InputContext *ic) {
     return actions;
 }
 
-extern "C" {
-EMSCRIPTEN_KEEPALIVE const char *get_menu_actions() {
-    static std::string ret;
-    if (auto *ic = instance->mostRecentInputContext()) {
-        ret = getMenuActions(ic).dump();
-        return ret.c_str();
+nlohmann::json statusAreaData(InputContext *inputContext) {
+    if (++statusAreaGeneration == 0) {
+        ++statusAreaGeneration;
     }
-    return "[]";
+    return {{"inputContext", inputContextToken(*inputContext)},
+            {"generation", statusAreaGeneration},
+            {"actions", menuActionsToJson(inputContext)}};
 }
 
-EMSCRIPTEN_KEEPALIVE void activate_menu_action(int id) {
-    if (auto *ic = instance->mostRecentInputContext()) {
+void notifyStatusArea(InputContext *inputContext) {
+    auto data = statusAreaData(inputContext).dump();
+    EM_ASM(fcitx.updateStatusArea(JSON.parse(UTF8ToString($0))), data.c_str());
+}
+
+InputContext *statusAreaInputContext(std::string_view inputContext,
+                                     uint32_t generation) {
+    if (generation != statusAreaGeneration) {
+        return nullptr;
+    }
+    return findInputContext(instance.get(), inputContext);
+}
+
+extern "C" {
+EMSCRIPTEN_KEEPALIVE void activate_menu_action(int id, const char *inputContext,
+                                               uint32_t generation) {
+    if (!inputContext || !*inputContext) {
+        return;
+    }
+    if (auto *ic = statusAreaInputContext(inputContext, generation)) {
         auto *action = instance->userInterfaceManager().lookupActionById(id);
         action->activate(ic);
     }

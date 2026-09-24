@@ -1,4 +1,6 @@
 #include "chromepanel.h"
+#include "../src/action.h"
+#include "../src/candidate.h"
 #include <emscripten.h>
 #include <fcitx/inputpanel.h>
 #include <nlohmann/json.hpp>
@@ -23,6 +25,8 @@ void ChromePanel::update(UserInterfaceComponent component,
                          InputContext *inputContext) {
     switch (component) {
     case UserInterfaceComponent::InputPanel: {
+        const auto candidateContext =
+            beginCandidateUpdate(inputContext, CandidateIndexMode::Page);
         const InputPanel &inputPanel = inputContext->inputPanel();
         std::vector<Candidate> candidates;
         int highlighted = -1;
@@ -48,7 +52,9 @@ void ChromePanel::update(UserInterfaceComponent component,
             }
         }
         auto str =
-            json{{"candidates", candidates},
+            json{{"inputContext", candidateContext.inputContext},
+                 {"generation", candidateContext.generation},
+                 {"candidates", candidates},
                  {"highlighted", highlighted},
                  {"preedit",
                   instance_->outputFilter(inputContext, inputPanel.preedit())
@@ -62,7 +68,7 @@ void ChromePanel::update(UserInterfaceComponent component,
         break;
     }
     case UserInterfaceComponent::StatusArea:
-        EM_ASM(fcitx.updateStatusArea());
+        notifyStatusArea(inputContext);
         break;
     }
 }

@@ -1,7 +1,8 @@
+import type { StatusArea } from './Fcitx5'
 import type { Input } from './focus'
 import { initPanel } from 'fcitx5-webview'
 import UZIP from 'uzip'
-import { activateMenuAction, getMenuActions } from './action'
+import { activateMenuAction } from './action'
 import { cli } from './cli'
 import { commit, deleteSurroundingText, placePanel, setPreedit } from './client'
 import { getAddons, getConfig, setConfig } from './config'
@@ -24,7 +25,21 @@ import { deployRimeInWorker, zip } from './workerAPI'
 const { promise: fcitxReady, resolve } = Promise.withResolvers()
 
 let inputMethodsCallback = () => {}
-let statusAreaCallback = () => {}
+let statusAreaCallback: (statusArea: StatusArea) => void = () => {}
+let chromeOSInputContextId: number | null = null
+
+function enableChromeOSInputContext() {
+  if (chromeOSInputContextId === null) {
+    chromeOSInputContextId = Module.ccall('create_input_context', 'number', ['string'], ['chromeos'])
+  }
+  const id = chromeOSInputContextId
+  return {
+    id,
+    keyEvent: (event: Parameters<typeof keyEvent>[0]) => keyEvent(event, id),
+    focusIn: (isPassword: boolean) => Module.ccall('focus_in', null, ['number', 'boolean'], [id, isPassword]),
+    focusOut: () => Module.ccall('focus_out', null, ['number'], [id]),
+  }
+}
 
 function getRuntime() {
   // @ts-expect-error uncertain environment
@@ -72,7 +87,6 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
   getAddons,
   jsKeyToFcitxString,
   fcitxStringToLocalizedString,
-  getMenuActions,
   activateMenuAction,
   installPlugin,
   getInstalledPlugins,
@@ -84,8 +98,11 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
       createKeyboard() // Must be called before init as webkeyboard will manipulate DOM.
     }
     Module.ccall('init', null, ['string', 'number', 'boolean'], [getLocale(), globalThis.fcitx.runtime, hasTouch])
+    if (globalThis.fcitx.runtime === SERVICE_WORKER) {
+      return enableChromeOSInputContext()
+    }
     if (globalThis.fcitx.runtime !== WEB) {
-      return { keyEvent }
+      return
     }
     startInputContextTracking()
     document.addEventListener('focus', focus, true)
@@ -116,6 +133,13 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     }
   },
   disable() {
+    if (globalThis.fcitx.runtime === SERVICE_WORKER) {
+      if (chromeOSInputContextId !== null) {
+        Module.ccall('destroy_input_context', null, ['number'], [chromeOSInputContextId])
+        chromeOSInputContextId = null
+      }
+      return
+    }
     if (globalThis.fcitx.runtime !== WEB) {
       return
     }
@@ -148,11 +172,11 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
       } }))
     }
   },
-  setStatusAreaCallback(callback: () => void) {
+  setStatusAreaCallback(callback: (statusArea: StatusArea) => void) {
     statusAreaCallback = callback
   },
-  updateStatusArea() {
-    statusAreaCallback()
+  updateStatusArea(statusArea: StatusArea) {
+    statusAreaCallback(statusArea)
   },
   setNotificationCallback,
   notify,
