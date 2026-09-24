@@ -20,13 +20,13 @@
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "@antfu/eslint-config": "^9.0.0",
-    "@playwright/test": "1.60.0",
-    "@types/node": "^25.9.2",
+    "@antfu/eslint-config": "^9.5.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "^26.6.2",
     "@types/uzip": "^0.20201231.2",
     "error-stack-parser": "^2.1.4",
-    "esbuild": "^0.28.0",
-    "eslint": "^10.4.1",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.11.0",
     "fcitx5-keyboard-web": "link:fcitx5-keyboard-web",
     "fcitx5-webview": "link:fcitx5-webview",
     "serve": "^14.2.6",
@@ -35,6 +35,6 @@
     "uzip": "^0.20201231.0"
   },
   "dependencies": {
-    "@types/emscripten": "^1.41.5"
+    "@types/emscripten": "^1.41.6"
   }
 }
