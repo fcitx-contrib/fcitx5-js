@@ -137,7 +137,7 @@ jobs:
         run: |
           npx playwright install
           npx playwright install-deps
-          pnpm run test
+          pnpm exec playwright test --workers=1 --reporter=line
 
       - name: Setup tmate session
         if: ${{ failure() }}
