@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 26.9.0
+          node-version: 26.x
 
       - name: Install dependencies
         run: |
@@ -51,7 +51,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 26.9.0
+          node-version: 26.x
 
       - name: Set up Homebrew (Ubuntu)
         if: ${{ matrix.os == 'ubuntu-24.04' }}
@@ -137,7 +137,7 @@ jobs:
         run: |
           npx playwright install
           npx playwright install-deps
-          pnpm exec playwright test --workers=1 --reporter=list --global-timeout=720000
+          pnpm run test
 
       - name: Setup tmate session
         if: ${{ failure() }}
