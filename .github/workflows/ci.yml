@@ -134,10 +134,12 @@ jobs:
 
       - name: Test
         if: ${{ matrix.rime_only != 'ON' }}
+        env:
+          DEBUG: pw:browser,pw:webserver
         run: |
           npx playwright install
           npx playwright install-deps
-          pnpm exec playwright test --workers=1 --reporter=line
+          pnpm exec playwright test --workers=1 --reporter=list --global-timeout=720000
 
       - name: Setup tmate session
         if: ${{ failure() }}
