@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 26.x
+          node-version: 26.9.0
 
       - name: Install dependencies
         run: |
@@ -51,7 +51,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 26.x
+          node-version: 26.9.0
 
       - name: Set up Homebrew (Ubuntu)
         if: ${{ matrix.os == 'ubuntu-24.04' }}
