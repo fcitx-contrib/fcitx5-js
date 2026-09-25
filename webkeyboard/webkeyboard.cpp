@@ -140,8 +140,15 @@ void WebKeyboard::scroll(std::string_view inputContext, uint32_t generation,
 }
 
 void WebKeyboard::updateStatusArea(InputContext *ic) {
+    if (!ic->hasFocus()) {
+        return;
+    }
+    auto statusArea = statusAreaData(ic);
+    if (!statusArea) {
+        return;
+    }
     notify_main_async(
-        json{{"type", "STATUS_AREA"}, {"data", statusAreaData(ic)}}.dump());
+        json{{"type", "STATUS_AREA"}, {"data", *statusArea}}.dump());
 }
 
 } // namespace fcitx

@@ -49,17 +49,27 @@ static nlohmann::json menuActionsToJson(InputContext *ic) {
     return actions;
 }
 
-nlohmann::json statusAreaData(InputContext *inputContext) {
+std::optional<nlohmann::json> statusAreaData(InputContext *inputContext) {
+    if (!inputContext->hasFocus()) {
+        return std::nullopt;
+    }
     if (++statusAreaGeneration == 0) {
         ++statusAreaGeneration;
     }
-    return {{"inputContext", inputContextToken(*inputContext)},
-            {"generation", statusAreaGeneration},
-            {"actions", menuActionsToJson(inputContext)}};
+    return nlohmann::json{{"inputContext", inputContextToken(*inputContext)},
+                          {"generation", statusAreaGeneration},
+                          {"actions", menuActionsToJson(inputContext)}};
 }
 
 void notifyStatusArea(InputContext *inputContext) {
-    auto data = statusAreaData(inputContext).dump();
+    if (!inputContext->hasFocus()) {
+        return;
+    }
+    auto statusArea = statusAreaData(inputContext);
+    if (!statusArea) {
+        return;
+    }
+    auto data = statusArea->dump();
     EM_ASM(fcitx.updateStatusArea(JSON.parse(UTF8ToString($0))), data.c_str());
 }
 
