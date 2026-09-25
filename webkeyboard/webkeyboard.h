@@ -1,11 +1,16 @@
 #pragma once
 
+#include "../src/candidate.h"
+
 #include <fcitx/addonfactory.h>
 #include <fcitx/addoninstance.h>
 #include <fcitx/addonmanager.h>
 #include <fcitx/candidatelist.h>
 #include <fcitx/instance.h>
 #include <nlohmann/json.hpp>
+
+#include <cstdint>
+#include <string_view>
 
 using json = nlohmann::json;
 
@@ -58,17 +63,21 @@ class WebKeyboard final : public VirtualKeyboardUserInterface {
     void showVirtualKeyboard() override {}
     void hideVirtualKeyboard() override {}
     void updateStatusArea(InputContext *ic);
-    void scroll(int start, int count);
+    void scroll(std::string_view inputContext, uint32_t generation, int start,
+                int count);
 
   private:
     Instance *instance_;
 
-    void setCandidatesAsync(const std::vector<Candidate> &candidates,
+    void setCandidatesAsync(const CandidateContext &candidateContext,
+                            const std::vector<Candidate> &candidates,
                             int highlighted, int scrollState, bool scrollStart,
                             bool scrollEnd, bool hasClientPreedit,
                             const std::span<const CandidateAction> &actions);
-    void expand();
+    void expand(const CandidateContext &candidateContext);
 };
+
+extern WebKeyboard *ui;
 
 class WebKeyboardFactory : public AddonFactory {
   public:

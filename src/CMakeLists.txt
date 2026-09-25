@@ -4,6 +4,7 @@ add_executable(Fcitx5
     input_method.cpp
     config.cpp
     action.cpp
+    candidate.cpp
     event_js.cpp
     ${DUMMY_CPP}
 )

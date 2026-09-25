@@ -3,6 +3,7 @@
 #include <fcitx/inputpanel.h>
 #include <nlohmann/json.hpp>
 
+#include "../src/action.h"
 #include "webpanel.h"
 
 bool f5m_is_linear_layout = false;
@@ -460,7 +461,7 @@ void WebPanel::update(UserInterfaceComponent component,
         break;
     }
     case UserInterfaceComponent::StatusArea:
-        EM_ASM(fcitx.updateStatusArea());
+        notifyStatusArea(inputContext);
         break;
     }
 }

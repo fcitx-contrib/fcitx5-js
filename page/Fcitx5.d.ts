@@ -28,6 +28,12 @@ export interface MenuAction {
   children?: MenuAction[]
 }
 
+export interface StatusArea {
+  inputContext: string
+  generation: number
+  actions: MenuAction[]
+}
+
 interface AddonCategory {
   addons: {
     comment: string
@@ -61,6 +67,13 @@ export interface KeyData {
   preventDefault: () => void
 }
 
+export interface ChromeOSInputContext {
+  id: number
+  keyEvent: (keyData: KeyData) => boolean
+  focusIn: (isPassword: boolean) => void
+  focusOut: () => void
+}
+
 export interface CustomPhrase {
   keyword: string
   phrase: string
@@ -71,7 +84,7 @@ export interface CustomPhrase {
 export interface FCITX {
   (name: string, ...args: any[]): string
   // Return value is for ChromeOS.
-  enable: () => { keyEvent: (keyData: KeyData) => boolean } | undefined
+  enable: () => ChromeOSInputContext | undefined
   // ChromeOS only.
   commit: (contextId: number, text: string) => void
   // ChromeOS only.
@@ -87,15 +100,14 @@ export interface FCITX {
   getAllInputMethods: () => { name: string, displayName: string, languageCode: string }[]
   setInputMethodsCallback: (callback: () => void) => void
   updateInputMethods: () => void
-  setStatusAreaCallback: (callback: () => void) => void
-  updateStatusArea: () => void
+  setStatusAreaCallback: (callback: (statusArea: StatusArea) => void) => void
+  updateStatusArea: (statusArea: StatusArea) => void
   getConfig: (uri: string) => Config
   setConfig: (uri: string, json: object) => void
   getAddons: () => AddonCategory[]
   jsKeyToFcitxString: (event: KeyboardEvent) => string
   fcitxStringToLocalizedString: (key: string) => string
-  getMenuActions: () => MenuAction[]
-  activateMenuAction: (id: number) => void
+  activateMenuAction: (id: number, inputContext: string, generation: number) => void
   installPlugin: (buffer: ArrayBuffer) => string
   getInstalledPlugins: () => string[]
   unzip: (buffer: ArrayBuffer, dir: string) => void

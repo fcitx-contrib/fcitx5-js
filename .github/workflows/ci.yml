@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install -y clang-format
-          npm i -g pnpm
+          npm i -g pnpm@12.5.1
           pnpm --prefix=fcitx5-keyboard-web i
           pnpm --prefix=fcitx5-keyboard-web run build
           pnpm --prefix=fcitx5-webview i
@@ -71,7 +71,7 @@ jobs:
 
       - name: Install node dependencies
         run: |
-          npm i -g pnpm
+          npm i -g pnpm@12.5.1
           pnpm --prefix=fcitx5-keyboard-web i
           pnpm --prefix=fcitx5-keyboard-web run build
           pnpm --prefix=fcitx5-webview i

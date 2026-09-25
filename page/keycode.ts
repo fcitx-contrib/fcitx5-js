@@ -26,17 +26,18 @@ function extract(event: KeyData): [string, string, number] | undefined {
   return [key, code, modifiers]
 }
 
-export function processKey(key: string, code: string, modifiers: number, isRelease: boolean): boolean {
-  // A pathname change can replace the input context without firing focus, so initialize its surrounding text before the first key.
-  sendSurroundingText()
-  const contextId = getInputContextId()
+export function processKey(key: string, code: string, modifiers: number, isRelease: boolean, contextId: number | null = getInputContextId()): boolean {
+  if (globalThis.fcitx.runtime === WEB) {
+    // A pathname change can replace the input context without firing focus, so initialize its surrounding text before the first key.
+    sendSurroundingText()
+  }
   if (contextId === null) {
     return false
   }
   return Module.ccall('process_key', 'boolean', ['number', 'string', 'string', 'number', 'boolean'], [contextId, key, code, modifiers, isRelease])
 }
 
-export function keyEvent(event: KeyData): boolean {
+export function keyEvent(event: KeyData, contextId?: number): boolean {
   const extracted = extract(event)
   if (!extracted) {
     systemInputMethodInUseCallback()
@@ -56,7 +57,7 @@ export function keyEvent(event: KeyData): boolean {
       }
     }
   }
-  if (processKey(...extracted, isRelease)) {
+  if (processKey(...extracted, isRelease, contextId ?? getInputContextId())) {
     if (globalThis.fcitx.runtime === WEB) {
       event.preventDefault()
     }
