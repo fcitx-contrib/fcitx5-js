@@ -76,6 +76,22 @@ test('Clicking panel remains focus', async ({ page }) => {
   await expect(textarea).toBeFocused()
 })
 
+test('Panel refocus does not steal a newer focus', async ({ page }) => {
+  await init(page)
+
+  const textarea = page.locator('textarea')
+  const input = page.locator('input')
+  await textarea.focus()
+  await page.evaluate(() => {
+    document.querySelector<HTMLElement>('.fcitx-decoration')!.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    document.querySelector('textarea')!.blur()
+    document.querySelector('input')!.focus()
+  })
+  await page.waitForTimeout(50)
+
+  await expect(input).toBeFocused()
+})
+
 test('Clicking input switches focus', async ({ page }) => {
   await init(page)
 

@@ -16,6 +16,8 @@ let input: Input | null = null
 let userClick = false
 let originalSpellCheck = true
 let inputHandlingEnabled = false
+let focusGeneration = 0
+let internallyBlurredInput: Input | null = null
 const inputContexts = new Map<Input, InputContext>()
 const inputContextElements = new Map<number, Input>()
 const originalReadOnly = new Map<Input, boolean>()
@@ -29,22 +31,29 @@ function setInputReadOnly(element: Input) {
 }
 
 function scheduleRefocus(element: Input, blurFirst: boolean) {
+  const scheduledFocusGeneration = focusGeneration
   const timer = window.setTimeout(() => {
     refocusTimers.delete(timer)
-    if (!inputHandlingEnabled) {
+    if (!inputHandlingEnabled || focusGeneration !== scheduledFocusGeneration) {
       return
     }
     if (!blurFirst) {
       element.focus()
       return
     }
-    element.blur()
-    if (!inputHandlingEnabled) {
+    internallyBlurredInput = element
+    try {
+      element.blur()
+    }
+    finally {
+      internallyBlurredInput = null
+    }
+    if (!inputHandlingEnabled || focusGeneration !== scheduledFocusGeneration) {
       return
     }
     const refocusTimer = window.setTimeout(() => {
       refocusTimers.delete(refocusTimer)
-      if (inputHandlingEnabled) {
+      if (inputHandlingEnabled && focusGeneration === scheduledFocusGeneration) {
         element.focus()
       }
     }, 0)
@@ -58,6 +67,11 @@ function cancelRefocus() {
     clearTimeout(timer)
   }
   refocusTimers.clear()
+}
+
+function invalidateRefocus() {
+  focusGeneration++
+  cancelRefocus()
 }
 
 function inputContextProgram() {
@@ -185,7 +199,7 @@ export function startInputContextTracking() {
 export function stopInputContextTracking() {
   inputHandlingEnabled = false
   userClick = false
-  cancelRefocus()
+  invalidateRefocus()
   inputContextObserver?.disconnect()
   if (input) {
     cleanupInputSession()
@@ -210,17 +224,19 @@ export function refocusInput(element: Input) {
   scheduleRefocus(element, false)
 }
 
-export function focus() {
-  if (!inputHandlingEnabled || !isInputElement(document.activeElement)) {
+export function focus(event?: FocusEvent) {
+  invalidateRefocus()
+  const target = (event?.target as Element | null) ?? document.activeElement
+  if (!inputHandlingEnabled || !isInputElement(target)) {
     return
   }
-  if (input === document.activeElement && inputContexts.has(input)) {
+  if (input === target && inputContexts.has(input)) {
     return
   }
-  if (input && input !== document.activeElement) {
+  if (input && input !== target) {
     cleanupInputSession()
   }
-  input = <Input>document.activeElement
+  input = target
   originalSpellCheck = input.spellcheck
   if (hasTouch) {
     if (!input.readOnly) {
@@ -286,8 +302,12 @@ function cleanupInputSession() {
   resetPreedit()
 }
 
-export function blur() {
-  if (!input) {
+export function blur(event?: FocusEvent) {
+  const target = (event?.target as Element | null) ?? input
+  if (target !== internallyBlurredInput) {
+    invalidateRefocus()
+  }
+  if (!input || target !== input) {
     return
   }
   // Don't call focus_out if user clicks panel.

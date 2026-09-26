@@ -107,6 +107,22 @@ test('Touching input switches focus', async ({ page }) => {
   await expectKeyboardShown(page)
 })
 
+test('System keyboard refocus does not steal a newer focus', async ({ page }) => {
+  await init(page)
+
+  const input = page.locator('input')
+  await page.evaluate(() => {
+    const textarea = document.createElement('textarea')
+    textarea.id = 'late-textarea'
+    textarea.addEventListener('blur', () => document.querySelector('input')!.focus(), { once: true })
+    document.body.append(textarea)
+    textarea.focus()
+  })
+  await page.waitForTimeout(50)
+
+  await expect(input).toBeFocused()
+})
+
 test('Kick system keyboard', async ({ page }) => {
   await init(page)
 
