@@ -9,13 +9,13 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 26.x
 
@@ -40,31 +40,31 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: ubuntu-24.04, os: ubuntu-24.04 }
-          - { name: ubuntu-24.04-arm, os: ubuntu-24.04-arm }
+          - { name: ubuntu-26.04, os: ubuntu-26.04 }
+          - { name: ubuntu-26.04-arm, os: ubuntu-26.04-arm }
           - { name: macos-26, os: macos-26 }
-          - { name: rime-only, os: ubuntu-24.04, rime_only: 'ON' }
+          - { name: rime-only, os: ubuntu-26.04, rime_only: 'ON' }
     steps:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 26.x
 
       - name: Set up Homebrew (Ubuntu)
-        if: ${{ matrix.os == 'ubuntu-24.04' }}
+        if: ${{ matrix.os == 'ubuntu-26.04' }}
         uses: Homebrew/actions/setup-homebrew@main
 
       # Use latest gettext and cmake to compare with macOS.
       - name: Install dependencies (Ubuntu)
-        if: ${{ matrix.os == 'ubuntu-24.04' }}
+        if: ${{ matrix.os == 'ubuntu-26.04' }}
         run: |
           brew install gettext cmake
 
       - name: Install dependencies (Ubuntu arm64)
-        if: ${{ matrix.os == 'ubuntu-24.04-arm' }}
+        if: ${{ matrix.os == 'ubuntu-26.04-arm' }}
         run: |
           sudo apt install -y \
             gettext
@@ -155,7 +155,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v8
         with:
-          pattern: artifact-ubuntu-24.04
+          pattern: artifact-ubuntu-26.04
           merge-multiple: true
 
       - name: Release
