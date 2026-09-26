@@ -1,5 +1,4 @@
 import type { StatusArea } from './Fcitx5'
-import type { Input } from './focus'
 import { initPanel } from 'fcitx5-webview'
 import UZIP from 'uzip'
 import { activateMenuAction } from './action'
@@ -9,7 +8,7 @@ import { getAddons, getConfig, setConfig } from './config'
 import { OPTIONS, SERVICE_WORKER, WEB, WEB_WORKER } from './constant'
 import { hasTouch, isFirefox } from './context'
 import { getCustomPhrases, setCustomPhrases } from './custom-phrase'
-import { blur, clickPanel, focus, isInputElement, redrawCaretAndPreeditUnderline, startInputContextTracking, stopInputContextTracking } from './focus'
+import { blur, clickPanel, focus, isInputElement, prepareTouchInputs, redrawCaretAndPreeditUnderline, refocusInput, restoreTouchInputs, startInputContextTracking, stopInputContextTracking } from './focus'
 import { lsDir, mount, reset, rmR, traverseAsync, traverseSync } from './fs'
 import { currentInputMethod, getAllInputMethods, getInputMethods, getLanguageName, setCurrentInputMethod, setInputMethods } from './input-method'
 import { createKeyboard, sendEventToKeyboard } from './keyboard'
@@ -27,6 +26,7 @@ const { promise: fcitxReady, resolve } = Promise.withResolvers()
 let inputMethodsCallback = () => {}
 let statusAreaCallback: (statusArea: StatusArea) => void = () => {}
 let chromeOSInputContextId: number | null = null
+let webInputEnabled = false
 
 function enableChromeOSInputContext() {
   if (chromeOSInputContextId === null) {
@@ -93,6 +93,9 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
   unzip,
   utf8Index2JS,
   enable() {
+    if (globalThis.fcitx.runtime === WEB && webInputEnabled) {
+      return
+    }
     // Don't create keyboard for desktop, otherwise it may jump out when widening window.
     if (globalThis.fcitx.runtime === WEB && hasTouch) {
       createKeyboard() // Must be called before init as webkeyboard will manipulate DOM.
@@ -104,6 +107,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     if (globalThis.fcitx.runtime !== WEB) {
       return
     }
+    webInputEnabled = true
     startInputContextTracking()
     document.addEventListener('focus', focus, true)
     document.addEventListener('blur', blur, true)
@@ -118,14 +122,12 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     if (hasTouch) {
       // This is destructive. I tried listening on touchstart of input elements, but system keyboard still shows
       // up because on iOS if you touch body that nears an input element, it's still focused before set readonly.
-      document.querySelectorAll('input, textarea').forEach((el) => {
-        (<Input>el).readOnly = true
-      })
+      prepareTouchInputs()
       const activeElement = document.activeElement as HTMLElement | null
       if (isInputElement(activeElement)) {
         // Collapse system keyboard and expand fcitx keyboard.
         activeElement.blur()
-        setTimeout(() => activeElement.focus(), 0)
+        refocusInput(activeElement)
       }
     }
     else {
@@ -143,6 +145,10 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     if (globalThis.fcitx.runtime !== WEB) {
       return
     }
+    if (!webInputEnabled) {
+      return
+    }
+    webInputEnabled = false
     document.removeEventListener('focus', focus, true)
     document.removeEventListener('blur', blur, true)
     document.removeEventListener('keydown', keyEvent)
@@ -154,10 +160,7 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     document.removeEventListener('selectionchange', selectionChange)
     stopInputContextTracking()
     if (hasTouch) {
-      // Not ideal, but 🤷‍♂️
-      document.querySelectorAll('input, textarea').forEach((el) => {
-        (<Input>el).readOnly = false
-      })
+      restoreTouchInputs()
     }
   },
   setInputMethodsCallback(callback: () => void) {

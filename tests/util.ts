@@ -1,11 +1,71 @@
 import type { Locator, Page } from '@playwright/test'
 import { expect } from '@playwright/test'
 
+export interface RecordedFcitxCall {
+  name: string
+  args: unknown[]
+  result: unknown
+}
+
 export async function init(page: Page) {
   await page.goto('http://localhost:9000')
   return page.evaluate(() => {
     return window.fcitxReady
   })
+}
+
+export function installResizeObserverProbe(page: Page) {
+  return page.addInitScript(() => {
+    const probe = { observed: 0, unobserved: 0 }
+    ;(window as any).__resizeObserverProbe = probe
+    window.ResizeObserver = class {
+      observe() {
+        probe.observed++
+      }
+
+      unobserve() {
+        probe.unobserved++
+      }
+
+      disconnect() {}
+    } as unknown as typeof ResizeObserver
+  })
+}
+
+export function recordFcitxCalls(page: Page) {
+  return page.evaluate(() => {
+    const recordedNames = new Set([
+      'create_input_context',
+      'destroy_input_context',
+      'focus_in',
+      'focus_out',
+      'init',
+      'process_key',
+      'set_surrounding_text',
+    ])
+    const calls: RecordedFcitxCall[] = []
+    const original = fcitx.Module.ccall
+    fcitx.__recordedCalls = calls
+    fcitx.Module.ccall = ((...args: Parameters<typeof original>) => {
+      const result = original(...args)
+      if (recordedNames.has(args[0])) {
+        calls.push({
+          name: args[0],
+          args: [...((args[3] as unknown[] | undefined) ?? [])],
+          result,
+        })
+      }
+      return result
+    }) as typeof original
+  })
+}
+
+export function recordedFcitxCalls(page: Page): Promise<RecordedFcitxCall[]> {
+  return page.evaluate(() => fcitx.__recordedCalls)
+}
+
+export function resizeObserverProbe(page: Page): Promise<{ observed: number, unobserved: number }> {
+  return page.evaluate(() => (window as any).__resizeObserverProbe)
 }
 
 export async function captureInputContextId(page: Page, activate: () => Promise<void>) {

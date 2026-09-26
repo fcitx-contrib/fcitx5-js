@@ -15,8 +15,50 @@ interface InputContext {
 let input: Input | null = null
 let userClick = false
 let originalSpellCheck = true
+let inputHandlingEnabled = false
 const inputContexts = new Map<Input, InputContext>()
 const inputContextElements = new Map<number, Input>()
+const originalReadOnly = new Map<Input, boolean>()
+const refocusTimers = new Set<number>()
+
+function setInputReadOnly(element: Input) {
+  if (!originalReadOnly.has(element)) {
+    originalReadOnly.set(element, element.readOnly)
+  }
+  element.readOnly = true
+}
+
+function scheduleRefocus(element: Input, blurFirst: boolean) {
+  const timer = window.setTimeout(() => {
+    refocusTimers.delete(timer)
+    if (!inputHandlingEnabled) {
+      return
+    }
+    if (!blurFirst) {
+      element.focus()
+      return
+    }
+    element.blur()
+    if (!inputHandlingEnabled) {
+      return
+    }
+    const refocusTimer = window.setTimeout(() => {
+      refocusTimers.delete(refocusTimer)
+      if (inputHandlingEnabled) {
+        element.focus()
+      }
+    }, 0)
+    refocusTimers.add(refocusTimer)
+  }, 0)
+  refocusTimers.add(timer)
+}
+
+function cancelRefocus() {
+  for (const timer of refocusTimers) {
+    clearTimeout(timer)
+  }
+  refocusTimers.clear()
+}
 
 function inputContextProgram() {
   return globalThis.location.pathname
@@ -136,10 +178,14 @@ const inputContextObserver = (() => {
 })()
 
 export function startInputContextTracking() {
+  inputHandlingEnabled = true
   inputContextObserver?.observe(document, { childList: true, subtree: true })
 }
 
 export function stopInputContextTracking() {
+  inputHandlingEnabled = false
+  userClick = false
+  cancelRefocus()
   inputContextObserver?.disconnect()
   if (input) {
     cleanupInputSession()
@@ -149,22 +195,38 @@ export function stopInputContextTracking() {
   }
 }
 
+export function prepareTouchInputs() {
+  document.querySelectorAll<Input>('input, textarea').forEach(setInputReadOnly)
+}
+
+export function restoreTouchInputs() {
+  for (const [element, readOnly] of originalReadOnly) {
+    element.readOnly = readOnly
+  }
+  originalReadOnly.clear()
+}
+
+export function refocusInput(element: Input) {
+  scheduleRefocus(element, false)
+}
+
 export function focus() {
-  if (!isInputElement(document.activeElement)) {
+  if (!inputHandlingEnabled || !isInputElement(document.activeElement)) {
+    return
+  }
+  if (input === document.activeElement && inputContexts.has(input)) {
     return
   }
   if (input && input !== document.activeElement) {
     cleanupInputSession()
   }
   input = <Input>document.activeElement
+  originalSpellCheck = input.spellcheck
   if (hasTouch) {
     if (!input.readOnly) {
       const element = input
-      input.readOnly = true
-      setTimeout(() => {
-        element.blur()
-        setTimeout(() => element.focus(), 0)
-      }, 0)
+      setInputReadOnly(element)
+      scheduleRefocus(element, true)
       return
     }
     input.addEventListener('touchstart', resetInput)
@@ -177,7 +239,6 @@ export function focus() {
   resizeObserver?.observe(input)
   input.addEventListener('mousedown', resetInput)
   input.addEventListener('compositionstart', resetInput)
-  originalSpellCheck = input.spellcheck
   const context = ensureCurrentInputContext()
   if (!context) {
     return
@@ -197,6 +258,7 @@ export function focus() {
 }
 
 function cleanupInputSession() {
+  userClick = false
   if (!input) {
     return
   }
@@ -232,7 +294,7 @@ export function blur() {
   if (userClick) {
     userClick = false
     // Refocus to ensure setting selectionEnd works and clicking outside fires blur event.
-    setTimeout(() => input?.focus(), 0)
+    scheduleRefocus(input, false)
     return
   }
   cleanupInputSession()
