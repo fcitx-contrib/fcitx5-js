@@ -21,6 +21,7 @@ test('invalid menu action ID is ignored', async ({ page }) => {
   await page.keyboard.press('Control+Alt+Shift+U')
   await expect.poll(() => page.evaluate(() => fcitx.__candidateContext)).toBeTruthy()
 
+  // A null action dereference traps in Wasm and rejects page.evaluate().
   await page.evaluate(() => {
     const context = fcitx.__statusAreaContext ?? {
       inputContext: fcitx.__candidateContext.inputContext,
