@@ -42,17 +42,17 @@ test('long press comma triggers Unicode mode for the focused input context', asy
   await page.evaluate(async ({ x, y, dx }) => {
     const mask = document.querySelector('.fcitx-keyboard-mask')!
     const dispatch = (type: string, touch: Touch, touches: Touch[]) => {
-      mask.dispatchEvent(new TouchEvent(type, {
-        bubbles: true,
-        cancelable: true,
-        changedTouches: [touch],
-        touches,
-      }))
+      const event = new Event(type, { bubbles: true, cancelable: true })
+      Object.defineProperties(event, {
+        changedTouches: { value: [touch] },
+        touches: { value: touches },
+      })
+      mask.dispatchEvent(event)
     }
-    let touch = new Touch({ identifier: 1, target: mask, clientX: x, clientY: y })
+    let touch = { identifier: 1, target: mask, clientX: x, clientY: y } as unknown as Touch
     dispatch('touchstart', touch, [touch])
     await new Promise(resolve => setTimeout(resolve, 400))
-    touch = new Touch({ identifier: 1, target: mask, clientX: x - dx, clientY: y })
+    touch = { identifier: 1, target: mask, clientX: x - dx, clientY: y } as unknown as Touch
     dispatch('touchmove', touch, [touch])
     dispatch('touchend', touch, [])
   }, {
