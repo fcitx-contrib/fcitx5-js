@@ -3,7 +3,7 @@ import type { FCITX, EM_MODULE as MODULE } from './Fcitx5.d.ts'
 declare global {
   type EM_MODULE = MODULE
   var fcitx: { [key: string]: any } & FCITX // eslint-disable-line vars-on-top
-  type MessageData = {
+  type WorkerRequestData = {
     type: 'MKDIR'
     data: string
   } | {
@@ -13,6 +13,27 @@ declare global {
       buffer: ArrayBuffer
     }
   } | {
+    type: 'ZIP'
+    data: Record<string, Uint8Array>
+  } | {
+    type: 'DEPLOY'
+  }
+  type WorkerResponseData = {
+    type: 'MKDIR'
+    data: string
+  } | {
+    type: 'WRITE_FILE'
+    data: {
+      path: string
+      buffer: ArrayBuffer
+    }
+  } | {
+    type: 'ZIP_BUFFER'
+    data: ArrayBuffer
+  } | {
+    type: 'DONE'
+  }
+  interface WorkerNotification {
     type: 'NOTIFY'
     data: {
       name: string
@@ -21,17 +42,9 @@ declare global {
       timeout: number
       tipId: string
     }
-  } | {
-    type: 'ZIP'
-    data: Record<string, Uint8Array>
-  } | {
-    type: 'ZIP_BUFFER'
-    data: ArrayBuffer
-  } | {
-    type: 'DEPLOY'
-  } | {
-    type: 'DONE'
   }
+  type WorkerRequest = WorkerRequestData & { requestId: number }
+  type WorkerResponse = WorkerResponseData & { requestId: number }
 }
 
 export {}

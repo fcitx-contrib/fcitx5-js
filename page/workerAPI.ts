@@ -5,10 +5,13 @@ import { reload } from './plugin'
 let worker: Worker
 let deployed = false
 let deploying = false
-let zipBuffer: ArrayBuffer | null = null
-let res: (data: MessageData) => void
+let nextRequestId = 0
+const pendingRequests = new Map<number, {
+  resolve: (data: ArrayBuffer | undefined) => void
+  zipBuffer?: ArrayBuffer
+}>()
 
-let notifyData: (MessageData & { type: 'NOTIFY' }) | null = null
+let notifyData: WorkerNotification | null = null
 
 function notify() {
   if (!notifyData) {
@@ -29,7 +32,19 @@ function ensureWorker() {
     return
   }
   worker = new Worker(globalThis.fcitx.Module.locateFile('worker.js', ''), { type: 'module' })
-  worker.onmessage = ({ data }: MessageEvent<MessageData>) => {
+  worker.onmessage = ({ data }: MessageEvent<WorkerResponse | WorkerNotification>) => {
+    if (data.type === 'NOTIFY') {
+      notifyData = data
+      // Delay success and error notification to after reload finishes.
+      if (!['success', 'error'].includes(data.data.icon)) {
+        notify()
+      }
+      return
+    }
+    const pending = pendingRequests.get(data.requestId)
+    if (!pending) {
+      return
+    }
     switch (data.type) {
       case 'MKDIR':
         globalThis.fcitx.Module.FS.mkdirTree(data.data)
@@ -37,40 +52,36 @@ function ensureWorker() {
       case 'WRITE_FILE':
         globalThis.fcitx.Module.FS.writeFile(data.data.path, new Uint8Array(data.data.buffer))
         break
-      case 'NOTIFY': {
-        notifyData = data
-        // Delay success and error notification to after reload finishes.
-        if (!['success', 'error'].includes(data.data.icon)) {
-          notify()
-        }
-        break
-      }
       case 'ZIP_BUFFER':
-        zipBuffer = data.data
+        pending.zipBuffer = data.data
         break
       case 'DONE':
-        res(data)
+        pendingRequests.delete(data.requestId)
+        pending.resolve(pending.zipBuffer)
         break
     }
   }
 }
 
-function execute(msg: MessageData, transfer?: Transferable[]) {
-  worker.postMessage(msg, transfer || [])
-  const { resolve, promise } = Promise.withResolvers<any>()
-  res = resolve
+function execute(msg: WorkerRequestData, transfer?: Transferable[]) {
+  const requestId = nextRequestId++
+  const { resolve, promise } = Promise.withResolvers<ArrayBuffer | undefined>()
+  pendingRequests.set(requestId, { resolve })
+  worker.postMessage({ ...msg, requestId } satisfies WorkerRequest, transfer || [])
   return promise
 }
 
-function copyFile(path: string) {
+async function copyFile(path: string) {
   const { buffer } = globalThis.fcitx.Module.FS.readFile(path)
-  return execute({ type: 'WRITE_FILE', data: {
+  await execute({ type: 'WRITE_FILE', data: {
     path,
     buffer: buffer as ArrayBuffer,
   } }, [buffer])
 }
 
-const copyDir = traverseAsync((path: string) => execute({ type: 'MKDIR', data: path }), copyFile, undefined)
+const copyDir = traverseAsync(async (path: string) => {
+  await execute({ type: 'MKDIR', data: path })
+}, copyFile, undefined)
 
 async function deploy() {
   try {
@@ -112,8 +123,9 @@ export async function zip(manifest: UZIP.UZIPFiles): Promise<ArrayBuffer> {
     return UZIP.encode(manifest, true) // Disable compression for higher speed.
   }
   ensureWorker()
-  await execute({ type: 'ZIP', data: manifest }, Object.values(manifest).map(array => array.buffer))
-  const buffer = zipBuffer!
-  zipBuffer = null
+  const buffer = await execute({ type: 'ZIP', data: manifest }, Object.values(manifest).map(array => array.buffer))
+  if (buffer === undefined) {
+    throw new Error('Worker did not return a zip buffer')
+  }
   return buffer
 }
