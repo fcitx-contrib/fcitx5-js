@@ -1,4 +1,5 @@
 #include "wasmfrontend.h"
+#include "../fcitx5/src/modules/unicode/unicode_public.h"
 #include <emscripten.h>
 #include <fcitx/focusgroup.h>
 
@@ -80,6 +81,14 @@ void WasmFrontend::focusOut(WasmInputContextId id) {
 void WasmFrontend::resetInput(WasmInputContextId id) {
     if (auto *ic = findInputContext(id)) {
         ic->reset();
+    }
+}
+
+void WasmFrontend::triggerUnicode(WasmInputContextId id) {
+    auto *unicode = instance_->addonManager().addon("unicode");
+    auto *ic = findInputContext(id);
+    if (unicode && ic) {
+        unicode->call<IUnicode::trigger>(ic);
     }
 }
 

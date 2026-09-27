@@ -3,7 +3,7 @@ import { onMessage, setBuiltInLayout, setClient } from 'fcitx5-keyboard-web'
 import getCaretCoordinates from 'textarea-caret'
 import { activateMenuAction } from './action'
 import { hasPreedit } from './client'
-import { getInputElement, resetInput } from './focus'
+import { getInputContextId, getInputElement, resetInput } from './focus'
 import { processKey } from './keycode'
 import { onTextChange, redo, undo } from './undoRedo'
 import { graphemeIndices } from './unicode'
@@ -416,6 +416,14 @@ export function createKeyboard() {
           return activateMenuAction(event.data.id, event.data.inputContext, event.data.generation)
         case 'UNDO':
           return undo()
+        case 'UNICODE': {
+          resetInput()
+          const id = getInputContextId()
+          if (id !== null) {
+            return fcitx.Module.ccall('trigger_unicode', null, ['number'], [id])
+          }
+          break
+        }
       }
     },
   })
