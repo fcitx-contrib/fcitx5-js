@@ -15,6 +15,7 @@
 #include <fcitx/action.h>
 #include <fcitx/inputmethodmanager.h>
 #include <fcitx/userinterfacemanager.h>
+#include <jstransport.h>
 #include <sys/stat.h>
 
 FCITX_DEFINE_STATIC_ADDON_REGISTRY(getStaticAddon)
@@ -32,8 +33,6 @@ Runtime runtime;
 IsoCodes isoCodes;
 #endif
 
-void notify_main_async(const std::string &str);
-
 static void answerCandidateAction(std::string_view inputContext,
                                   uint32_t generation,
                                   ActionableCandidateList *actionableList,
@@ -43,13 +42,13 @@ static void answerCandidateAction(std::string_view inputContext,
         for (const auto &action : actionableList->candidateActions(candidate)) {
             actions.push_back({{"id", action.id()}, {"text", action.text()}});
         }
-        notify_main_async(json{{"type", "CANDIDATE_ACTIONS"},
-                               {"data",
-                                {{"inputContext", inputContext},
-                                 {"generation", generation},
-                                 {"index", index},
-                                 {"actions", actions}}}}
-                              .dump());
+        sendEventToKeyboard(json{{"type", "CANDIDATE_ACTIONS"},
+                                 {"data",
+                                  {{"inputContext", inputContext},
+                                   {"generation", generation},
+                                   {"index", index},
+                                   {"actions", actions}}}}
+                                .dump());
     }
 }
 

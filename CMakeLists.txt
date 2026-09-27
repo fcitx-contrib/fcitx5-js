@@ -91,6 +91,7 @@ set_target_properties(Fcitx5Config Fcitx5Utils Fcitx5Core
 
 add_subdirectory(wasmfrontend)
 add_subdirectory(wasmnotifications)
+add_subdirectory(jstransport)
 add_subdirectory(webkeyboard)
 add_subdirectory(fcitx5-webview)
 add_subdirectory(webpanel)

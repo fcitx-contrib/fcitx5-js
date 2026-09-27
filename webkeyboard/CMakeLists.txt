@@ -1,5 +1,6 @@
 add_library(webkeyboard STATIC webkeyboard.cpp)
-target_link_libraries(webkeyboard Fcitx5::Core nlohmann_json::nlohmann_json)
+target_link_libraries(webkeyboard Fcitx5::Core jstransport
+    nlohmann_json::nlohmann_json)
 target_include_directories(webkeyboard PRIVATE
     "${PROJECT_SOURCE_DIR}/fcitx5-webview/pugixml/src"
 )
