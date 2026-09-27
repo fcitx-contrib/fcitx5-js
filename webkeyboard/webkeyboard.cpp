@@ -1,17 +1,12 @@
 #include "webkeyboard.h"
 #include "../src/action.h"
-#include <emscripten.h>
 #include <fcitx/action.h>
 #include <fcitx/inputpanel.h>
 #include <fcitx/menu.h>
 #include <fcitx/statusarea.h>
+#include <jstransport.h>
 
 namespace fcitx {
-
-// Name and usages are copied from fcitx5-harmony, but is actually sync.
-void notify_main_async(const std::string &str) {
-    EM_ASM(fcitx.sendEventToKeyboard(UTF8ToString($0)), str.c_str());
-}
 
 WebKeyboard::WebKeyboard(Instance *instance) : instance_(instance) {}
 
@@ -34,12 +29,12 @@ void WebKeyboard::update(UserInterfaceComponent component,
         } else if (!inputPanel.overlayMessage().empty()) {
             auxUp = inputPanel.overlayMessage();
         }
-        notify_main_async(json{{"type", "PREEDIT"},
-                               {"data",
-                                {{"auxUp", auxUp.toString()},
-                                 {"preedit", preedit.toString()},
-                                 {"caret", inputPanel.preedit().cursor()}}}}
-                              .dump());
+        sendEventToKeyboard(json{{"type", "PREEDIT"},
+                                 {"data",
+                                  {{"auxUp", auxUp.toString()},
+                                   {"preedit", preedit.toString()},
+                                   {"caret", inputPanel.preedit().cursor()}}}}
+                                .dump());
         if (list) {
             const auto &bulk = list->toBulk();
             if (bulk) {
@@ -61,7 +56,7 @@ void WebKeyboard::update(UserInterfaceComponent component,
             highlighted = list->cursorIndex();
         }
         if (auxUp.empty() && preedit.empty() && candidates.empty()) {
-            notify_main_async(R"JSON({"type":"CLEAR"})JSON");
+            sendEventToKeyboard(R"JSON({"type":"CLEAR"})JSON");
         } else {
             setCandidatesAsync(candidateContext, candidates, highlighted, 0,
                                false, false,
@@ -91,7 +86,7 @@ void WebKeyboard::setCandidatesAsync(
                     {"scrollEnd", scrollEnd},
                     {"hasClientPreedit", hasClientPreedit},
                     {"tabActions", actions}}}};
-    notify_main_async(j.dump());
+    sendEventToKeyboard(j.dump());
 }
 
 // Vertically 2 screens.
@@ -147,7 +142,7 @@ void WebKeyboard::updateStatusArea(InputContext *ic) {
     if (!statusArea) {
         return;
     }
-    notify_main_async(
+    sendEventToKeyboard(
         json{{"type", "STATUS_AREA"}, {"data", *statusArea}}.dump());
 }
 

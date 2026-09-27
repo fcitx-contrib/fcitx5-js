@@ -58,7 +58,7 @@ else()
     list(APPEND STATIC_ADDONS keyboard)
 endif()
 
-target_link_libraries(Fcitx5 ${EXE_LINK_OPTIONS})
+target_link_libraries(Fcitx5 ${EXE_LINK_OPTIONS} jstransport)
 
 # Work around fcitx5 67891da6 using this private variable from the caller's
 # scope when locating Fcitx5ImportAddon.cpp.in.
