@@ -43,6 +43,7 @@ export function recordFcitxCalls(page: Page) {
       'process_key',
       'reset_input',
       'set_surrounding_text',
+      'trigger_quickphrase',
       'trigger_unicode',
     ])
     const calls: RecordedFcitxCall[] = []

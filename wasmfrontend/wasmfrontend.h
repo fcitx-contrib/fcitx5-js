@@ -35,6 +35,7 @@ class WasmFrontend : public AddonInstance {
     void focusIn(WasmInputContextId id, bool isPassword);
     void focusOut(WasmInputContextId id);
     void resetInput(WasmInputContextId id);
+    void triggerQuickPhrase(WasmInputContextId id);
     void triggerUnicode(WasmInputContextId id);
     void setSurroundingText(WasmInputContextId id, const std::string &text,
                             unsigned int cursor, unsigned int anchor);
