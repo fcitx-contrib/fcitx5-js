@@ -88,8 +88,10 @@ EMSCRIPTEN_KEEPALIVE void activate_menu_action(int id, const char *inputContext,
         return;
     }
     if (auto *ic = statusAreaInputContext(inputContext, generation)) {
-        auto *action = instance->userInterfaceManager().lookupActionById(id);
-        action->activate(ic);
+        if (auto *action =
+                instance->userInterfaceManager().lookupActionById(id)) {
+            action->activate(ic);
+        }
     }
 }
 }
