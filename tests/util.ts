@@ -41,7 +41,9 @@ export function recordFcitxCalls(page: Page) {
       'focus_out',
       'init',
       'process_key',
+      'reset_input',
       'set_surrounding_text',
+      'trigger_unicode',
     ])
     const calls: RecordedFcitxCall[] = []
     const original = fcitx.Module.ccall
