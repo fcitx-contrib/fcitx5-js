@@ -227,6 +227,38 @@ test('Move selection', async ({ page }) => {
   }
 })
 
+test('ArrowUp and ArrowDown preserve selection at boundary', async ({ page }) => {
+  await init(page)
+  const textarea = page.locator('textarea')
+  await textarea.tap()
+  await expectKeyboardShown(page)
+  await openEditor(page)
+  await textarea.evaluate((el: HTMLTextAreaElement) => {
+    el.value = 'abc\nde'
+    el.selectionStart = el.selectionEnd = 2
+  })
+
+  const select = getSelect(page)
+  const up = getUp(page)
+  await select.tap()
+  await up.tap()
+  expect(await getSelection(textarea)).toEqual([0, 2])
+  await up.tap()
+  expect(await getSelection(textarea)).toEqual([0, 2])
+
+  await select.tap()
+  await textarea.evaluate((el: HTMLTextAreaElement) => {
+    el.selectionStart = el.selectionEnd = 2
+  })
+  const down = getDown(page)
+  await select.tap()
+  await down.tap()
+  const selectionAtEnd = await getSelection(textarea)
+  expect(selectionAtEnd[0]).toBeLessThan(selectionAtEnd[1])
+  await down.tap()
+  expect(await getSelection(textarea)).toEqual(selectionAtEnd)
+})
+
 test('Clipboard', async ({ page }) => {
   if (browserName(page) === 'chromium') {
     page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
