@@ -76,6 +76,10 @@ EMSCRIPTEN_KEEPALIVE void focus_out(uint32_t id) { frontend->focusOut(id); }
 
 EMSCRIPTEN_KEEPALIVE void reset_input(uint32_t id) { frontend->resetInput(id); }
 
+EMSCRIPTEN_KEEPALIVE void trigger_quickphrase(uint32_t id) {
+    frontend->triggerQuickPhrase(id);
+}
+
 EMSCRIPTEN_KEEPALIVE void trigger_unicode(uint32_t id) {
     frontend->triggerUnicode(id);
 }

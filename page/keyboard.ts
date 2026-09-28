@@ -416,6 +416,14 @@ export function createKeyboard() {
           return activateMenuAction(event.data.id, event.data.inputContext, event.data.generation)
         case 'UNDO':
           return undo()
+        case 'QUICKPHRASE': {
+          resetInput()
+          const id = getInputContextId()
+          if (id !== null) {
+            return fcitx.Module.ccall('trigger_quickphrase', null, ['number'], [id])
+          }
+          break
+        }
         case 'UNICODE': {
           resetInput()
           const id = getInputContextId()

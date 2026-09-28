@@ -1,4 +1,5 @@
 #include "wasmfrontend.h"
+#include "../fcitx5/src/modules/quickphrase/quickphrase_public.h"
 #include "../fcitx5/src/modules/unicode/unicode_public.h"
 #include <emscripten.h>
 #include <fcitx/focusgroup.h>
@@ -81,6 +82,14 @@ void WasmFrontend::focusOut(WasmInputContextId id) {
 void WasmFrontend::resetInput(WasmInputContextId id) {
     if (auto *ic = findInputContext(id)) {
         ic->reset();
+    }
+}
+
+void WasmFrontend::triggerQuickPhrase(WasmInputContextId id) {
+    auto *quickphrase = instance_->addonManager().addon("quickphrase");
+    auto *ic = findInputContext(id);
+    if (quickphrase && ic) {
+        quickphrase->call<IQuickPhrase::trigger>(ic, "", "", "", "", Key());
     }
 }
 
