@@ -164,8 +164,10 @@ function simulate(key: string, code: string) {
   switch (code) {
     case 'ArrowDown': {
       const newCaret = getIndexOfNextRow(input, preText, postText)
-      if (movingSelection && postText) {
-        moveSelection(input, newCaret, fixed)
+      if (movingSelection) {
+        if (postText) {
+          moveSelection(input, newCaret, fixed)
+        }
       }
       else {
         updateInput(input, input.value, newCaret, newCaret, 'none')
@@ -202,8 +204,10 @@ function simulate(key: string, code: string) {
       break
     case 'ArrowUp': {
       const newCaret = getIndexOfPrevRow(input, preText)
-      if (movingSelection && preText) {
-        moveSelection(input, newCaret, fixed)
+      if (movingSelection) {
+        if (preText) {
+          moveSelection(input, newCaret, fixed)
+        }
       }
       else {
         updateInput(input, input.value, newCaret, newCaret, 'none')
