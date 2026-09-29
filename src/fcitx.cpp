@@ -196,6 +196,25 @@ EMSCRIPTEN_KEEPALIVE void scroll(int start, int count, const char *inputContext,
     }
 }
 
+EMSCRIPTEN_KEEPALIVE void page_candidate(bool next, const char *inputContext,
+                                         uint32_t generation) {
+    auto *ic = inputContext && *inputContext
+                   ? candidateInputContext(inputContext, generation)
+                   : nullptr;
+    if (!ic) {
+        return;
+    }
+    const auto &list = ic->inputPanel().candidateList();
+    if (!list) {
+        return;
+    }
+    auto *pageable = list->toPageable();
+    if (!pageable) {
+        return;
+    }
+    next ? pageable->next() : pageable->prev();
+}
+
 EMSCRIPTEN_KEEPALIVE void write_clipboard(const char *text) {
     if (clipboard != nullptr) {
         clipboard->call<IClipboard::setClipboardV2>("", text, false);

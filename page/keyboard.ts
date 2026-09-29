@@ -391,6 +391,8 @@ export function createKeyboard() {
           break
         case 'PASTE':
           return paste()
+        case 'PAGE':
+          return fcitx.Module.ccall('page_candidate', null, ['boolean', 'string', 'number'], [event.data.next, event.data.inputContext, event.data.generation])
         case 'REDO':
           return redo()
         case 'SCROLL':
