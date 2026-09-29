@@ -15,6 +15,8 @@ void WebKeyboard::update(UserInterfaceComponent component,
     switch (component) {
     case UserInterfaceComponent::InputPanel: {
         int highlighted = -1;
+        bool hasPrev = false;
+        bool hasNext = false;
         std::vector<Candidate> candidates;
         const InputPanel &inputPanel = inputContext->inputPanel();
         const auto &list = inputPanel.candidateList();
@@ -54,12 +56,16 @@ void WebKeyboard::update(UserInterfaceComponent component,
                          .toString()});
             }
             highlighted = list->cursorIndex();
+            if (const auto *pageable = list->toPageable()) {
+                hasPrev = pageable->hasPrev();
+                hasNext = pageable->hasNext();
+            }
         }
         if (auxUp.empty() && preedit.empty() && candidates.empty()) {
             sendEventToKeyboard(R"JSON({"type":"CLEAR"})JSON");
         } else {
             setCandidatesAsync(candidateContext, candidates, highlighted, 0,
-                               false, false,
+                               false, false, hasPrev, hasNext,
                                !inputPanel.clientPreedit().empty(), {});
         }
         break;
@@ -73,8 +79,8 @@ void WebKeyboard::update(UserInterfaceComponent component,
 void WebKeyboard::setCandidatesAsync(
     const CandidateContext &candidateContext,
     const std::vector<Candidate> &candidates, int highlighted, int scrollState,
-    bool scrollStart, bool scrollEnd, bool hasClientPreedit,
-    const std::span<const CandidateAction> &actions) {
+    bool scrollStart, bool scrollEnd, bool hasPrev, bool hasNext,
+    bool hasClientPreedit, const std::span<const CandidateAction> &actions) {
     auto j = json{{"type", "CANDIDATES"},
                   {"data",
                    {{"inputContext", candidateContext.inputContext},
@@ -84,6 +90,8 @@ void WebKeyboard::setCandidatesAsync(
                     {"scrollState", scrollState},
                     {"scrollStart", scrollStart},
                     {"scrollEnd", scrollEnd},
+                    {"hasPrev", hasPrev},
+                    {"hasNext", hasNext},
                     {"hasClientPreedit", hasClientPreedit},
                     {"tabActions", actions}}}};
     sendEventToKeyboard(j.dump());
@@ -129,8 +137,8 @@ void WebKeyboard::scroll(std::string_view inputContext, uint32_t generation,
         tabbedActions = tabbed->tabActions();
     }
     setCandidatesAsync({std::string(inputContext), generation}, candidates,
-                       start == 0 ? 0 : -1, 2, start == 0, endReached,
-                       !ic->inputPanel().clientPreedit().empty(),
+                       start == 0 ? 0 : -1, 2, start == 0, endReached, false,
+                       false, !ic->inputPanel().clientPreedit().empty(),
                        tabbedActions);
 }
 
