@@ -10,7 +10,15 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-26.04
+    container: archlinux:latest
+    env:
+      SWC_NATIVE_BINDING_CACHE: /root/.cache/swc
     steps:
+      - name: Install system dependencies
+        run: |
+          pacman -Syu --noconfirm clang git
+          install -d -m 700 "$SWC_NATIVE_BINDING_CACHE"
+
       - uses: actions/checkout@v7
         with:
           submodules: recursive
@@ -21,7 +29,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt install -y clang-format
           npm i -g pnpm@12.5.1
           pnpm --prefix=fcitx5-keyboard-web i
           pnpm --prefix=fcitx5-keyboard-web run build
