@@ -34,6 +34,7 @@ Emscripten is required; see `.emscripten-version` for the pinned version. Do NOT
 After changing code, always build to verify the change compiles:
 
 ```sh
+./scripts/patch.sh
 emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
 EMCC_FORCE_STDLIBS=libc++ cmake --build build
 ```

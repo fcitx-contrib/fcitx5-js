@@ -139,7 +139,7 @@ WebPanel::WebPanel(Instance *instance)
         tabbedList->triggerTabAction(id);
     });
     eventHandler_ = instance_->watchEvent(
-        EventType::InputContextKeyEvent, EventWatcherPhase::PreInputMethod,
+        EventType::InputContextKeyEvent, EventWatcherPhase::PreTempMode,
         [this](Event &event) {
             auto &keyEvent = static_cast<KeyEvent &>(event);
             const auto key = keyEvent.key();
