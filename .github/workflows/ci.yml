@@ -106,6 +106,7 @@ jobs:
       - name: Build
         run: |
           ./scripts/install-deps.sh
+          ./scripts/patch.sh
           emcmake cmake -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DRIME_ONLY=${{ matrix.rime_only || 'OFF' }}

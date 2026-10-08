@@ -33,6 +33,7 @@ https://emscripten.org/docs/getting_started/downloads.html
 
 ### Build with CMake
 ```sh
+./scripts/patch.sh
 emcmake cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
 EMCC_FORCE_STDLIBS=libc++ cmake --build build
 ```
