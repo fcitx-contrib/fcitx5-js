@@ -136,9 +136,20 @@ void WebKeyboard::scroll(std::string_view inputContext, uint32_t generation,
     if (const auto &tabbed = list->toTabbed()) {
         tabbedActions = tabbed->tabActions();
     }
+    int highlighted = start == 0 ? 0 : -1;
+    if (const auto *cursor = list->toBulkCursor()) {
+        const int index = cursor->globalCursorIndex();
+        if (index >= 0) {
+            highlighted =
+                index >= start &&
+                        index - start < static_cast<int>(candidates.size())
+                    ? index - start
+                    : -1;
+        }
+    }
     setCandidatesAsync({std::string(inputContext), generation}, candidates,
-                       start == 0 ? 0 : -1, 2, start == 0, endReached, false,
-                       false, !ic->inputPanel().clientPreedit().empty(),
+                       highlighted, 2, start == 0, endReached, false, false,
+                       !ic->inputPanel().clientPreedit().empty(),
                        tabbedActions);
 }
 
