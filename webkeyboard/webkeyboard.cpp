@@ -99,7 +99,20 @@ void WebKeyboard::setCandidatesAsync(
 
 // Vertically 2 screens.
 void WebKeyboard::expand(const CandidateContext &candidateContext) {
-    scroll(candidateContext.inputContext, candidateContext.generation, 0, 60);
+    auto *ic = candidateInputContext(candidateContext.inputContext,
+                                     candidateContext.generation);
+    if (!ic) {
+        return;
+    }
+    int count = 60;
+    if (const auto &list = ic->inputPanel().candidateList()) {
+        if (const auto *cursor = list->toBulkCursor()) {
+            // Load the highlighted candidate even beyond the initial batch.
+            count = std::max(count, cursor->globalCursorIndex() + 1);
+        }
+    }
+    scroll(candidateContext.inputContext, candidateContext.generation, 0,
+           count);
 }
 
 void WebKeyboard::scroll(std::string_view inputContext, uint32_t generation,

@@ -46,3 +46,19 @@ test('bulk candidates default to the first candidate when the global cursor is u
   await page.keyboard.press('Shift+Tab')
   await expect(candidates.nth(0)).toHaveClass(/fcitx-keyboard-highlighted/)
 })
+
+test('bulk highlight beyond the initial batch remains visible', async ({ page }) => {
+  await init(page)
+  await page.locator('textarea').tap()
+  await page.keyboard.press('Control+Alt+Shift+U')
+  await page.keyboard.type('letter')
+
+  // Move the cursor beyond the sixty candidates loaded initially.
+  for (let index = 0; index < 60; index++) {
+    await page.keyboard.press('Tab')
+  }
+  const candidate = page.locator('.fcitx-keyboard-candidate').nth(60)
+  await expect(candidate).toBeAttached()
+  await expect(candidate).toHaveClass(/fcitx-keyboard-highlighted/)
+  await expect(candidate).toBeInViewport({ ratio: 1 })
+})
