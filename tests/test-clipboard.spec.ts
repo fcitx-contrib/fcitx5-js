@@ -9,7 +9,9 @@ function openClipboard(page: Page) {
 test('Clipboard', async ({ page }) => {
   test.skip(process.platform === 'linux' && browserName(page) === 'webkit')
   await init(page)
-  const CONTROL = process.platform === 'darwin' ? 'Meta' : 'Control'
+  const CONTROL = process.platform === 'darwin'
+    ? 'Meta'
+    : 'Control'
 
   const textarea = page.locator('textarea')
   await textarea.click()
@@ -63,7 +65,9 @@ test('Primary selection', async ({ page }) => {
     const bar = document.createElement('div')
     bar.textContent = 'bar'
     document.body.append(foo, bar)
-    fcitx.setConfig('fcitx://config/addon/clipboard', { PastePrimaryKey: { 0: fcitxKey } })
+    fcitx.setConfig('fcitx://config/addon/clipboard', {
+      PastePrimaryKey: { 0: fcitxKey },
+    })
     const range = document.createRange()
     range.setStartBefore(foo)
     range.setEndAfter(bar)

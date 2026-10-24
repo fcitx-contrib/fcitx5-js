@@ -11,7 +11,17 @@ test('keyboard-us', async ({ page }) => {
   })
 
   await init(page)
-  expect(addons.sort()).toEqual(['clipboard', 'imselector', 'keyboard', 'notifications', 'quickphrase', 'unicode', 'wasmfrontend', 'webkeyboard', 'webpanel'])
+  expect(addons.sort()).toEqual([
+    'clipboard',
+    'imselector',
+    'keyboard',
+    'notifications',
+    'quickphrase',
+    'unicode',
+    'wasmfrontend',
+    'webkeyboard',
+    'webpanel',
+  ])
 
   const textarea = page.locator('textarea')
   await textarea.click()

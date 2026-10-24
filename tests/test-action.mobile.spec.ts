@@ -48,15 +48,27 @@ for (const { name, direction, triggerName } of [
       const dispatch = (type: string, touch: Touch, touches: Touch[]) => {
         const event = new Event(type, { bubbles: true, cancelable: true })
         Object.defineProperties(event, {
-          changedTouches: { value: [touch] },
+          changedTouches: {
+            value: [touch],
+          },
           touches: { value: touches },
         })
         mask.dispatchEvent(event)
       }
-      let touch = { identifier: 1, target: mask, clientX: x, clientY: y } as unknown as Touch
+      let touch = {
+        identifier: 1,
+        target: mask,
+        clientX: x,
+        clientY: y,
+      } as unknown as Touch
       dispatch('touchstart', touch, [touch])
       await new Promise(resolve => setTimeout(resolve, 400))
-      touch = { identifier: 1, target: mask, clientX: x + dx, clientY: y } as unknown as Touch
+      touch = {
+        identifier: 1,
+        target: mask,
+        clientX: x + dx,
+        clientY: y,
+      } as unknown as Touch
       dispatch('touchmove', touch, [touch])
       dispatch('touchend', touch, [])
     }, {

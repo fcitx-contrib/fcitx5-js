@@ -54,7 +54,9 @@ export function recordFcitxCalls(page: Page) {
       if (recordedNames.has(args[0])) {
         calls.push({
           name: args[0],
-          args: [...((args[3] as unknown[] | undefined) ?? [])],
+          args: [
+            ...((args[3] as unknown[] | undefined) ?? []),
+          ],
           result,
         })
       }
@@ -118,13 +120,20 @@ export async function getBox(locator: Locator): Promise<{ x: number, y: number, 
 // For test, don't let the initial "en" tip on focus affect panel visibility.
 // In reality, it won't be an issue as real engine ignores the hide action.
 export function disableTip(page: Page) {
-  return page.evaluate(() => fcitx.setConfig('fcitx://config/global', { Behavior: { ShowInputMethodInformation: 'False' } }))
+  return page.evaluate(() => fcitx.setConfig('fcitx://config/global', {
+    Behavior: { ShowInputMethodInformation: 'False' },
+  }))
 }
 
 export async function showPanel(page: Page) {
   await page.evaluate(() => {
     fcitx.setCandidates([
-      { text: 'foo', label: '1', comment: 'comment', actions: [] },
+      {
+        text: 'foo',
+        label: '1',
+        comment: 'comment',
+        actions: [],
+      },
     ], 0, '', true, false, true, 0, false, false)
     fcitx.placePanel(0, 0, 0, 0, false)
   })
@@ -143,9 +152,14 @@ export async function tapKeyboard(page: Page, key: string | Locator,
 ) {
   const keyboard = page.locator('#fcitx-virtual-keyboard')
   const box = await getBox(keyboard)
-  const locator = typeof key === 'string' ? keyboard.locator('.fcitx-keyboard-key', { hasText: key }) : key
+  const locator = typeof key === 'string'
+    ? keyboard.locator('.fcitx-keyboard-key', { hasText: key })
+    : key
   const keyBox = await getBox(locator)
-  return keyboard.tap({ force: true, position: { x: keyBox.x + keyBox.width / 2 - box.x, y: keyBox.y + keyBox.height / 2 - box.y } })
+  return keyboard.tap({
+    force: true,
+    position: { x: keyBox.x + keyBox.width / 2 - box.x, y: keyBox.y + keyBox.height / 2 - box.y },
+  })
 }
 
 export function getSelection(locator: Locator): Promise<[number, number]> {

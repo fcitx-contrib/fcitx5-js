@@ -29,7 +29,9 @@ export function redrawCaret(event: { target: EventTarget | null }) {
     return
   }
   const box = input.getBoundingClientRect()
-  const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
+  const caret = input.selectionDirection === 'backward'
+    ? input.selectionStart!
+    : input.selectionEnd!
   const { top, left } = getCaretCoordinates(input, caret)
   const offsetX = left - input.scrollLeft
   const offsetY = top - input.scrollTop

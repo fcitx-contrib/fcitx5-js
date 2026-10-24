@@ -5,7 +5,9 @@ import { init } from './util'
 async function configureInputContexts(page: Page, shareInputState: 'No' | 'Program' | 'All') {
   await page.evaluate((shareInputState) => {
     fcitx.setInputMethods(['keyboard-us', 'keyboard-th'])
-    fcitx.setConfig('fcitx://config/global', { Behavior: { ShareInputState: shareInputState } })
+    fcitx.setConfig('fcitx://config/global', {
+      Behavior: { ShareInputState: shareInputState },
+    })
   }, shareInputState)
 }
 

@@ -164,12 +164,30 @@ test('Selection direction none', async ({ page }) => {
   await openEditor(page)
 
   for (const [button, start] of [
-    [getLeft(page), 3],
-    [getRight(page), 4],
-    [getUp(page), 1],
-    [getDown(page), 7],
-    [getHome(page), 2],
-    [getEnd(page), 5],
+    [
+      getLeft(page),
+      3,
+    ],
+    [
+      getRight(page),
+      4,
+    ],
+    [
+      getUp(page),
+      1,
+    ],
+    [
+      getDown(page),
+      7,
+    ],
+    [
+      getHome(page),
+      2,
+    ],
+    [
+      getEnd(page),
+      5,
+    ],
   ] as [Locator, number][]) {
     await textarea.evaluate((el: HTMLTextAreaElement) => {
       el.value = 'a\nbcd\ne'
@@ -214,13 +232,41 @@ test('Move selection', async ({ page }) => {
   })
 
   for (const [button, start, end] of [
-    [getSelect(page), 2, 2],
-    [getLeft(page), 1, 2],
-    [getDown(page), 2, 5],
-    [getRight(page), 2, 6],
-    [getUp(page), 2, 2],
-    [getHome(page), 0, 2],
-    [getEnd(page), 0, 3],
+    [
+      getSelect(page),
+      2,
+      2,
+    ],
+    [
+      getLeft(page),
+      1,
+      2,
+    ],
+    [
+      getDown(page),
+      2,
+      5,
+    ],
+    [
+      getRight(page),
+      2,
+      6,
+    ],
+    [
+      getUp(page),
+      2,
+      2,
+    ],
+    [
+      getHome(page),
+      0,
+      2,
+    ],
+    [
+      getEnd(page),
+      0,
+      3,
+    ],
   ] as [Locator, number, number][]) {
     await button.tap()
     expect(await getSelection(textarea)).toEqual([start, end])

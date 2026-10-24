@@ -178,7 +178,9 @@ ____ commit pre|edit ____
 */
   const i = utf8Index2JS(preeditText, index)
   const start = input.selectionStart! - preeditIndex
-  const end = preedit ? start + preedit.length : input.selectionEnd!
+  const end = preedit
+    ? start + preedit.length
+    : input.selectionEnd!
   const newStart = start + commitText.length
   input.value = input.value.slice(0, start) + commitText + preeditText + input.value.slice(end)
   input.selectionStart = input.selectionEnd = newStart + i

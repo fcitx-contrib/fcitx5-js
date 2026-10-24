@@ -13,7 +13,9 @@ export function getInputMethods() {
 }
 
 export function setInputMethods(ims: string[]) {
-  return Module.ccall('set_input_methods', null, ['string'], [JSON.stringify(ims)])
+  return Module.ccall('set_input_methods', null, ['string'], [
+    JSON.stringify(ims),
+  ])
 }
 
 export function getAllInputMethods() {

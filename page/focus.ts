@@ -261,7 +261,9 @@ export function focus(event?: FocusEvent) {
   }
   focusInputContext(context, input)
   if (hasTouch && input.tagName === 'INPUT') {
-    const inputType = input.type === 'number' ? 'number' : 'text'
+    const inputType = input.type === 'number'
+      ? 'number'
+      : 'text'
     sendSystemEventToKeyboard({ type: 'INPUT_TYPE', data: inputType })
   }
   resetSurroundingText()
@@ -323,7 +325,9 @@ export function blur(event?: FocusEvent) {
 export function getInputElement(id?: number): Input | null {
   if (id !== undefined) {
     const element = inputContextElements.get(id)
-    return element === input ? element : null
+    return element === input
+      ? element
+      : null
   }
   return input
 }

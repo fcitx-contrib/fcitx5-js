@@ -5,7 +5,11 @@ import { getLocale } from './locale'
 import Module from './module'
 
 export function reload() {
-  Module.ccall('reload', null, ['string', 'number', 'boolean'], [getLocale(), globalThis.fcitx.runtime, hasTouch])
+  Module.ccall('reload', null, ['string', 'number', 'boolean'], [
+    getLocale(),
+    globalThis.fcitx.runtime,
+    hasTouch,
+  ])
 }
 
 const textDecoder = new TextDecoder()
@@ -13,7 +17,10 @@ const textDecoder = new TextDecoder()
 function addDefaultIMs(byteArray: Uint8Array) {
   const inputMethods = (JSON.parse(textDecoder.decode(byteArray)).input_methods ?? []) as string[]
   const currentInputMethods = globalThis.fcitx.getInputMethods().map(im => im.name)
-  globalThis.fcitx.setInputMethods([...currentInputMethods, ...inputMethods.filter(im => !currentInputMethods.includes(im))])
+  globalThis.fcitx.setInputMethods([
+    ...currentInputMethods,
+    ...inputMethods.filter(im => !currentInputMethods.includes(im)),
+  ])
 }
 
 function distributeFiles(manifest: UZIP.UZIPFiles, dir: string) {

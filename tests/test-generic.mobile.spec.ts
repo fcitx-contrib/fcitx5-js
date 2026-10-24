@@ -70,12 +70,19 @@ test('Numpad', async ({ page }) => {
   const symbolBox = await getBox(symbol)
   await page.evaluate(async ({ x, y }) => {
     const mask = document.querySelector('.fcitx-keyboard-mask')!
-    const touch = { identifier: 0, target: mask, clientX: x, clientY: y } as unknown as Touch
+    const touch = {
+      identifier: 0,
+      target: mask,
+      clientX: x,
+      clientY: y,
+    } as unknown as Touch
     const dispatchTouch = (type: string, touches: Touch[]) => {
       const event = new Event(type, { bubbles: true, cancelable: true })
       Object.defineProperties(event, {
         touches: { value: touches },
-        changedTouches: { value: [touch] },
+        changedTouches: {
+          value: [touch],
+        },
       })
       mask.dispatchEvent(event)
     }

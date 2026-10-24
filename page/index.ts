@@ -57,7 +57,9 @@ function getRuntime() {
 }
 
 globalThis.fcitx = Object.assign((...args: any[]) => {
-  return Module.ccall('web_action', 'string', ['string'], [JSON.stringify(args)])
+  return Module.ccall('web_action', 'string', ['string'], [
+    JSON.stringify(args),
+  ])
 }, {
   Module,
   UZIP,
@@ -100,7 +102,11 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
     if (globalThis.fcitx.runtime === WEB && hasTouch) {
       createKeyboard() // Must be called before init as webkeyboard will manipulate DOM.
     }
-    Module.ccall('init', null, ['string', 'number', 'boolean'], [getLocale(), globalThis.fcitx.runtime, hasTouch])
+    Module.ccall('init', null, ['string', 'number', 'boolean'], [
+      getLocale(),
+      globalThis.fcitx.runtime,
+      hasTouch,
+    ])
     if (globalThis.fcitx.runtime === SERVICE_WORKER) {
       return enableChromeOSInputContext()
     }
@@ -169,10 +175,13 @@ globalThis.fcitx = Object.assign((...args: any[]) => {
   updateInputMethods() {
     inputMethodsCallback()
     if (globalThis.fcitx.runtime === WEB) {
-      sendEventToKeyboard(JSON.stringify({ type: 'INPUT_METHODS', data: {
-        currentInputMethod: globalThis.fcitx.currentInputMethod(),
-        inputMethods: globalThis.fcitx.getInputMethods(),
-      } }))
+      sendEventToKeyboard(JSON.stringify({
+        type: 'INPUT_METHODS',
+        data: {
+          currentInputMethod: globalThis.fcitx.currentInputMethod(),
+          inputMethods: globalThis.fcitx.getInputMethods(),
+        },
+      }))
     }
   },
   setStatusAreaCallback(callback: (statusArea: StatusArea) => void) {

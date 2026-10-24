@@ -18,10 +18,13 @@ function copyDir(path: string, requestId: number) {
     (path: string) => respond({ type: 'MKDIR', data: path }, requestId),
     (path: string) => {
       const { buffer } = globalThis.fcitx.Module.FS.readFile(path)
-      respond({ type: 'WRITE_FILE', data: {
-        path,
-        buffer: buffer as ArrayBuffer,
-      } }, requestId, [buffer])
+      respond({
+        type: 'WRITE_FILE',
+        data: {
+          path,
+          buffer: buffer as ArrayBuffer,
+        },
+      }, requestId, [buffer])
     },
     undefined,
   )(path)
@@ -41,7 +44,10 @@ globalThis.onmessage = async ({ data }: MessageEvent<WorkerRequest>) => {
     case 'DEPLOY':
       if (!rimeLoaded) {
         globalThis.fcitx.setNotificationCallback((name, icon, body, timeout, tipId) => {
-          notify({ type: 'NOTIFY', data: { name, icon, body, timeout, tipId } })
+          notify({
+            type: 'NOTIFY',
+            data: { name, icon, body, timeout, tipId },
+          })
         })
         globalThis.fcitx.enable()
         rimeLoaded = true

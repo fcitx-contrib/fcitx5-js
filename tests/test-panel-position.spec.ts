@@ -5,7 +5,12 @@ import { getBox, init } from './util'
 async function showPanel(page: Page) {
   await page.evaluate(() => {
     window.fcitx.setCandidates([
-      { text: 'foo', label: '1', comment: 'comment', actions: [] },
+      {
+        text: 'foo',
+        label: '1',
+        comment: 'comment',
+        actions: [],
+      },
     ], 0, '', true, false, true, 0, false, false)
     const panel = document.querySelector('.fcitx-panel')!.getBoundingClientRect()
     const decoration = document.querySelector('.fcitx-decoration')!.getBoundingClientRect()

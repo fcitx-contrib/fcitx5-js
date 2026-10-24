@@ -33,7 +33,13 @@ test('disable cleans and re-enable restores the input session', async ({ page })
   const destroy = disabledCalls.findIndex(call => call.name === 'destroy_input_context' && call.args[0] === firstContext)
   expect(focusOut).toBeGreaterThan(-1)
   expect(destroy).toBeGreaterThan(focusOut)
-  expect(await page.evaluate(context => fcitx.Module.ccall('process_key', 'boolean', ['number', 'string', 'string', 'number', 'boolean'], [context, 'a', 'KeyA', 0, false]), firstContext)).toBe(false)
+  expect(await page.evaluate(context => fcitx.Module.ccall('process_key', 'boolean', [
+    'number',
+    'string',
+    'string',
+    'number',
+    'boolean',
+  ], [context, 'a', 'KeyA', 0, false]), firstContext)).toBe(false)
 
   const callCount = (await recordedFcitxCalls(page)).length
   await page.locator('button').focus()

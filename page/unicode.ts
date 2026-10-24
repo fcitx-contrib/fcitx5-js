@@ -28,7 +28,9 @@ export function jsIndexToCharCount(text: string, jsIndex: number): number {
     if (codePoint === undefined) {
       break
     }
-    i += codePoint > 0xFFFF ? 2 : 1
+    i += codePoint > 0xFFFF
+      ? 2
+      : 1
     count++
   }
   return count

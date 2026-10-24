@@ -73,10 +73,13 @@ function execute(msg: WorkerRequestData, transfer?: Transferable[]) {
 
 async function copyFile(path: string) {
   const { buffer } = globalThis.fcitx.Module.FS.readFile(path)
-  await execute({ type: 'WRITE_FILE', data: {
-    path,
-    buffer: buffer as ArrayBuffer,
-  } }, [buffer])
+  await execute({
+    type: 'WRITE_FILE',
+    data: {
+      path,
+      buffer: buffer as ArrayBuffer,
+    },
+  }, [buffer])
 }
 
 const copyDir = traverseAsync(async (path: string) => {

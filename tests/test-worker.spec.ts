@@ -7,8 +7,12 @@ test('overlapping worker zip requests resolve with their own response', async ({
   const contents = await page.evaluate(async () => {
     fcitx.useWorker = true
     const [first, second] = await Promise.all([
-      fcitx.zip({ 'first.txt': new TextEncoder().encode('first') }),
-      fcitx.zip({ 'second.txt': new TextEncoder().encode('second') }),
+      fcitx.zip({
+        'first.txt': new TextEncoder().encode('first'),
+      }),
+      fcitx.zip({
+        'second.txt': new TextEncoder().encode('second'),
+      }),
     ])
     return [
       new TextDecoder().decode(fcitx.UZIP.parse(first)['first.txt']),

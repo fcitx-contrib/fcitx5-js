@@ -157,8 +157,12 @@ function simulate(key: string, code: string) {
     return replaceSelection(input, key)
   }
   // 'none' is treated as 'forward' natively.
-  const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
-  const fixed = input.selectionDirection === 'backward' ? input.selectionEnd! : input.selectionStart!
+  const caret = input.selectionDirection === 'backward'
+    ? input.selectionStart!
+    : input.selectionEnd!
+  const fixed = input.selectionDirection === 'backward'
+    ? input.selectionEnd!
+    : input.selectionStart!
   const preText = input.value.slice(0, caret)
   const postText = input.value.slice(caret)
   switch (code) {
@@ -360,7 +364,12 @@ export function createKeyboard() {
         case 'BACKSPACE_SLIDE':
           return backspaceSlide(event.data)
         case 'CANDIDATE_ACTION':
-          return fcitx.Module.ccall('activate_candidate_action', null, ['number', 'number', 'string', 'number'], [event.data.index, event.data.id, event.data.inputContext, event.data.generation])
+          return fcitx.Module.ccall('activate_candidate_action', null, ['number', 'number', 'string', 'number'], [
+            event.data.index,
+            event.data.id,
+            event.data.inputContext,
+            event.data.generation,
+          ])
         case 'CANDIDATE_TAB_ACTION':
           return fcitx.Module.ccall('activate_candidate_tab_action', null, ['number', 'string', 'number'], [event.data.id, event.data.inputContext, event.data.generation])
         case 'COLLAPSE':
@@ -375,7 +384,9 @@ export function createKeyboard() {
         case 'DESELECT': {
           const input = getInputElement()
           if (input) {
-            const caret = input.selectionDirection === 'backward' ? input.selectionStart! : input.selectionEnd!
+            const caret = input.selectionDirection === 'backward'
+              ? input.selectionStart!
+              : input.selectionEnd!
             updateInput(input, input.value, caret, caret, 'none')
             movingSelection = false
           }
@@ -396,7 +407,12 @@ export function createKeyboard() {
         case 'REDO':
           return redo()
         case 'SCROLL':
-          return fcitx.Module.ccall('scroll', null, ['number', 'number', 'string', 'number'], [event.data.start, event.data.count, event.data.inputContext, event.data.generation])
+          return fcitx.Module.ccall('scroll', null, ['number', 'number', 'string', 'number'], [
+            event.data.start,
+            event.data.count,
+            event.data.inputContext,
+            event.data.generation,
+          ])
         case 'SELECT': {
           const input = getInputElement()
           if (input) {

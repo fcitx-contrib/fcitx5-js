@@ -21,7 +21,11 @@ function extract(event: KeyData): [string, string, number] | undefined {
   const modifiers = Number(shiftKey) | Number(capsLock) << 1 | Number(ctrlKey) << 2 | Number(altKey) << 3 | Number(metaKey) << 6
   // Rime good_old_caps_lock: false needs it.
   if (key.length === 1 && key >= 'A' && key <= 'Z' && shiftKey && capsLock) {
-    return [key.toLowerCase(), code, modifiers]
+    return [
+      key.toLowerCase(),
+      code,
+      modifiers,
+    ]
   }
   return [key, code, modifiers]
 }
@@ -34,7 +38,19 @@ export function processKey(key: string, code: string, modifiers: number, isRelea
   if (contextId === null) {
     return false
   }
-  return Module.ccall('process_key', 'boolean', ['number', 'string', 'string', 'number', 'boolean'], [contextId, key, code, modifiers, isRelease])
+  return Module.ccall('process_key', 'boolean', [
+    'number',
+    'string',
+    'string',
+    'number',
+    'boolean',
+  ], [
+    contextId,
+    key,
+    code,
+    modifiers,
+    isRelease,
+  ])
 }
 
 export function keyEvent(event: KeyData, contextId?: number): boolean {
