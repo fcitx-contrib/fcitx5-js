@@ -474,6 +474,7 @@ export function hideKeyboard() {
     return
   }
   keyboardShown = false
+  sendSystemEventToKeyboard({ type: 'ABORT' })
   const keyboard = document.getElementById(keyboardId)!
   keyboard.style.bottom = hiddenBottom
 }
