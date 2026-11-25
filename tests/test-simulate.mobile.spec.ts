@@ -363,6 +363,117 @@ test('Clipboard', async ({ page }) => {
   expect(await getSelection(textarea), 'Should deselect after paste').toEqual([0, 0])
 })
 
+function deferClipboardReads(page: Page) {
+  return page.evaluateHandle(() => {
+    const reads: ((text: string) => void)[] = []
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        readText: () => new Promise<string>((resolve) => {
+          reads.push(resolve)
+        }),
+      },
+    })
+    return reads
+  })
+}
+
+test.describe('Delayed clipboard paste', () => {
+  test.beforeEach(async ({ page }) => {
+    await init(page)
+    await page.locator('textarea').tap()
+    await expectKeyboardShown(page)
+    await openEditor(page)
+    await page.evaluate(() => {
+      const textarea = document.querySelector('textarea')!
+      textarea.value = 'abcdef'
+      textarea.setSelectionRange(2, 4)
+      const input = document.querySelector('input')!
+      input.value = 'uvwxyz'
+      input.setSelectionRange(1, 3)
+    })
+  })
+
+  for (const boundary of [
+    'switching inputs',
+    'refocusing the same input',
+    'changing the pathname without blur',
+    'removing the original input',
+    'disabling and re-enabling the keyboard',
+  ] as const) {
+    test(`ignores a result after ${boundary}`, async ({ page }) => {
+      const original = await page.evaluateHandle(() => document.querySelector('textarea')!)
+      const input = page.locator('input')
+      const reads = await deferClipboardReads(page)
+      await getPaste(page).tap()
+      expect(await reads.evaluate(reads => reads.length)).toBe(1)
+
+      await page.evaluate((boundary) => {
+        const textarea = document.querySelector('textarea')!
+        const input = document.querySelector('input')!
+        switch (boundary) {
+          case 'switching inputs':
+            input.focus()
+            break
+          case 'refocusing the same input':
+            textarea.blur()
+            textarea.focus()
+            break
+          case 'changing the pathname without blur':
+            history.pushState(null, '', '/after-paste-started')
+            break
+          case 'removing the original input':
+            textarea.remove()
+            input.focus()
+            break
+          case 'disabling and re-enabling the keyboard':
+            fcitx.disable()
+            textarea.blur()
+            fcitx.enable()
+            textarea.focus()
+            break
+        }
+      }, boundary)
+      const focusMoved = boundary === 'switching inputs' || boundary === 'removing the original input'
+      await expect(focusMoved
+        ? input
+        : page.locator('textarea')).toBeFocused()
+      await expectKeyboardShown(page)
+
+      if (boundary === 'switching inputs') {
+        await openEditor(page)
+        await getSelect(page).tap()
+        await expect(getCutOrSelectAll(page)).toHaveText('Cut')
+      }
+      const originalSelection = await original.evaluate(element => [element.selectionStart, element.selectionEnd])
+      const inputSelection = await getSelection(input)
+      await reads.evaluate(([resolve]) => resolve('stale'))
+
+      expect(await original.evaluate(element => element.value)).toBe('abcdef')
+      expect(await original.evaluate(element => [element.selectionStart, element.selectionEnd])).toEqual(originalSelection)
+      await expect(input).toHaveValue('uvwxyz')
+      expect(await getSelection(input)).toEqual(inputSelection)
+      if (boundary === 'switching inputs') {
+        await expect(getCutOrSelectAll(page)).toHaveText('Cut')
+      }
+    })
+  }
+
+  test('only applies the latest request when reads resolve out of order', async ({ page }) => {
+    const textarea = page.locator('textarea')
+    const reads = await deferClipboardReads(page)
+    await getPaste(page).tap()
+    await getPaste(page).tap()
+    expect(await reads.evaluate(reads => reads.length)).toBe(2)
+
+    await reads.evaluate(([, resolve]) => resolve('new'))
+    await expect(textarea).toHaveValue('abnewef')
+    expect(await getSelection(textarea)).toEqual([5, 5])
+    await reads.evaluate(([resolve]) => resolve('old'))
+    await expect(textarea).toHaveValue('abnewef')
+    expect(await getSelection(textarea)).toEqual([5, 5])
+  })
+})
+
 test('Backspace', async ({ page }) => {
   await init(page)
 
