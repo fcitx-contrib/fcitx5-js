@@ -3,7 +3,7 @@ import { onMessage, setBuiltInLayout, setClient } from 'fcitx5-keyboard-web'
 import getCaretCoordinates from 'textarea-caret'
 import { activateMenuAction } from './action'
 import { hasPreedit } from './client'
-import { getInputContextId, getInputElement, resetInput } from './focus'
+import { getInputContextId, getInputElement, isCurrentInputContext, resetInput } from './focus'
 import { processKey } from './keycode'
 import { onTextChange, redo, undo } from './undoRedo'
 import { graphemeIndices } from './unicode'
@@ -313,6 +313,7 @@ function deselect() {
 }
 
 let buffer = '' // A fallback for paste if user rejects permission or context is insecure.
+let pasteGeneration = 0
 
 function copy(remove: boolean) {
   const input = getInputElement()
@@ -329,16 +330,29 @@ function copy(remove: boolean) {
 }
 
 async function paste() {
+  const input = getInputElement()
+  const contextId = getInputContextId()
+  if (!keyboardShown || !input || contextId === null || !isCurrentInputContext(input, contextId)) {
+    return
+  }
+
+  const generation = ++pasteGeneration
+  const isCurrentPaste = () => generation === pasteGeneration && isCurrentInputContext(input, contextId)
   let text = buffer
   try {
     text = await navigator.clipboard.readText()
   }
   catch {}
-  const input = getInputElement()
-  if (input && text) {
+  if (!isCurrentPaste()) {
+    return
+  }
+  if (text) {
     replaceSelection(input, text)
   }
-  deselect()
+  // Inserting text dispatches events that can synchronously move focus.
+  if (isCurrentPaste()) {
+    deselect()
+  }
 }
 
 export function createKeyboard() {
@@ -474,6 +488,7 @@ export function hideKeyboard() {
     return
   }
   keyboardShown = false
+  pasteGeneration++
   sendSystemEventToKeyboard({ type: 'ABORT' })
   const keyboard = document.getElementById(keyboardId)!
   keyboard.style.bottom = hiddenBottom

@@ -128,6 +128,13 @@ export function getInputContextId(): number | null {
   return ensureCurrentInputContext()?.id ?? null
 }
 
+export function isCurrentInputContext(element: Input, id: number) {
+  const context = inputContexts.get(element)
+  return inputHandlingEnabled && input === element
+    && element.isConnected && element.ownerDocument === document
+    && context?.id === id && !context.destroying && context.program === inputContextProgram()
+}
+
 // false means disable, true means respect the original value.
 export function setSpellCheck(spellCheck: boolean) {
   if (!input) {
